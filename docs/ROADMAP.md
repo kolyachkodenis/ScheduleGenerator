@@ -63,6 +63,8 @@ The roadmap is divided into small, verifiable stages. Each stage must end with a
 
 ## Stage 4: Prototype the solver
 
+**Status:** Complete
+
 - Compare CP-SAT, MILP, and heuristic approaches on a small scheduling problem.
 - Build a minimal solver without a user interface or database.
 - Verify hard constraints using focused test cases.

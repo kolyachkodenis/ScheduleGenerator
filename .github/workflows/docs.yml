@@ -23,3 +23,9 @@ jobs:
         run: python scripts/validate_dataset.py --require-schema examples/small-school.json
       - name: Test validation rules
         run: python -m unittest discover --start-directory tests --verbose
+        env:
+          PYTHONPATH: src
+      - name: Solve and verify the synthetic timetable
+        run: python -m schedule_generator.prototype examples/small-school.json --output prototype-result.json --time-limit 10
+        env:
+          PYTHONPATH: src
