@@ -57,5 +57,5 @@ Numerical targets will be set during discovery after representative school data 
 
 ## Current milestone
 
-The next milestone is Stage 1: document the real scheduling process and obtain representative, appropriately anonymized examples.
+Stage 1 is in progress. The discovery package is ready, but the process, use cases, quality targets, and representative examples still require validation by a school-side requirements owner.
 

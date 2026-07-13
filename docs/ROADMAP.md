@@ -16,6 +16,8 @@ The roadmap is divided into small, verifiable stages. Each stage must end with a
 
 ## Stage 1: Study the real scheduling process
 
+**Status:** In progress
+
 - Document how timetables are currently created.
 - Collect examples of curricula and completed timetables.
 - Determine the structure of the school week, shifts, and lesson periods.

@@ -27,6 +27,7 @@ Project documentation:
 - [Project charter](docs/PROJECT_CHARTER.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Domain glossary](docs/GLOSSARY.md)
+- [Scheduling-process discovery](docs/discovery/README.md)
 - [Contributing guide](CONTRIBUTING.md)
 - [Architecture decisions](docs/adr/README.md)
 
