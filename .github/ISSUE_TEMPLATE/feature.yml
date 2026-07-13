@@ -1,0 +1,40 @@
+name: Feature request
+description: Propose a new capability or scheduling rule.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe the user or scheduling problem to solve.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: Describe observable behavior, without prescribing implementation unless necessary.
+    validations:
+      required: true
+  - type: textarea
+    id: rules
+    attributes:
+      label: Relevant rules and examples
+      description: Include representative examples and identify whether rules appear hard or soft.
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List conditions that make the request complete and verifiable.
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Data safety
+      options:
+        - label: Examples contain no unauthorized personal data.
+          required: true
+

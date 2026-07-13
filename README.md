@@ -20,11 +20,16 @@ The system should account for, among other things:
 
 ## Status
 
-The project is currently in the planning stage. Implementation has not started yet.
+The project is currently in the discovery and planning stage. Implementation has not started yet.
 
-See the detailed [project roadmap](docs/ROADMAP.md).
+Project documentation:
+
+- [Project charter](docs/PROJECT_CHARTER.md)
+- [Roadmap](docs/ROADMAP.md)
+- [Domain glossary](docs/GLOSSARY.md)
+- [Contributing guide](CONTRIBUTING.md)
+- [Architecture decisions](docs/adr/README.md)
 
 ## Preliminary technical direction
 
 The scheduling engine will likely use a constraint solver such as Google OR-Tools CP-SAT. The API, user interface, and data storage stack will be selected after the requirements phase and a small solver prototype.
-

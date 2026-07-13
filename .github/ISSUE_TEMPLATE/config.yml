@@ -1,0 +1,6 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Project roadmap
+    url: https://github.com/kolyachkodenis/ScheduleGenerator/blob/main/docs/ROADMAP.md
+    about: Review the planned stages and current project scope before opening an issue.
+

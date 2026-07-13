@@ -4,6 +4,8 @@ The roadmap is divided into small, verifiable stages. Each stage must end with a
 
 ## Stage 0: Project organization
 
+**Status:** Complete
+
 - Define the product purpose and the boundaries of the first release.
 - Identify the owner of school-side requirements.
 - Choose how documentation and architectural decisions will be maintained.
