@@ -30,6 +30,8 @@ The roadmap is divided into small, verifiable stages. Each stage must end with a
 
 ## Stage 2: Build the constraint catalog
 
+**Status:** In progress
+
 - Divide all rules into hard constraints and soft preferences.
 - Prevent simultaneous lessons for the same class, teacher, or classroom.
 - Account for teacher and classroom availability.

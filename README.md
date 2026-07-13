@@ -28,6 +28,7 @@ Project documentation:
 - [Roadmap](docs/ROADMAP.md)
 - [Domain glossary](docs/GLOSSARY.md)
 - [Scheduling-process discovery](docs/discovery/README.md)
+- [Constraint catalog](docs/constraints/README.md)
 - [Contributing guide](CONTRIBUTING.md)
 - [Architecture decisions](docs/adr/README.md)
 
