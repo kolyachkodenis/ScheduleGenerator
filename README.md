@@ -29,6 +29,7 @@ Project documentation:
 - [Domain glossary](docs/GLOSSARY.md)
 - [Scheduling-process discovery](docs/discovery/README.md)
 - [Constraint catalog](docs/constraints/README.md)
+- [Data model](docs/data-model/README.md)
 - [Contributing guide](CONTRIBUTING.md)
 - [Architecture decisions](docs/adr/README.md)
 

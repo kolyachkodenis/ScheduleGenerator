@@ -48,6 +48,8 @@ The roadmap is divided into small, verifiable stages. Each stage must end with a
 
 ## Stage 3: Design the data model
 
+**Status:** In progress
+
 - Model the school, academic year, terms, and week structure.
 - Model classes and groups without storing unnecessary personal data.
 - Model subjects, teachers, classrooms, and time slots.

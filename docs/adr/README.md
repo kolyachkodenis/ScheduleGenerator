@@ -14,4 +14,4 @@ Architecture decision records (ADRs) document technical choices that would other
 ## Records
 
 - [ADR 0001: Maintain project documentation in the repository](0001-repository-documentation.md)
-
+- [ADR 0002: Use versioned JSON datasets for domain prototypes](0002-versioned-json-datasets.md)

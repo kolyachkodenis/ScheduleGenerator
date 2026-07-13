@@ -1,0 +1,753 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/kolyachkodenis/ScheduleGenerator/schemas/school-dataset.schema.json",
+  "title": "ScheduleGenerator school dataset",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "dataset_id",
+    "school",
+    "academic_period",
+    "subjects",
+    "teachers",
+    "classrooms",
+    "classes",
+    "group_partitions",
+    "groups",
+    "cohorts",
+    "curriculum_requirements",
+    "resource_availability",
+    "fixed_lessons",
+    "policies",
+    "timetable_versions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "dataset_id": {
+      "$ref": "#/$defs/id"
+    },
+    "school": {
+      "$ref": "#/$defs/school"
+    },
+    "academic_period": {
+      "$ref": "#/$defs/academic_period"
+    },
+    "subjects": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/subject"
+      }
+    },
+    "teachers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/teacher"
+      }
+    },
+    "classrooms": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/classroom"
+      }
+    },
+    "classes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/class"
+      }
+    },
+    "group_partitions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/group_partition"
+      }
+    },
+    "groups": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/group"
+      }
+    },
+    "cohorts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/cohort"
+      }
+    },
+    "curriculum_requirements": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/curriculum_requirement"
+      }
+    },
+    "resource_availability": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/resource_availability"
+      }
+    },
+    "fixed_lessons": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/fixed_lesson"
+      }
+    },
+    "policies": {
+      "$ref": "#/$defs/policies"
+    },
+    "timetable_versions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/timetable_version"
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]*$",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "label": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "clock_time": {
+      "type": "string",
+      "pattern": "^(?:[01][0-9]|2[0-3]):[0-5][0-9]$"
+    },
+    "school": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "timezone"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "$ref": "#/$defs/label"
+        },
+        "timezone": {
+          "type": "string",
+          "pattern": "^[A-Za-z_]+(?:/[A-Za-z0-9_+.-]+)+$"
+        }
+      }
+    },
+    "academic_period": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "start_date", "end_date", "days", "periods", "shifts"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "$ref": "#/$defs/label"
+        },
+        "start_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "end_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "days": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/day"
+          }
+        },
+        "periods": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/period"
+          }
+        },
+        "shifts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/shift"
+          }
+        }
+      }
+    },
+    "day": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "ordinal"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "$ref": "#/$defs/label"
+        },
+        "ordinal": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 7
+        }
+      }
+    },
+    "period": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "ordinal", "start_time", "end_time"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "$ref": "#/$defs/label"
+        },
+        "ordinal": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        },
+        "start_time": {
+          "$ref": "#/$defs/clock_time"
+        },
+        "end_time": {
+          "$ref": "#/$defs/clock_time"
+        }
+      }
+    },
+    "shift": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "period_ids"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "$ref": "#/$defs/label"
+        },
+        "period_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      }
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "default_workload"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "$ref": "#/$defs/label"
+        },
+        "default_workload": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10
+        }
+      }
+    },
+    "teacher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "qualified_subject_ids"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "$ref": "#/$defs/label"
+        },
+        "qualified_subject_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      }
+    },
+    "classroom": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "capacity", "capabilities"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "$ref": "#/$defs/label"
+        },
+        "capacity": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "capabilities": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      }
+    },
+    "class": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "grade", "student_count", "shift_id"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "$ref": "#/$defs/label"
+        },
+        "grade": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 13
+        },
+        "student_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "shift_id": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "group_partition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "class_id", "complete"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "$ref": "#/$defs/label"
+        },
+        "class_id": {
+          "$ref": "#/$defs/id"
+        },
+        "complete": {
+          "type": "boolean"
+        }
+      }
+    },
+    "group": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "class_id", "partition_id", "student_count"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "$ref": "#/$defs/label"
+        },
+        "class_id": {
+          "$ref": "#/$defs/id"
+        },
+        "partition_id": {
+          "$ref": "#/$defs/id"
+        },
+        "student_count": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "participant_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": {
+          "enum": ["class", "group", "cohort"]
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "cohort_member_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": {
+          "enum": ["class", "group"]
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "cohort": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "members"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "$ref": "#/$defs/label"
+        },
+        "members": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/cohort_member_ref"
+          }
+        }
+      }
+    },
+    "curriculum_requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "participant",
+        "subject_id",
+        "eligible_teacher_ids",
+        "weekly_lessons",
+        "block_length",
+        "required_room_capabilities",
+        "allowed_classroom_ids"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "participant": {
+          "$ref": "#/$defs/participant_ref"
+        },
+        "subject_id": {
+          "$ref": "#/$defs/id"
+        },
+        "eligible_teacher_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "weekly_lessons": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 40
+        },
+        "block_length": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "required_room_capabilities": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "allowed_classroom_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      }
+    },
+    "resource_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": {
+          "enum": ["teacher", "classroom", "class", "group"]
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "slot_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["day_id", "period_id"],
+      "properties": {
+        "day_id": {
+          "$ref": "#/$defs/id"
+        },
+        "period_id": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "resource_availability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resource", "unavailable_slots", "preferred_slots"],
+      "properties": {
+        "resource": {
+          "$ref": "#/$defs/resource_ref"
+        },
+        "unavailable_slots": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/slot_ref"
+          }
+        },
+        "preferred_slots": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/slot_ref"
+          }
+        }
+      }
+    },
+    "fixed_lesson": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "requirement_id", "occurrence_index", "slot", "teacher_id", "classroom_id"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "requirement_id": {
+          "$ref": "#/$defs/id"
+        },
+        "occurrence_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "slot": {
+          "$ref": "#/$defs/slot_ref"
+        },
+        "teacher_id": {
+          "$ref": "#/$defs/id"
+        },
+        "classroom_id": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "daily_limit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resource", "maximum"],
+      "properties": {
+        "resource": {
+          "$ref": "#/$defs/resource_ref"
+        },
+        "maximum": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        }
+      }
+    },
+    "difficult_load_target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["participant", "target"],
+      "properties": {
+        "participant": {
+          "$ref": "#/$defs/participant_ref"
+        },
+        "target": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "constraint_weight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["constraint_id", "priority", "weight"],
+      "properties": {
+        "constraint_id": {
+          "type": "string",
+          "pattern": "^SC-[0-9]{3}$"
+        },
+        "priority": {
+          "enum": ["P1", "P2", "P3"]
+        },
+        "weight": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000
+        }
+      }
+    },
+    "policies": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["daily_limits", "difficult_load_targets", "soft_constraint_weights"],
+      "properties": {
+        "daily_limits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/daily_limit"
+          }
+        },
+        "difficult_load_targets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/difficult_load_target"
+          }
+        },
+        "soft_constraint_weights": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/constraint_weight"
+          }
+        }
+      }
+    },
+    "lesson_assignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "requirement_id",
+        "occurrence_index",
+        "slot",
+        "teacher_id",
+        "classroom_id",
+        "locked"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "requirement_id": {
+          "$ref": "#/$defs/id"
+        },
+        "occurrence_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "slot": {
+          "$ref": "#/$defs/slot_ref"
+        },
+        "teacher_id": {
+          "$ref": "#/$defs/id"
+        },
+        "classroom_id": {
+          "$ref": "#/$defs/id"
+        },
+        "locked": {
+          "type": "boolean"
+        }
+      }
+    },
+    "change_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "assignment_id", "reason"],
+      "properties": {
+        "type": {
+          "enum": ["created", "moved", "resource_changed", "locked", "unlocked", "removed"]
+        },
+        "assignment_id": {
+          "$ref": "#/$defs/id"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        }
+      }
+    },
+    "timetable_version": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status",
+        "created_at",
+        "parent_version_id",
+        "generation",
+        "assignments",
+        "changes"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "enum": ["draft", "approved", "superseded"]
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "parent_version_id": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "generation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["seed", "time_limit_seconds"],
+          "properties": {
+            "seed": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "time_limit_seconds": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "assignments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/lesson_assignment"
+          }
+        },
+        "changes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/change_record"
+          }
+        }
+      }
+    }
+  }
+}
