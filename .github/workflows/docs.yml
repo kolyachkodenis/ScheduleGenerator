@@ -26,6 +26,6 @@ jobs:
         env:
           PYTHONPATH: src
       - name: Solve and verify the synthetic timetable
-        run: python -m schedule_generator.prototype examples/small-school.json --output prototype-result.json --time-limit 10
+        run: python -m schedule_generator examples/small-school.json --output generation-result.json --time-limit 10
         env:
           PYTHONPATH: src

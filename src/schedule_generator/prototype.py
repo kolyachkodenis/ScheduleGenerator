@@ -735,6 +735,7 @@ def solve_dataset(
     status = solver.status_name(status_code)
     assignments: list[dict[str, Any]] = []
     penalties: dict[str, dict[str, int]] = {}
+    quality_violations: list[dict[str, Any]] = []
     validation_errors: list[str] = []
 
     if status in {"OPTIMAL", "FEASIBLE"}:
@@ -749,7 +750,24 @@ def solve_dataset(
             value = solver.value(term.variable)
             totals[term.constraint_id]["raw"] += value
             totals[term.constraint_id]["weighted"] += value * term.weight
+            if value:
+                quality_violations.append(
+                    {
+                        "constraint_id": term.constraint_id,
+                        "description": term.description,
+                        "value": value,
+                        "weight": term.weight,
+                        "weighted_penalty": value * term.weight,
+                    }
+                )
         penalties = dict(sorted(totals.items()))
+        quality_violations.sort(
+            key=lambda item: (
+                -item["weighted_penalty"],
+                item["constraint_id"],
+                item["description"],
+            )
+        )
 
     diagnostics: list[dict[str, Any]] = []
     if status == "INFEASIBLE":
@@ -791,6 +809,15 @@ def solve_dataset(
         },
         "assignments": assignments,
         "penalties": penalties,
+        "quality_report": {
+            "total_penalty": sum(
+                item["weighted"] for item in penalties.values()
+            ),
+            "by_constraint": penalties,
+            "violations": quality_violations,
+        }
+        if status in {"OPTIMAL", "FEASIBLE"}
+        else None,
         "diagnostics": diagnostics,
         "validation_errors": validation_errors,
     }

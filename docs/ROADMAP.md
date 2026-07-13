@@ -78,6 +78,8 @@ The roadmap is divided into small, verifiable stages. Each stage must end with a
 
 ## Stage 5: Implement the scheduling core
 
+**Status:** Complete
+
 - Keep the school domain model independent of the selected solver.
 - Validate input before starting a generation job.
 - Convert validated domain data into the solver model.
