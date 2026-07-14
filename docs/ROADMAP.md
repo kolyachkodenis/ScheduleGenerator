@@ -149,6 +149,8 @@ The roadmap is divided into small, verifiable stages. Each stage must end with a
 
 ## Stage 10: Support manual editing
 
+**Status:** Complete for versioned local timetable drafts 0.6.0
+
 - Move lessons with drag and drop or a dedicated dialog.
 - Highlight hard conflicts immediately.
 - Show how each change affects the quality score.
@@ -241,4 +243,4 @@ Integrations, mobile applications, teacher substitutions, and complex alternatin
 
 ## Next milestone
 
-Complete discovery with representative real school data while starting Stage 10: add safe manual timetable editing and change history.
+Complete discovery with representative real school data while starting Stage 11: export and publish approved timetable versions.

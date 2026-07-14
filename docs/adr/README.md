@@ -19,3 +19,4 @@ Architecture decision records (ADRs) document technical choices that would other
 - [ADR 0004: Use SQLite for school configuration data](0004-use-sqlite-for-school-data.md)
 - [ADR 0005: Use persistent transport-neutral generation jobs](0005-use-persistent-generation-jobs.md)
 - [ADR 0006: Use a build-free local web interface](0006-use-local-web-interface.md)
+- [ADR 0007: Use linear version history for timetable drafts](0007-use-linear-timetable-draft-history.md)

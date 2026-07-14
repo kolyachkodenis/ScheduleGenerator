@@ -11,6 +11,7 @@ from schedule_generator import (
     generate_schedule,
 )
 from schedule_generator.prototype import ROOT
+from schedule_generator.quality import evaluate_quality
 from scripts.benchmark_solver import build_dataset
 
 
@@ -90,6 +91,13 @@ class SolverPrototypeTests(unittest.TestCase):
         self.assertEqual(self.typed_result.solver.seed, 1)
         self.assertEqual(self.typed_result.solver.workers, 1)
         self.assertEqual(self.typed_result.solver.time_limit_seconds, 10)
+
+    def test_manual_quality_evaluator_matches_solver_result(self) -> None:
+        report = evaluate_quality(load_example(), self.result["assignments"])
+        self.assertEqual(
+            report["total_penalty"],
+            self.result["quality_report"]["total_penalty"],
+        )
 
     def test_problem_fingerprint_is_independent_of_key_order(self) -> None:
         dataset = load_example()

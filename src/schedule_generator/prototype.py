@@ -735,7 +735,7 @@ def solve_dataset(
     status = solver.status_name(status_code)
     assignments: list[dict[str, Any]] = []
     penalties: dict[str, dict[str, int]] = {}
-    quality_violations: list[dict[str, Any]] = []
+    quality_report: dict[str, Any] | None = None
     validation_errors: list[str] = []
 
     if status in {"OPTIMAL", "FEASIBLE"}:
@@ -743,31 +743,10 @@ def solve_dataset(
         validation_errors = verify_solution(dataset, assignments)
         if validation_errors:
             status = "INVALID_SOLUTION"
-        totals: defaultdict[str, dict[str, int]] = defaultdict(
-            lambda: {"raw": 0, "weighted": 0}
-        )
-        for term in artifacts.penalty_terms:
-            value = solver.value(term.variable)
-            totals[term.constraint_id]["raw"] += value
-            totals[term.constraint_id]["weighted"] += value * term.weight
-            if value:
-                quality_violations.append(
-                    {
-                        "constraint_id": term.constraint_id,
-                        "description": term.description,
-                        "value": value,
-                        "weight": term.weight,
-                        "weighted_penalty": value * term.weight,
-                    }
-                )
-        penalties = dict(sorted(totals.items()))
-        quality_violations.sort(
-            key=lambda item: (
-                -item["weighted_penalty"],
-                item["constraint_id"],
-                item["description"],
-            )
-        )
+        from schedule_generator.quality import evaluate_quality
+
+        quality_report = evaluate_quality(dataset, assignments)
+        penalties = quality_report["by_constraint"]
 
     diagnostics: list[dict[str, Any]] = []
     if status == "INFEASIBLE":
@@ -796,7 +775,7 @@ def solve_dataset(
             "workers": workers,
             "time_limit_seconds": time_limit,
             "wall_time_seconds": solver.wall_time,
-            "objective": solver.objective_value
+            "objective": quality_report["total_penalty"]
             if status in {"OPTIMAL", "FEASIBLE"}
             else None,
             "best_bound": solver.best_objective_bound
@@ -809,13 +788,7 @@ def solve_dataset(
         },
         "assignments": assignments,
         "penalties": penalties,
-        "quality_report": {
-            "total_penalty": sum(
-                item["weighted"] for item in penalties.values()
-            ),
-            "by_constraint": penalties,
-            "violations": quality_violations,
-        }
+        "quality_report": quality_report
         if status in {"OPTIMAL", "FEASIBLE"}
         else None,
         "diagnostics": diagnostics,

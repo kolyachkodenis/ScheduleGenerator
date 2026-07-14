@@ -69,6 +69,39 @@ MIGRATIONS = (
         );
         """,
     ),
+    (
+        3,
+        """
+        CREATE TABLE IF NOT EXISTS timetable_drafts (
+            draft_id TEXT PRIMARY KEY,
+            job_id TEXT NOT NULL UNIQUE,
+            dataset_id TEXT NOT NULL,
+            dataset_revision INTEGER NOT NULL,
+            current_version INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (job_id) REFERENCES generation_jobs(job_id) ON DELETE CASCADE
+        );
+        CREATE TABLE IF NOT EXISTS timetable_draft_versions (
+            draft_id TEXT NOT NULL,
+            version INTEGER NOT NULL,
+            assignments_json TEXT NOT NULL,
+            quality_json TEXT,
+            validation_errors_json TEXT NOT NULL DEFAULT '[]',
+            change_json TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (draft_id, version),
+            FOREIGN KEY (draft_id) REFERENCES timetable_drafts(draft_id) ON DELETE CASCADE
+        );
+        CREATE TABLE IF NOT EXISTS timetable_locks (
+            draft_id TEXT NOT NULL,
+            assignment_id TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (draft_id, assignment_id),
+            FOREIGN KEY (draft_id) REFERENCES timetable_drafts(draft_id) ON DELETE CASCADE
+        );
+        """,
+    ),
 )
 
 

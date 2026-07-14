@@ -7,6 +7,7 @@ from http import HTTPStatus
 from pathlib import Path
 
 from schedule_generator.api import GenerationOptions, GenerationResult, SchedulingProblem
+from schedule_generator.editing import TimetableEditingService
 from schedule_generator.jobs import SchedulingService
 from schedule_generator.web import WebApplication
 
@@ -18,7 +19,17 @@ def successful_result(
         problem,
         {
             "status": "FEASIBLE",
-            "assignments": [],
+            "assignments": [
+                {
+                    "id": "req_joint_advisory__0",
+                    "requirement_id": "req_joint_advisory",
+                    "occurrence_index": 0,
+                    "slot": {"day_id": "mon", "period_id": "p1"},
+                    "occupied_period_ids": ["p1"],
+                    "teacher_id": "t_history",
+                    "classroom_id": "hall",
+                }
+            ],
             "quality_report": {
                 "total_penalty": options.seed,
                 "by_constraint": {},
@@ -40,6 +51,19 @@ def service_factory(store):
     )
 
 
+def editing_factory(store):
+    return TimetableEditingService(
+        store,
+        validator=lambda _dataset, _assignments: [],
+        quality_evaluator=lambda _dataset, _assignments: {
+            "total_penalty": 0,
+            "by_constraint": {},
+            "violations": [],
+        },
+        generator=successful_result,
+    )
+
+
 class WebApplicationTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
@@ -47,6 +71,7 @@ class WebApplicationTests(unittest.TestCase):
             Path(self.temporary.name) / "school.db",
             run_in_background=False,
             service_factory=service_factory,
+            editing_factory=editing_factory,
         )
 
     def tearDown(self) -> None:
@@ -119,6 +144,57 @@ class WebApplicationTests(unittest.TestCase):
         self.assertEqual(
             self.payload(invalid), {"valid": False, "errors": ["no assignments"]}
         )
+
+    def test_draft_routes_support_move_lock_undo_and_compare(self) -> None:
+        self.application.dispatch("POST", "/api/demo")
+        job = self.payload(
+            self.application.dispatch(
+                "POST",
+                "/api/jobs",
+                json.dumps({"dataset_id": "small_school_demo"}).encode(),
+            )
+        )
+        draft = self.payload(
+            self.application.dispatch("POST", f"/api/jobs/{job['job_id']}/draft")
+        )
+        moved = self.payload(
+            self.application.dispatch(
+                "POST",
+                f"/api/drafts/{draft['draft_id']}/move",
+                json.dumps(
+                    {
+                        "assignment_id": "req_joint_advisory__0",
+                        "day_id": "tue",
+                        "period_id": "p2",
+                    }
+                ).encode(),
+            )
+        )
+        self.assertEqual(moved["current_version"], 1)
+        locked = self.payload(
+            self.application.dispatch(
+                "POST",
+                f"/api/drafts/{draft['draft_id']}/lock",
+                json.dumps(
+                    {"assignment_id": "req_joint_advisory__0", "locked": True}
+                ).encode(),
+            )
+        )
+        self.assertEqual(locked["locked_assignment_ids"], ["req_joint_advisory__0"])
+        comparison = self.payload(
+            self.application.dispatch(
+                "POST",
+                f"/api/drafts/{draft['draft_id']}/compare",
+                json.dumps({"left": 0, "right": 1}).encode(),
+            )
+        )
+        self.assertEqual(len(comparison["changes"]), 1)
+        undone = self.payload(
+            self.application.dispatch(
+                "POST", f"/api/drafts/{draft['draft_id']}/undo"
+            )
+        )
+        self.assertEqual(undone["current_version"], 0)
 
     def test_bad_json_and_unknown_routes_are_reported(self) -> None:
         malformed = self.application.dispatch("POST", "/api/jobs", b"{")

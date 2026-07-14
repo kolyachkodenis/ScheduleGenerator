@@ -11,6 +11,7 @@ from schedule_generator.api import (
     generate_schedule,
 )
 from schedule_generator.data_import import ImportIssue, ImportPreview, apply_import, preview_import
+from schedule_generator.editing import DraftVersion, TimetableDraft, TimetableEditingService
 from schedule_generator.jobs import (
     GenerationAlternative,
     GenerationJob,
@@ -35,6 +36,9 @@ __all__ = [
     "ImportPreview",
     "preview_import",
     "apply_import",
+    "DraftVersion",
+    "TimetableDraft",
+    "TimetableEditingService",
     "GenerationAlternative",
     "GenerationJob",
     "GenerationRequest",
@@ -42,4 +46,4 @@ __all__ = [
     "SchedulingService",
 ]
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"

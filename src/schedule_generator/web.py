@@ -13,6 +13,8 @@ from pathlib import Path
 from typing import Any, Callable
 from urllib.parse import unquote, urlparse
 
+from schedule_generator.api import GenerationOptions
+from schedule_generator.editing import TimetableDraft, TimetableEditingService
 from schedule_generator.jobs import GenerationJob, GenerationRequest, SchedulingService
 from schedule_generator.storage import DatasetStore
 
@@ -58,6 +60,20 @@ def job_to_dict(job: GenerationJob) -> dict[str, Any]:
     }
 
 
+def draft_to_dict(draft: TimetableDraft) -> dict[str, Any]:
+    return {
+        "draft_id": draft.draft_id,
+        "job_id": draft.job_id,
+        "dataset_id": draft.dataset_id,
+        "dataset_revision": draft.dataset_revision,
+        "current_version": draft.current_version,
+        "latest_version": draft.latest_version,
+        "locked_assignment_ids": list(draft.locked_assignment_ids),
+        "version": asdict(draft.version),
+        "history": list(draft.history),
+    }
+
+
 class WebApplication:
     """Route requests without coupling behavior to the HTTP server implementation."""
 
@@ -66,14 +82,20 @@ class WebApplication:
         database: str | Path,
         run_in_background: bool = True,
         service_factory: Callable[[DatasetStore], SchedulingService] = SchedulingService,
+        editing_factory: Callable[[DatasetStore], TimetableEditingService] = TimetableEditingService,
     ) -> None:
         self.database = Path(database)
         self.run_in_background = run_in_background
         self.service_factory = service_factory
+        self.editing_factory = editing_factory
 
     def _service(self) -> tuple[DatasetStore, SchedulingService]:
         store = DatasetStore(self.database)
         return store, self.service_factory(store)
+
+    def _editing(self) -> tuple[DatasetStore, TimetableEditingService]:
+        store = DatasetStore(self.database)
+        return store, self.editing_factory(store)
 
     def dispatch(self, method: str, raw_path: str, body: bytes = b"") -> WebResponse:
         path = unquote(urlparse(raw_path).path)
@@ -97,6 +119,14 @@ class WebApplication:
                     return self._get_job(job_id)
                 if method == "POST" and action == "cancel":
                     return self._cancel_job(job_id)
+                if method == "POST" and action == "draft":
+                    return self._create_draft(job_id)
+            if path.startswith("/api/drafts/"):
+                draft_id, action = self._draft_path(path)
+                if method == "GET" and action is None:
+                    return self._get_draft(draft_id)
+                if method == "POST":
+                    return self._edit_draft(draft_id, action, payload)
             if method == "PUT" and path.startswith("/api/datasets/"):
                 return self._replace_collection(path, payload)
             if method == "POST" and path == "/api/validate":
@@ -137,7 +167,12 @@ class WebApplication:
                 for item in store.list()
             ]
             jobs = [job_to_dict(job) for job in service.list_jobs()]
-            return WebResponse.json(HTTPStatus.OK, {"datasets": datasets, "jobs": jobs})
+            editing = self.editing_factory(store)
+            drafts = [draft_to_dict(draft) for draft in editing.list()]
+            return WebResponse.json(
+                HTTPStatus.OK,
+                {"datasets": datasets, "jobs": jobs, "drafts": drafts},
+            )
         finally:
             store.close()
 
@@ -227,6 +262,76 @@ class WebApplication:
             return WebResponse.json(
                 HTTPStatus.OK, job_to_dict(service.cancel_job(job_id))
             )
+        finally:
+            store.close()
+
+    @staticmethod
+    def _draft_path(path: str) -> tuple[str, str | None]:
+        parts = path.strip("/").split("/")
+        if len(parts) not in {3, 4}:
+            raise ValueError("invalid draft route")
+        return parts[2], parts[3] if len(parts) == 4 else None
+
+    def _create_draft(self, job_id: str) -> WebResponse:
+        store, editing = self._editing()
+        try:
+            return WebResponse.json(
+                HTTPStatus.CREATED, draft_to_dict(editing.create_from_job(job_id))
+            )
+        finally:
+            store.close()
+
+    def _get_draft(self, draft_id: str) -> WebResponse:
+        store, editing = self._editing()
+        try:
+            return WebResponse.json(HTTPStatus.OK, draft_to_dict(editing.get(draft_id)))
+        finally:
+            store.close()
+
+    def _edit_draft(
+        self, draft_id: str, action: str | None, payload: dict[str, Any]
+    ) -> WebResponse:
+        store, editing = self._editing()
+        try:
+            if action == "move":
+                draft = editing.move(
+                    draft_id,
+                    str(payload.get("assignment_id", "")),
+                    str(payload.get("day_id", "")),
+                    str(payload.get("period_id", "")),
+                    payload.get("teacher_id"),
+                    payload.get("classroom_id"),
+                )
+                return WebResponse.json(HTTPStatus.OK, draft_to_dict(draft))
+            if action == "lock":
+                draft = editing.set_lock(
+                    draft_id,
+                    str(payload.get("assignment_id", "")),
+                    bool(payload.get("locked", True)),
+                )
+                return WebResponse.json(HTTPStatus.OK, draft_to_dict(draft))
+            if action == "undo":
+                return WebResponse.json(HTTPStatus.OK, draft_to_dict(editing.undo(draft_id)))
+            if action == "redo":
+                return WebResponse.json(HTTPStatus.OK, draft_to_dict(editing.redo(draft_id)))
+            if action == "regenerate":
+                options = GenerationOptions(
+                    float(payload.get("time_limit_seconds", 10)),
+                    int(payload.get("seed", 1)),
+                    int(payload.get("workers", 1)),
+                )
+                return WebResponse.json(
+                    HTTPStatus.OK,
+                    draft_to_dict(editing.regenerate(draft_id, options)),
+                )
+            if action == "compare":
+                return WebResponse.json(
+                    HTTPStatus.OK,
+                    editing.compare(
+                        draft_id, int(payload.get("left", 0)), int(payload["right"])
+                    ),
+                )
+            raise ValueError("unknown draft action")
         finally:
             store.close()
 

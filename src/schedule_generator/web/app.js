@@ -1,4 +1,4 @@
-const state = { datasets: [], jobs: [], dataset: null, collection: "classes", poller: null };
+const state = { datasets: [], jobs: [], drafts: [], dataset: null, collection: "classes", poller: null };
 const collections = [
   ["classes", "Classes"], ["teachers", "Teachers"], ["subjects", "Subjects"],
   ["classrooms", "Classrooms"], ["groups", "Groups"], ["cohorts", "Cohorts"],
@@ -42,6 +42,7 @@ async function loadState(quiet = false) {
     const payload = await api("/api/state");
     state.datasets = payload.datasets;
     state.jobs = payload.jobs;
+    state.drafts = payload.drafts || [];
     state.dataset = state.datasets[0] || null;
     render();
     if (!quiet) notice("Workspace refreshed");
@@ -64,6 +65,7 @@ function render() {
   renderRules(data);
   renderCurrentRun();
   renderJobSelect();
+  renderResults();
 }
 
 function renderChecklist(data) {
@@ -136,17 +138,63 @@ function selectedJob() {
   return state.jobs.find((job) => job.job_id === id) || [...state.jobs].reverse().find((job) => job.status === "SUCCEEDED");
 }
 
+function selectedDraft() {
+  const job = selectedJob();
+  return job ? state.drafts.find((draft) => draft.job_id === job.job_id) : null;
+}
+
 function renderResults() {
   const job = selectedJob();
   document.querySelector("#no-result").hidden = Boolean(job?.result);
   document.querySelector("#result-content").hidden = !job?.result;
   if (!job?.result || !state.dataset) return;
-  const report = job.result.quality_report;
+  const draft = selectedDraft();
+  const result = draft ? {
+    assignments: draft.version.assignments,
+    quality_report: draft.version.quality,
+    validation_errors: draft.version.validation_errors
+  } : job.result;
+  const report = result.quality_report;
   document.querySelector("#quality-chip").textContent = report ? `Quality penalty ${report.total_penalty}` : "Feasible timetable";
   const violations = report?.violations || [];
   document.querySelector("#quality-report").innerHTML = violations.length ? violations.map((item) => `<div class="quality-item"><strong>${html(item.constraint_id)} · +${item.weighted_penalty}</strong><small>${html(item.description)}</small></div>`).join("") : `<div class="check-item"><span>No preference violations</span><b>Excellent</b></div>`;
+  renderEditing(draft);
   renderResourceOptions();
-  renderTimetable(job.result.assignments);
+  renderTimetable(result.assignments, draft);
+}
+
+function changeLabel(change) {
+  if (change.type === "generated") return "Generated result";
+  if (change.type === "move") return `Moved ${change.assignment_id}`;
+  if (change.type === "regenerate") return `Regenerated with ${change.locked_assignment_ids.length} lock(s)`;
+  return change.type;
+}
+
+function renderEditing(draft) {
+  const start = document.querySelector("#start-editing");
+  const undo = document.querySelector("#undo-edit");
+  const redo = document.querySelector("#redo-edit");
+  const regenerate = document.querySelector("#regenerate-draft");
+  const historyPanel = document.querySelector("#history-panel");
+  const conflict = document.querySelector("#conflict-banner");
+  start.hidden = Boolean(draft);
+  undo.disabled = !draft || draft.current_version === 0;
+  redo.disabled = !draft || draft.current_version >= draft.latest_version;
+  regenerate.hidden = !draft;
+  historyPanel.hidden = !draft;
+  document.querySelector("#version-label").textContent = draft ? `Draft version ${draft.current_version}` : "Generated result";
+  const errors = draft?.version.validation_errors || [];
+  conflict.hidden = !errors.length;
+  conflict.textContent = errors.length ? `${errors.length} hard conflict(s): ${errors.join(" · ")}` : "";
+  if (!draft) return;
+  document.querySelector("#version-history").innerHTML = [...draft.history].reverse().map((item) => `<div class="version-item ${item.version === draft.current_version ? "current" : ""}"><strong>Version ${item.version}</strong><small>${html(changeLabel(item.change))}</small></div>`).join("");
+  const options = draft.history.map((item) => `<option value="${item.version}">Version ${item.version}</option>`).join("");
+  const left = document.querySelector("#compare-left");
+  const right = document.querySelector("#compare-right");
+  left.innerHTML = options;
+  right.innerHTML = options;
+  left.value = "0";
+  right.value = String(draft.current_version);
 }
 
 function renderResourceOptions() {
@@ -170,13 +218,14 @@ function assignmentMatches(assignment, mode, resourceId) {
   return cohort?.members.some((member) => member.type === "class" && member.id === resourceId);
 }
 
-function renderTimetable(assignments) {
+function renderTimetable(assignments, draft = null) {
   const data = state.dataset.data;
   const mode = document.querySelector("#view-mode").value;
   const resourceId = document.querySelector("#resource-select").value;
   const filtered = assignments.filter((item) => assignmentMatches(item, mode, resourceId));
   const periods = [...data.academic_period.periods].sort((a, b) => a.ordinal - b.ordinal);
   const days = [...data.academic_period.days].sort((a, b) => a.ordinal - b.ordinal);
+  const locked = new Set(draft?.locked_assignment_ids || []);
   const cells = (day, period) => {
     const lesson = filtered.find((item) => item.slot.day_id === day.id && item.occupied_period_ids.includes(period.id));
     if (!lesson) return "";
@@ -184,9 +233,115 @@ function renderTimetable(assignments) {
     const subject = data.subjects.find((item) => item.id === requirement?.subject_id)?.label || lesson.requirement_id;
     const teacher = data.teachers.find((item) => item.id === lesson.teacher_id)?.label || lesson.teacher_id;
     const room = data.classrooms.find((item) => item.id === lesson.classroom_id)?.label || lesson.classroom_id;
-    return `<span class="lesson">${html(subject)}<small>${html(teacher)} · ${html(room)}</small></span>`;
+    const startsHere = lesson.slot.period_id === period.id;
+    const classes = `lesson ${draft && startsHere ? "editable" : ""} ${locked.has(lesson.id) ? "locked" : ""}`;
+    return `<span class="${classes}" ${draft && startsHere && !locked.has(lesson.id) ? `draggable="true" data-assignment-id="${html(lesson.id)}"` : ""}>${html(subject)}<small>${html(teacher)} · ${html(room)}</small>${draft && startsHere ? `<button type="button" data-edit-assignment="${html(lesson.id)}" aria-label="Edit ${html(subject)}">${locked.has(lesson.id) ? "◆" : "✎"}</button>` : ""}</span>`;
   };
-  document.querySelector("#timetable").innerHTML = `<table><thead><tr><th>Period</th>${days.map((day) => `<th>${html(day.label)}</th>`).join("")}</tr></thead><tbody>${periods.map((period) => `<tr><th>${html(period.label)}<br><small>${html(period.start_time)}</small></th>${days.map((day) => `<td>${cells(day, period)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+  const timetable = document.querySelector("#timetable");
+  timetable.innerHTML = `<table><thead><tr><th>Period</th>${days.map((day) => `<th>${html(day.label)}</th>`).join("")}</tr></thead><tbody>${periods.map((period) => `<tr><th>${html(period.label)}<br><small>${html(period.start_time)}</small></th>${days.map((day) => `<td class="${draft ? "drop-target" : ""}" data-day-id="${html(day.id)}" data-period-id="${html(period.id)}">${cells(day, period)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+  timetable.querySelectorAll("[data-edit-assignment]").forEach((button) => button.addEventListener("click", () => openMoveDialog(button.dataset.editAssignment)));
+  if (draft) bindDragAndDrop(timetable);
+}
+
+function updateDraft(draft) {
+  const index = state.drafts.findIndex((item) => item.draft_id === draft.draft_id);
+  if (index >= 0) state.drafts[index] = draft; else state.drafts.push(draft);
+  renderResults();
+}
+
+async function createDraft() {
+  const job = selectedJob();
+  if (!job) return;
+  try {
+    const draft = await api(`/api/jobs/${job.job_id}/draft`, {method: "POST"});
+    updateDraft(draft);
+    notice("Editable timetable created");
+  } catch (error) { notice(error.message, true); }
+}
+
+function openMoveDialog(assignmentId) {
+  const draft = selectedDraft();
+  const assignment = draft?.version.assignments.find((item) => item.id === assignmentId);
+  if (!assignment) return;
+  const data = state.dataset.data;
+  const fill = (selector, items, selected) => {
+    const select = document.querySelector(selector);
+    select.innerHTML = items.map((item) => `<option value="${html(item.id)}">${html(item.label)}</option>`).join("");
+    select.value = selected;
+  };
+  document.querySelector("#move-assignment-id").value = assignmentId;
+  fill("#move-day", data.academic_period.days, assignment.slot.day_id);
+  fill("#move-period", data.academic_period.periods, assignment.slot.period_id);
+  fill("#move-teacher", data.teachers, assignment.teacher_id);
+  fill("#move-room", data.classrooms, assignment.classroom_id);
+  document.querySelector("#toggle-lock").textContent = draft.locked_assignment_ids.includes(assignmentId) ? "Unlock lesson" : "Lock lesson";
+  document.querySelector("#move-dialog").showModal();
+}
+
+async function moveAssignment(assignmentId, dayId, periodId, teacherId, classroomId) {
+  const draft = selectedDraft();
+  if (!draft) return;
+  try {
+    const updated = await api(`/api/drafts/${draft.draft_id}/move`, {
+      method: "POST",
+      body: JSON.stringify({assignment_id: assignmentId, day_id: dayId, period_id: periodId, teacher_id: teacherId, classroom_id: classroomId})
+    });
+    updateDraft(updated);
+    document.querySelector("#move-dialog").close();
+    notice(updated.version.validation_errors.length ? "Move saved with hard conflicts" : "Lesson moved", Boolean(updated.version.validation_errors.length));
+  } catch (error) { notice(error.message, true); }
+}
+
+async function draftAction(action, payload = {}) {
+  const draft = selectedDraft();
+  if (!draft) return null;
+  const updated = await api(`/api/drafts/${draft.draft_id}/${action}`, {method: "POST", body: JSON.stringify(payload)});
+  updateDraft(updated);
+  return updated;
+}
+
+async function toggleCurrentLock() {
+  const draft = selectedDraft();
+  const assignmentId = document.querySelector("#move-assignment-id").value;
+  if (!draft || !assignmentId) return;
+  try {
+    const locked = !draft.locked_assignment_ids.includes(assignmentId);
+    const updated = await draftAction("lock", {assignment_id: assignmentId, locked});
+    document.querySelector("#move-dialog").close();
+    notice(locked ? "Lesson locked" : "Lesson unlocked");
+    return updated;
+  } catch (error) { notice(error.message, true); }
+}
+
+async function compareVersions() {
+  const draft = selectedDraft();
+  if (!draft) return;
+  try {
+    const comparison = await api(`/api/drafts/${draft.draft_id}/compare`, {
+      method: "POST",
+      body: JSON.stringify({left: Number(document.querySelector("#compare-left").value), right: Number(document.querySelector("#compare-right").value)})
+    });
+    const quality = comparison.quality_delta === null ? "quality not comparable" : `quality ${comparison.quality_delta > 0 ? "+" : ""}${comparison.quality_delta}`;
+    document.querySelector("#comparison-result").textContent = `${comparison.changes.length} lesson change(s), ${quality}, conflict delta ${comparison.validation_error_delta > 0 ? "+" : ""}${comparison.validation_error_delta}.`;
+  } catch (error) { notice(error.message, true); }
+}
+
+function bindDragAndDrop(timetable) {
+  timetable.querySelectorAll("[draggable=true]").forEach((lesson) => {
+    lesson.addEventListener("dragstart", (event) => event.dataTransfer.setData("text/plain", lesson.dataset.assignmentId));
+  });
+  timetable.querySelectorAll(".drop-target").forEach((cell) => {
+    cell.addEventListener("dragover", (event) => { event.preventDefault(); cell.classList.add("drag-over"); });
+    cell.addEventListener("dragleave", () => cell.classList.remove("drag-over"));
+    cell.addEventListener("drop", async (event) => {
+      event.preventDefault();
+      cell.classList.remove("drag-over");
+      const assignmentId = event.dataTransfer.getData("text/plain");
+      const draft = selectedDraft();
+      const assignment = draft?.version.assignments.find((item) => item.id === assignmentId);
+      if (assignment) await moveAssignment(assignmentId, cell.dataset.dayId, cell.dataset.periodId, assignment.teacher_id, assignment.classroom_id);
+    });
+  });
 }
 
 async function saveCollection() {
@@ -235,5 +390,22 @@ document.querySelector("#generation-form").addEventListener("submit", startGener
 document.querySelector("#job-select").addEventListener("change", renderResults);
 document.querySelector("#view-mode").addEventListener("change", () => { renderResourceOptions(); renderResults(); });
 document.querySelector("#resource-select").addEventListener("change", renderResults);
+document.querySelector("#start-editing").addEventListener("click", createDraft);
+document.querySelector("#undo-edit").addEventListener("click", async () => { try { await draftAction("undo"); notice("Undid last change"); } catch (error) { notice(error.message, true); } });
+document.querySelector("#redo-edit").addEventListener("click", async () => { try { await draftAction("redo"); notice("Redid change"); } catch (error) { notice(error.message, true); } });
+document.querySelector("#regenerate-draft").addEventListener("click", async () => { try { notice("Regenerating unlocked lessons…"); await draftAction("regenerate", {time_limit_seconds: 10, seed: 1, workers: 1}); notice("Unlocked lessons regenerated"); } catch (error) { notice(error.message, true); } });
+document.querySelector("#compare-versions").addEventListener("click", compareVersions);
+document.querySelector("#close-move").addEventListener("click", () => document.querySelector("#move-dialog").close());
+document.querySelector("#toggle-lock").addEventListener("click", toggleCurrentLock);
+document.querySelector("#move-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  await moveAssignment(
+    document.querySelector("#move-assignment-id").value,
+    document.querySelector("#move-day").value,
+    document.querySelector("#move-period").value,
+    document.querySelector("#move-teacher").value,
+    document.querySelector("#move-room").value
+  );
+});
 showView(location.hash.slice(1) in titles ? location.hash.slice(1) : "overview");
 loadState(true);

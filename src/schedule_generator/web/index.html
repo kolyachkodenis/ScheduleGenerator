@@ -118,15 +118,39 @@
         <div class="section-intro results-heading"><div><p class="eyebrow">Generated timetable</p><h2>Review results</h2><p>Inspect the selected alternative and its quality explanation.</p></div><select id="job-select" aria-label="Select generation job"></select></div>
         <div id="no-result" class="empty-inline">Generate a successful timetable to see results.</div>
         <div id="result-content" hidden>
+          <div id="editing-toolbar" class="editing-toolbar">
+            <div><span class="eyebrow">Manual editing</span><strong id="version-label">Generated result</strong></div>
+            <div class="editing-actions">
+              <button id="start-editing" class="primary-button">Edit timetable</button>
+              <button id="undo-edit" class="icon-button" title="Undo" disabled>↶</button>
+              <button id="redo-edit" class="icon-button" title="Redo" disabled>↷</button>
+              <button id="regenerate-draft" class="text-button" hidden>Regenerate unlocked</button>
+            </div>
+          </div>
+          <div id="conflict-banner" class="conflict-banner" hidden></div>
           <div class="result-toolbar"><div id="quality-chip" class="quality-chip"></div><div><label for="view-mode">View by</label><select id="view-mode"><option value="class">Class</option><option value="teacher">Teacher</option><option value="classroom">Classroom</option></select></div><div><label for="resource-select">Resource</label><select id="resource-select"></select></div></div>
           <div class="two-column result-grid">
             <article class="panel timetable-panel"><div id="timetable" class="timetable"></div></article>
-            <article class="panel"><div class="panel-heading"><div><p class="eyebrow">Quality report</p><h3>Detected preferences</h3></div></div><div id="quality-report" class="quality-report"></div></article>
+            <div class="result-side">
+              <article class="panel"><div class="panel-heading"><div><p class="eyebrow">Quality report</p><h3>Detected preferences</h3></div></div><div id="quality-report" class="quality-report"></div></article>
+              <article id="history-panel" class="panel" hidden><div class="panel-heading"><div><p class="eyebrow">Change history</p><h3>Versions</h3></div></div><div id="version-history" class="version-history"></div><div class="compare-controls"><select id="compare-left" aria-label="Compare from version"></select><select id="compare-right" aria-label="Compare to version"></select><button id="compare-versions" class="text-button">Compare</button></div><div id="comparison-result" class="comparison-result"></div></article>
+            </div>
           </div>
         </div>
       </section>
     </main>
   </div>
+  <dialog id="move-dialog">
+    <form id="move-form" method="dialog">
+      <div class="dialog-heading"><div><p class="eyebrow">Manual placement</p><h2>Move lesson</h2></div><button id="close-move" class="icon-button" type="button" aria-label="Close">×</button></div>
+      <input id="move-assignment-id" type="hidden">
+      <div class="field"><label for="move-day">Day</label><select id="move-day"></select></div>
+      <div class="field"><label for="move-period">Starting period</label><select id="move-period"></select></div>
+      <div class="field"><label for="move-teacher">Teacher</label><select id="move-teacher"></select></div>
+      <div class="field"><label for="move-room">Classroom</label><select id="move-room"></select></div>
+      <div class="dialog-actions"><button id="toggle-lock" class="text-button" type="button">Lock lesson</button><button class="primary-button" type="submit">Apply move</button></div>
+    </form>
+  </dialog>
   <script src="/assets/app.js" defer></script>
 </body>
 </html>

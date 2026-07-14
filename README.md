@@ -36,6 +36,7 @@ Project documentation:
 - [School data storage and import](docs/data-import/README.md)
 - [Application API and generation workflow](docs/api/README.md)
 - [Operator user interface](docs/user-interface/README.md)
+- [Manual timetable editing](docs/manual-editing/README.md)
 - [Contributing guide](CONTRIBUTING.md)
 - [Architecture decisions](docs/adr/README.md)
 
