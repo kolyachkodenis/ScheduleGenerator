@@ -135,6 +135,8 @@ The roadmap is divided into small, verifiable stages. Each stage must end with a
 
 ## Stage 9: Build the first user interface
 
+**Status:** Complete for the local operator interface 0.5.0
+
 - Create a school setup wizard.
 - Add editors for classes, teachers, subjects, and classrooms.
 - Add editors for availability and curriculum requirements.
@@ -239,4 +241,4 @@ Integrations, mobile applications, teacher substitutions, and complex alternatin
 
 ## Next milestone
 
-Complete discovery with representative real school data while starting Stage 9: build the first operator user interface on the stable application API.
+Complete discovery with representative real school data while starting Stage 10: add safe manual timetable editing and change history.

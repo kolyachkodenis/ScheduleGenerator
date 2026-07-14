@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ScheduleGenerator</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#overview" aria-label="ScheduleGenerator home">
+        <span class="brand-mark">SG</span>
+        <span><strong>Schedule</strong><small>Generator</small></span>
+      </a>
+      <nav aria-label="Operator workflow">
+        <button class="nav-item active" data-view="overview"><span>01</span> Overview</button>
+        <button class="nav-item" data-view="data"><span>02</span> School data</button>
+        <button class="nav-item" data-view="rules"><span>03</span> Rules</button>
+        <button class="nav-item" data-view="generate"><span>04</span> Generate</button>
+        <button class="nav-item" data-view="results"><span>05</span> Results</button>
+      </nav>
+      <div class="sidebar-note">
+        <span class="status-dot"></span>
+        <div><strong>Local workspace</strong><small>Data stays on this computer</small></div>
+      </div>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Timetable operations</p>
+          <h1 id="page-title">Overview</h1>
+        </div>
+        <div class="top-actions">
+          <span id="dataset-badge" class="dataset-badge">No dataset</span>
+          <button id="refresh" class="icon-button" title="Refresh data" aria-label="Refresh data">↻</button>
+        </div>
+      </header>
+
+      <div id="notice" class="notice" role="status" hidden></div>
+
+      <section id="view-overview" class="view active">
+        <div id="empty-state" class="empty-state" hidden>
+          <span class="empty-icon">＋</span>
+          <p class="eyebrow">First-time setup</p>
+          <h2>Configure your school workspace</h2>
+          <p>Start with safe synthetic data, then replace it with your classes, teachers, rooms, and curriculum.</p>
+          <button id="load-demo" class="primary-button">Load demonstration school</button>
+        </div>
+        <div id="dashboard" hidden>
+          <div class="hero-panel">
+            <div>
+              <p class="eyebrow">Current academic period</p>
+              <h2 id="school-name">School timetable</h2>
+              <p id="period-label" class="muted"></p>
+            </div>
+            <button class="primary-button" data-go="generate">Generate timetable</button>
+          </div>
+          <div class="metric-grid">
+            <article><span>Classes</span><strong id="metric-classes">0</strong><small>student cohorts</small></article>
+            <article><span>Teachers</span><strong id="metric-teachers">0</strong><small>available staff</small></article>
+            <article><span>Subjects</span><strong id="metric-subjects">0</strong><small>curriculum areas</small></article>
+            <article><span>Requirements</span><strong id="metric-requirements">0</strong><small>weekly lesson rules</small></article>
+          </div>
+          <div class="two-column">
+            <article class="panel">
+              <div class="panel-heading"><div><p class="eyebrow">Readiness</p><h3>Configuration checklist</h3></div><span id="readiness-score" class="score">0%</span></div>
+              <div id="checklist" class="checklist"></div>
+            </article>
+            <article class="panel">
+              <div class="panel-heading"><div><p class="eyebrow">Recent activity</p><h3>Generation jobs</h3></div><button class="text-button" data-go="results">View all</button></div>
+              <div id="recent-jobs" class="job-list"></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-data" class="view">
+        <div class="section-intro"><div><p class="eyebrow">Reference data</p><h2>School configuration</h2><p>Edit a collection as structured JSON. Changes are validated atomically before a new revision is saved.</p></div></div>
+        <div class="editor-layout">
+          <div id="collection-tabs" class="collection-tabs" role="tablist"></div>
+          <article class="panel editor-panel">
+            <div class="panel-heading"><div><p class="eyebrow" id="editor-kind">Collection</p><h3 id="editor-title">Classes</h3></div><span id="record-count" class="pill">0 records</span></div>
+            <label for="collection-json">Collection records</label>
+            <textarea id="collection-json" spellcheck="false"></textarea>
+            <div class="editor-actions"><small>IDs and references must remain unique and valid.</small><button id="save-collection" class="primary-button">Validate and save</button></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="view-rules" class="view">
+        <div class="section-intro"><div><p class="eyebrow">Scheduling policy</p><h2>Workload and constraints</h2><p>Review difficulty levels, daily limits, availability, and curriculum requirements.</p></div></div>
+        <div class="two-column rules-grid">
+          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">Subject workload</p><h3>Difficulty levels</h3></div></div><div id="difficulty-list" class="form-list"></div></article>
+          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">Preference weights</p><h3>Quality priorities</h3></div></div><div id="priority-list" class="form-list"></div></article>
+          <article class="panel span-two"><div class="panel-heading"><div><p class="eyebrow">Coverage</p><h3>Rules inventory</h3></div></div><div id="rules-summary" class="summary-row"></div></article>
+        </div>
+      </section>
+
+      <section id="view-generate" class="view">
+        <div class="section-intro"><div><p class="eyebrow">Solver controls</p><h2>Generate alternatives</h2><p>Every run is pinned to the current dataset revision and remains reproducible.</p></div></div>
+        <div class="two-column generate-grid">
+          <form id="generation-form" class="panel generation-form">
+            <div class="field"><label for="alternatives">Alternatives</label><input id="alternatives" type="number" min="1" max="10" value="2"><small>Different deterministic seeds</small></div>
+            <div class="field"><label for="time-limit">Time limit</label><div class="input-unit"><input id="time-limit" type="number" min="1" max="300" value="10"><span>seconds</span></div><small>Applied to each alternative</small></div>
+            <div class="field"><label for="seed">Starting seed</label><input id="seed" type="number" min="0" value="1"><small>Saved with the job</small></div>
+            <button class="primary-button large" type="submit">Start generation</button>
+          </form>
+          <article class="panel run-panel">
+            <p class="eyebrow">Current run</p>
+            <div id="current-run" class="current-run"><div class="run-placeholder">No generation job is active.</div></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="view-results" class="view">
+        <div class="section-intro results-heading"><div><p class="eyebrow">Generated timetable</p><h2>Review results</h2><p>Inspect the selected alternative and its quality explanation.</p></div><select id="job-select" aria-label="Select generation job"></select></div>
+        <div id="no-result" class="empty-inline">Generate a successful timetable to see results.</div>
+        <div id="result-content" hidden>
+          <div class="result-toolbar"><div id="quality-chip" class="quality-chip"></div><div><label for="view-mode">View by</label><select id="view-mode"><option value="class">Class</option><option value="teacher">Teacher</option><option value="classroom">Classroom</option></select></div><div><label for="resource-select">Resource</label><select id="resource-select"></select></div></div>
+          <div class="two-column result-grid">
+            <article class="panel timetable-panel"><div id="timetable" class="timetable"></div></article>
+            <article class="panel"><div class="panel-heading"><div><p class="eyebrow">Quality report</p><h3>Detected preferences</h3></div></div><div id="quality-report" class="quality-report"></div></article>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="/assets/app.js" defer></script>
+</body>
+</html>

@@ -18,3 +18,4 @@ Architecture decision records (ADRs) document technical choices that would other
 - [ADR 0003: Use OR-Tools CP-SAT for the scheduling prototype](0003-use-cp-sat-for-prototype.md)
 - [ADR 0004: Use SQLite for school configuration data](0004-use-sqlite-for-school-data.md)
 - [ADR 0005: Use persistent transport-neutral generation jobs](0005-use-persistent-generation-jobs.md)
+- [ADR 0006: Use a build-free local web interface](0006-use-local-web-interface.md)
