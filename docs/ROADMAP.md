@@ -107,6 +107,8 @@ The roadmap is divided into small, verifiable stages. Each stage must end with a
 
 ## Stage 7: Add data storage and import
 
+**Status:** Complete for local school configuration 0.3.0
+
 - Select a database and create migrations.
 - Implement CRUD operations for all school reference data.
 - Import XLSX and CSV files using documented templates.
@@ -235,4 +237,4 @@ Integrations, mobile applications, teacher substitutions, and complex alternatin
 
 ## Next milestone
 
-Complete Stages 1–4 before starting full implementation: obtain real examples, approve the constraint catalog, design the data model, and validate the solver approach with a prototype.
+Complete discovery with representative real school data while starting Stage 8: expose the scheduling core and configuration storage through a stable API and generation-job workflow.

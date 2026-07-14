@@ -20,7 +20,7 @@ The system should account for, among other things:
 
 ## Status
 
-The project is currently in the discovery and planning stage. Implementation has not started yet.
+The scheduling core, automated test suite, and local data-storage/import layer are implemented. Discovery with representative real school data remains in progress.
 
 Project documentation:
 
@@ -33,6 +33,7 @@ Project documentation:
 - [Solver prototype](docs/solver-prototype/README.md)
 - [Scheduling core](docs/scheduling-core/README.md)
 - [Testing strategy](docs/testing/README.md)
+- [School data storage and import](docs/data-import/README.md)
 - [Contributing guide](CONTRIBUTING.md)
 - [Architecture decisions](docs/adr/README.md)
 

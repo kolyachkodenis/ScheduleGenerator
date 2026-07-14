@@ -10,6 +10,8 @@ from schedule_generator.api import (
     SchedulingProblem,
     generate_schedule,
 )
+from schedule_generator.data_import import ImportIssue, ImportPreview, apply_import, preview_import
+from schedule_generator.storage import DatasetStore, StoredDataset
 
 __all__ = [
     "Diagnostic",
@@ -20,6 +22,12 @@ __all__ = [
     "QualityReport",
     "SchedulingProblem",
     "generate_schedule",
+    "DatasetStore",
+    "StoredDataset",
+    "ImportIssue",
+    "ImportPreview",
+    "preview_import",
+    "apply_import",
 ]
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
