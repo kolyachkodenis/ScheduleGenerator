@@ -1,4 +1,4 @@
-const state = { datasets: [], jobs: [], drafts: [], dataset: null, collection: "classes", poller: null };
+const state = { datasets: [], jobs: [], drafts: [], publications: [], dataset: null, collection: "classes", poller: null };
 const collections = [
   ["classes", "Classes"], ["teachers", "Teachers"], ["subjects", "Subjects"],
   ["classrooms", "Classrooms"], ["groups", "Groups"], ["cohorts", "Cohorts"],
@@ -43,6 +43,7 @@ async function loadState(quiet = false) {
     state.datasets = payload.datasets;
     state.jobs = payload.jobs;
     state.drafts = payload.drafts || [];
+    state.publications = payload.publications || [];
     state.dataset = state.datasets[0] || null;
     render();
     if (!quiet) notice("Workspace refreshed");
@@ -159,6 +160,7 @@ function renderResults() {
   const violations = report?.violations || [];
   document.querySelector("#quality-report").innerHTML = violations.length ? violations.map((item) => `<div class="quality-item"><strong>${html(item.constraint_id)} · +${item.weighted_penalty}</strong><small>${html(item.description)}</small></div>`).join("") : `<div class="check-item"><span>No preference violations</span><b>Excellent</b></div>`;
   renderEditing(draft);
+  renderPublication(draft);
   renderResourceOptions();
   renderTimetable(result.assignments, draft);
 }
@@ -195,6 +197,52 @@ function renderEditing(draft) {
   right.innerHTML = options;
   left.value = "0";
   right.value = String(draft.current_version);
+}
+
+function renderPublication(draft) {
+  const target = document.querySelector("#publication-status");
+  if (!draft) {
+    target.innerHTML = `<p>Create an editable timetable before approval.</p>`;
+    return;
+  }
+  const publication = state.publications.find((item) => item.draft_id === draft.draft_id && item.version === draft.current_version);
+  if (!publication) {
+    const blocked = draft.version.validation_errors.length > 0;
+    target.innerHTML = `<p>Version ${draft.current_version} is a draft${blocked ? " with unresolved conflicts" : " ready for review"}.</p><button id="approve-publication" class="primary-button" ${blocked ? "disabled" : ""}>Approve version</button>`;
+    target.querySelector("#approve-publication")?.addEventListener("click", approvePublication);
+    return;
+  }
+  if (publication.status === "APPROVED") {
+    target.innerHTML = `<p><span class="status-pill approved">Approved</span> Version ${publication.version} is immutable and ready to publish.</p><button id="publish-publication" class="primary-button">Publish XLSX and PDF</button>`;
+    target.querySelector("#publish-publication")?.addEventListener("click", () => changePublication(publication.publication_id, "publish"));
+    return;
+  }
+  const links = Object.entries(publication.artifacts).map(([kind, artifact]) => `<a href="/downloads/${encodeURIComponent(artifact.filename)}">Download ${html(kind.toUpperCase())}</a>`).join("");
+  if (publication.status === "PUBLISHED") {
+    target.innerHTML = `<p><span class="status-pill published">Published</span> Version ${publication.version} is available for distribution.</p><div class="download-links">${links}</div><button id="unpublish-publication" class="text-button">Unpublish</button>`;
+    target.querySelector("#unpublish-publication")?.addEventListener("click", () => changePublication(publication.publication_id, "unpublish"));
+  } else {
+    target.innerHTML = `<p><span class="status-pill unpublished">Unpublished</span> Version ${publication.version} is no longer available for download.</p><button id="republish-publication" class="primary-button">Publish again</button>`;
+    target.querySelector("#republish-publication")?.addEventListener("click", () => changePublication(publication.publication_id, "publish"));
+  }
+}
+
+async function approvePublication() {
+  const draft = selectedDraft();
+  if (!draft) return;
+  try {
+    await api(`/api/drafts/${draft.draft_id}/approve`, {method: "POST"});
+    await loadState(true);
+    notice(`Version ${draft.current_version} approved`);
+  } catch (error) { notice(error.message, true); }
+}
+
+async function changePublication(publicationId, action) {
+  try {
+    await api(`/api/publications/${publicationId}/${action}`, {method: "POST"});
+    await loadState(true);
+    notice(action === "publish" ? "Timetable published" : "Timetable unpublished");
+  } catch (error) { notice(error.message, true); }
 }
 
 function renderResourceOptions() {

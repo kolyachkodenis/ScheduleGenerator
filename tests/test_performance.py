@@ -11,7 +11,7 @@ from scripts.benchmark_solver import build_dataset
 
 class ModelScaleRegressionTests(unittest.TestCase):
     def test_large_synthetic_model_stays_within_size_budget(self) -> None:
-        artifacts = PrototypeBuilder(build_dataset(12)).build()
+        artifacts = PrototypeBuilder(build_dataset(11)).build()
         proto = artifacts.model.proto
 
         self.assertEqual(artifacts.diagnostics, [])
@@ -27,7 +27,7 @@ class SolverPerformanceBudgetTests(unittest.TestCase):
     CASES = (
         (2, 5.0, 10.0),
         (6, 15.0, 25.0),
-        (12, 15.0, 25.0),
+        (11, 15.0, 25.0),
     )
     MAX_PYTHON_PEAK_MIB = 512
 

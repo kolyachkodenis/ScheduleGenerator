@@ -20,6 +20,9 @@ Open `http://127.0.0.1:8765`. On a new database, use **Load demonstration school
 4. Choose the number of alternatives, time limit, and seed on **Generate**. Progress is refreshed while the persistent job runs, and a cancellation request is available.
 5. Review the selected alternative on **Results**. Timetables can be viewed by class, teacher, or classroom alongside the quality report.
 6. Choose **Edit timetable** to move lessons, inspect conflicts, lock placements, regenerate the unlocked remainder, and compare versions.
+7. Approve a conflict-free version, publish its XLSX and PDF files, or revoke those downloads from the distribution panel.
+
+Approval is disabled while hard conflicts are present, and later edits never silently change an already approved version.
 
 The server listens on the loopback interface by default. Binding it to another interface is not recommended until authentication and authorization are implemented in Stage 12.
 

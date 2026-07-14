@@ -151,6 +151,15 @@ textarea:focus, input:focus, select:focus { outline: 2px solid #8dbce8; outline-
 .compare-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 14px; }
 .compare-controls button { grid-column: 1 / -1; }
 .comparison-result { color: var(--muted); font-size: 12px; line-height: 1.5; }
+.publication-status { display: grid; gap: 12px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.publication-status p { margin: 0; }
+.publication-status button { justify-self: start; }
+.publication-status button:disabled { cursor: not-allowed; opacity: .45; }
+.status-pill { display: inline-block; padding: 3px 7px; margin-right: 4px; color: var(--navy); background: var(--sky); font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.status-pill.published { color: var(--green); background: #e9f6ef; }
+.status-pill.unpublished { color: var(--muted); background: #eef1f4; }
+.download-links { display: flex; flex-wrap: wrap; gap: 8px; }
+.download-links a { color: var(--blue); background: var(--sky); padding: 8px 10px; font-weight: 700; text-decoration: none; }
 dialog { width: min(520px, calc(100vw - 30px)); border: 0; padding: 0; color: var(--ink); box-shadow: 0 24px 70px rgba(15, 35, 58, .26); }
 dialog::backdrop { background: rgba(14, 30, 50, .62); }
 dialog form { display: grid; gap: 15px; padding: 25px; }

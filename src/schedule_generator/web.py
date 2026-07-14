@@ -16,6 +16,7 @@ from urllib.parse import unquote, urlparse
 from schedule_generator.api import GenerationOptions
 from schedule_generator.editing import TimetableDraft, TimetableEditingService
 from schedule_generator.jobs import GenerationJob, GenerationRequest, SchedulingService
+from schedule_generator.publication import PublicationService
 from schedule_generator.storage import DatasetStore
 
 
@@ -97,6 +98,10 @@ class WebApplication:
         store = DatasetStore(self.database)
         return store, self.editing_factory(store)
 
+    def _publication(self) -> tuple[DatasetStore, PublicationService]:
+        store = DatasetStore(self.database)
+        return store, PublicationService(store, self.database.parent / "published")
+
     def dispatch(self, method: str, raw_path: str, body: bytes = b"") -> WebResponse:
         path = unquote(urlparse(raw_path).path)
         try:
@@ -104,6 +109,8 @@ class WebApplication:
                 return self._asset("index.html")
             if method == "GET" and path.startswith("/assets/"):
                 return self._asset(path.removeprefix("/assets/"))
+            if method == "GET" and path.startswith("/downloads/"):
+                return self._download(path.removeprefix("/downloads/"))
             payload = json.loads(body.decode("utf-8")) if body else {}
             if not isinstance(payload, dict):
                 raise ValueError("request body must be a JSON object")
@@ -127,6 +134,9 @@ class WebApplication:
                     return self._get_draft(draft_id)
                 if method == "POST":
                     return self._edit_draft(draft_id, action, payload)
+            if method == "POST" and path.startswith("/api/publications/"):
+                publication_id, action = self._publication_path(path)
+                return self._change_publication(publication_id, action)
             if method == "PUT" and path.startswith("/api/datasets/"):
                 return self._replace_collection(path, payload)
             if method == "POST" and path == "/api/validate":
@@ -169,9 +179,20 @@ class WebApplication:
             jobs = [job_to_dict(job) for job in service.list_jobs()]
             editing = self.editing_factory(store)
             drafts = [draft_to_dict(draft) for draft in editing.list()]
+            publications = [
+                publication.to_dict()
+                for publication in PublicationService(
+                    store, self.database.parent / "published"
+                ).list()
+            ]
             return WebResponse.json(
                 HTTPStatus.OK,
-                {"datasets": datasets, "jobs": jobs, "drafts": drafts},
+                {
+                    "datasets": datasets,
+                    "jobs": jobs,
+                    "drafts": drafts,
+                    "publications": publications,
+                },
             )
         finally:
             store.close()
@@ -331,7 +352,41 @@ class WebApplication:
                         draft_id, int(payload.get("left", 0)), int(payload["right"])
                     ),
                 )
+            if action == "approve":
+                publications = PublicationService(
+                    store, self.database.parent / "published"
+                )
+                return WebResponse.json(
+                    HTTPStatus.CREATED, publications.approve(draft_id).to_dict()
+                )
             raise ValueError("unknown draft action")
+        finally:
+            store.close()
+
+    @staticmethod
+    def _publication_path(path: str) -> tuple[str, str]:
+        parts = path.strip("/").split("/")
+        if len(parts) != 4 or parts[3] not in {"publish", "unpublish"}:
+            raise ValueError("invalid publication route")
+        return parts[2], parts[3]
+
+    def _change_publication(self, publication_id: str, action: str) -> WebResponse:
+        store, publications = self._publication()
+        try:
+            publication = (
+                publications.publish(publication_id)
+                if action == "publish"
+                else publications.unpublish(publication_id)
+            )
+            return WebResponse.json(HTTPStatus.OK, publication.to_dict())
+        finally:
+            store.close()
+
+    def _download(self, filename: str) -> WebResponse:
+        store, publications = self._publication()
+        try:
+            path, content_type = publications.download(filename)
+            return WebResponse(HTTPStatus.OK, path.read_bytes(), content_type)
         finally:
             store.close()
 

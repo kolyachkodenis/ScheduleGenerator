@@ -196,6 +196,42 @@ class WebApplicationTests(unittest.TestCase):
         )
         self.assertEqual(undone["current_version"], 0)
 
+    def test_approved_timetable_can_be_published_downloaded_and_unpublished(self) -> None:
+        self.application.dispatch("POST", "/api/demo")
+        job = self.payload(
+            self.application.dispatch(
+                "POST",
+                "/api/jobs",
+                json.dumps({"dataset_id": "small_school_demo"}).encode(),
+            )
+        )
+        draft = self.payload(
+            self.application.dispatch("POST", f"/api/jobs/{job['job_id']}/draft")
+        )
+        approved = self.payload(
+            self.application.dispatch(
+                "POST", f"/api/drafts/{draft['draft_id']}/approve"
+            )
+        )
+        self.assertEqual(approved["status"], "APPROVED")
+        published = self.payload(
+            self.application.dispatch(
+                "POST", f"/api/publications/{approved['publication_id']}/publish"
+            )
+        )
+        pdf = published["artifacts"]["pdf"]["filename"]
+        download = self.application.dispatch("GET", f"/downloads/{pdf}")
+        self.assertEqual(download.status, HTTPStatus.OK)
+        self.assertEqual(download.content_type, "application/pdf")
+        self.assertTrue(download.body.startswith(b"%PDF"))
+        unpublished = self.payload(
+            self.application.dispatch(
+                "POST", f"/api/publications/{approved['publication_id']}/unpublish"
+            )
+        )
+        self.assertEqual(unpublished["status"], "UNPUBLISHED")
+        self.assertNotEqual(self.application.dispatch("GET", f"/downloads/{pdf}").status, HTTPStatus.OK)
+
     def test_bad_json_and_unknown_routes_are_reported(self) -> None:
         malformed = self.application.dispatch("POST", "/api/jobs", b"{")
         wrong_shape = self.application.dispatch("POST", "/api/jobs", b"[]")

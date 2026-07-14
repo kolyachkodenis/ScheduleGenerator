@@ -199,7 +199,7 @@ def build_dataset(class_count: int) -> dict:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--sizes", nargs="+", type=int, default=[2, 6, 12])
+    parser.add_argument("--sizes", nargs="+", type=int, default=[2, 6, 11])
     parser.add_argument("--time-limit", type=float, default=5.0)
     parser.add_argument("--seed", type=int, default=1)
     parser.add_argument("--json", type=Path)

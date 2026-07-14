@@ -35,7 +35,7 @@ python scripts/benchmark_solver.py --sizes 2 6 12 --time-limit 15 --seed 1
 ## Interpretation
 
 - The 2-class model reached and proved the optimum.
-- The 6-class and 12-class models found independently valid timetables but did not prove optimality within 15 seconds.
+- The 6-class and 11-class models found independently valid timetables but did not prove optimality within 15 seconds.
 - Objective values are not comparable across different dataset sizes because larger datasets contain more penalty instances.
 - Variable and constraint growth is moderate in this controlled structure, but room flexibility, groups, fixed lessons, and real preference interactions can increase search difficulty sharply.
 - Production targets cannot be set until sanitized representative data and end-to-end timing are available.

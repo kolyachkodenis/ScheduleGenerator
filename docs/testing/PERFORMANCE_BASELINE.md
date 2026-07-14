@@ -14,9 +14,9 @@
 
 | Classes | Status | End-to-end elapsed time | Python-tracked peak memory | Budget result |
 | ---: | --- | ---: | ---: | --- |
-| 2 | OPTIMAL | 2.303 s | 2.5 MiB | Pass |
-| 6 | FEASIBLE | 15.444 s | 0.8 MiB | Pass |
-| 12 | FEASIBLE | 16.192 s | 1.6 MiB | Pass |
+| 2 | OPTIMAL | 2.140 s | 2.5 MiB | Pass |
+| 6 | FEASIBLE | 15.472 s | 0.8 MiB | Pass |
+| 11 | FEASIBLE | 15.896 s | 1.4 MiB | Pass |
 
 The elapsed measurement includes dataset validation, candidate generation, model construction, solve time, result extraction, independent validation, and quality-report construction within the Python process. It excludes interpreter startup and dependency installation.
 

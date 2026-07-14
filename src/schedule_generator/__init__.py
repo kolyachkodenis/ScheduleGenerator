@@ -19,6 +19,13 @@ from schedule_generator.jobs import (
     JobStatus,
     SchedulingService,
 )
+from schedule_generator.publication import (
+    Publication,
+    PublicationService,
+    export_pdf,
+    export_xlsx,
+    timetable_views,
+)
 from schedule_generator.storage import DatasetStore, StoredDataset
 
 __all__ = [
@@ -44,6 +51,11 @@ __all__ = [
     "GenerationRequest",
     "JobStatus",
     "SchedulingService",
+    "Publication",
+    "PublicationService",
+    "timetable_views",
+    "export_xlsx",
+    "export_pdf",
 ]
 
-__version__ = "0.6.0"
+__version__ = "0.7.0"

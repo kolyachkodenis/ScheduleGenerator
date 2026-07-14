@@ -102,6 +102,26 @@ MIGRATIONS = (
         );
         """,
     ),
+    (
+        4,
+        """
+        CREATE TABLE IF NOT EXISTS timetable_publications (
+            publication_id TEXT PRIMARY KEY,
+            draft_id TEXT NOT NULL,
+            version INTEGER NOT NULL,
+            status TEXT NOT NULL,
+            artifacts_json TEXT NOT NULL DEFAULT '{}',
+            approved_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            published_at TEXT,
+            unpublished_at TEXT,
+            UNIQUE (draft_id, version),
+            FOREIGN KEY (draft_id, version)
+                REFERENCES timetable_draft_versions(draft_id, version) ON DELETE CASCADE
+        );
+        CREATE INDEX IF NOT EXISTS timetable_publications_status
+            ON timetable_publications(status, approved_at);
+        """,
+    ),
 )
 
 

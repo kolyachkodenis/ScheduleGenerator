@@ -21,8 +21,8 @@ Stage 6 completion applies to rules implemented by core 0.2.0. Catalog rules not
 | Soft-penalty unit tests | Isolate each implemented soft rule with fully fixed synthetic lessons and assert exact raw and weighted penalties. |
 | Property-based tests | Explore many key orders, group sizes, lesson counts, block lengths, and occurrence conflicts. |
 | Reference scenarios | Preserve behavior-level expectations without snapshotting one arbitrary optimized timetable. |
-| Scale regression | Limit model variable and constraint growth for the 12-class synthetic structure. |
-| Performance budgets | Measure end-to-end generation time and Python-tracked peak memory for 2, 6, and 12 classes. |
+| Scale regression | Limit model variable and constraint growth for the 11-class synthetic structure. |
+| Performance budgets | Measure end-to-end generation time and Python-tracked peak memory for 2, 6, and 11 classes. |
 
 ## Regular test command
 
@@ -31,7 +31,7 @@ $env:PYTHONPATH = "src"
 python -m unittest discover --start-directory tests --verbose
 ```
 
-Regular CI skips the long solver performance suite but always checks the 12-class model-size budget.
+Regular CI skips the long solver performance suite but always checks the 11-class model-size budget.
 
 ## Performance test command
 
@@ -47,7 +47,7 @@ Current provisional budgets are:
 | ---: | ---: | ---: | ---: |
 | 2 classes | 5 seconds | 10 seconds | 512 MiB |
 | 6 classes | 15 seconds | 25 seconds | 512 MiB |
-| 12 classes | 15 seconds | 25 seconds | 512 MiB |
+| 11 classes | 15 seconds | 25 seconds | 512 MiB |
 
 See the latest [local performance baseline](PERFORMANCE_BASELINE.md).
 

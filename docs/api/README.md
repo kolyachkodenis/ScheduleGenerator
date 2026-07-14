@@ -37,6 +37,10 @@ Each alternative uses a deterministic seed (`seed`, `seed + 1`, and so on). The 
 
 Pass edited assignment dictionaries to `validate_assignments`. The independent hard-constraint validator returns an empty list for a valid timetable or actionable error strings. Validation can target either the current dataset or an explicit historical revision.
 
+## Publication
+
+`PublicationService` approves a conflict-free immutable draft version, generates class and teacher views in XLSX and PDF, and controls whether those files are available for download. Artifact metadata includes a SHA-256 digest so distributed files can be verified. See the [publication workflow](../publication/README.md) for lifecycle and route details.
+
 ## Reference data
 
 The service exposes read/save operations for complete school datasets and validated replacement of top-level reference collections. Invalid changes are rejected before a storage transaction begins.
