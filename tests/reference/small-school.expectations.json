@@ -1,0 +1,17 @@
+{
+  "dataset": "examples/small-school.json",
+  "allowed_statuses": ["OPTIMAL", "FEASIBLE"],
+  "assignment_count": 27,
+  "validation_error_count": 0,
+  "quality_constraint_ids": ["SC-001", "SC-002", "SC-003", "SC-004", "SC-005"],
+  "fixed_assignments": [
+    {
+      "requirement_id": "req_joint_advisory",
+      "day_id": "mon",
+      "period_id": "p1",
+      "teacher_id": "t_history",
+      "classroom_id": "hall"
+    }
+  ]
+}
+

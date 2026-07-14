@@ -93,6 +93,8 @@ The roadmap is divided into small, verifiable stages. Each stage must end with a
 
 ## Stage 6: Test the scheduling core
 
+**Status:** Complete for scheduling core 0.2.0
+
 - Add unit tests for every hard constraint.
 - Add unit tests for every soft constraint and penalty.
 - Test impossible and contradictory problems.

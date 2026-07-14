@@ -32,6 +32,7 @@ Project documentation:
 - [Data model](docs/data-model/README.md)
 - [Solver prototype](docs/solver-prototype/README.md)
 - [Scheduling core](docs/scheduling-core/README.md)
+- [Testing strategy](docs/testing/README.md)
 - [Contributing guide](CONTRIBUTING.md)
 - [Architecture decisions](docs/adr/README.md)
 

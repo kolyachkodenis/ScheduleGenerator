@@ -24,6 +24,11 @@ def load_example() -> dict:
 class SolverPrototypeTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
+        cls.expectations = json.loads(
+            (ROOT / "tests" / "reference" / "small-school.expectations.json").read_text(
+                encoding="utf-8"
+            )
+        )
         cls.problem = SchedulingProblem.from_mapping(load_example())
         cls.typed_result = generate_schedule(
             cls.problem,
@@ -32,9 +37,21 @@ class SolverPrototypeTests(unittest.TestCase):
         cls.result = cls.typed_result.to_dict()
 
     def test_example_produces_verified_timetable(self) -> None:
-        self.assertIn(self.result["status"], {"OPTIMAL", "FEASIBLE"})
-        self.assertEqual(self.result["validation_errors"], [])
-        self.assertEqual(len(self.result["assignments"]), 27)
+        self.assertIn(self.result["status"], self.expectations["allowed_statuses"])
+        self.assertEqual(
+            len(self.result["validation_errors"]),
+            self.expectations["validation_error_count"],
+        )
+        self.assertEqual(
+            len(self.result["assignments"]), self.expectations["assignment_count"]
+        )
+        self.assertEqual(
+            {
+                item["constraint_id"]
+                for item in self.result["quality_report"]["violations"]
+            }.issubset(set(self.expectations["quality_constraint_ids"])),
+            True,
+        )
 
     def test_fixed_lesson_is_preserved(self) -> None:
         assignment = next(
@@ -83,6 +100,11 @@ class SolverPrototypeTests(unittest.TestCase):
 
     def test_fully_unavailable_teacher_reports_input_infeasibility(self) -> None:
         dataset = copy.deepcopy(load_example())
+        overlay = json.loads(
+            (ROOT / "tests" / "reference" / "teacher-unavailable.overlay.json").read_text(
+                encoding="utf-8"
+            )
+        )
         all_slots = [
             {"day_id": day["id"], "period_id": period["id"]}
             for day in dataset["academic_period"]["days"]
@@ -91,7 +113,7 @@ class SolverPrototypeTests(unittest.TestCase):
         availability = next(
             item
             for item in dataset["resource_availability"]
-            if item["resource"] == {"type": "teacher", "id": "t_math"}
+            if item["resource"] == overlay["resource"]
         )
         availability["unavailable_slots"] = all_slots
         availability["preferred_slots"] = []
@@ -100,9 +122,12 @@ class SolverPrototypeTests(unittest.TestCase):
             dataset, GenerationOptions(time_limit_seconds=1)
         ).to_dict()
 
-        self.assertEqual(result["status"], "INPUT_INFEASIBLE")
+        self.assertEqual(result["status"], overlay["expected_status"])
         self.assertTrue(
-            any(item["code"] == "NO_CANDIDATE" for item in result["diagnostics"])
+            any(
+                item["code"] == overlay["expected_diagnostic_code"]
+                for item in result["diagnostics"]
+            )
         )
 
     def test_invalid_dataset_returns_actionable_status(self) -> None:
