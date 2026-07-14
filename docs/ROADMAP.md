@@ -243,4 +243,4 @@ Integrations, mobile applications, teacher substitutions, and complex alternatin
 
 ## Next milestone
 
-Complete discovery with representative real school data while starting Stage 12: users, authorization, audit trails, and operational security.
+Complete discovery with representative real school data while starting Stage 13: reproducible deployment, observability, health checks, and operational procedures.

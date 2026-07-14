@@ -10,7 +10,7 @@ Install the development requirements, then run:
 python scripts/run_web_app.py --database schedule-generator.db
 ```
 
-Open `http://127.0.0.1:8765`. On a new database, use **Load demonstration school** to create a safe synthetic workspace.
+Open `http://127.0.0.1:8765`. A new database first asks for its administrator account. After signing in, use **Load demonstration school** to create a safe synthetic workspace.
 
 ## Operator workflow
 
@@ -21,10 +21,11 @@ Open `http://127.0.0.1:8765`. On a new database, use **Load demonstration school
 5. Review the selected alternative on **Results**. Timetables can be viewed by class, teacher, or classroom alongside the quality report.
 6. Choose **Edit timetable** to move lessons, inspect conflicts, lock placements, regenerate the unlocked remainder, and compare versions.
 7. Approve a conflict-free version, publish its XLSX and PDF files, or revoke those downloads from the distribution panel.
+8. Administrators manage accounts, inspect the audit trail, and create database backups on **Security**.
 
 Approval is disabled while hard conflicts are present, and later edits never silently change an already approved version.
 
-The server listens on the loopback interface by default. Binding it to another interface is not recommended until authentication and authorization are implemented in Stage 12.
+The server listens on the loopback interface by default. A non-loopback deployment requires TLS termination and the operational hardening described in the [security baseline](../security/README.md).
 
 ## Architecture
 

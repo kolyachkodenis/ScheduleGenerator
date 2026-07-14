@@ -20,7 +20,7 @@ The system should account for, among other things:
 
 ## Status
 
-The scheduling core, automated test suite, local operator workflow, versioned editing, and controlled XLSX/PDF publication are implemented. Discovery with representative real school data remains in progress.
+The scheduling core, automated test suite, protected local operator workflow, versioned editing, controlled XLSX/PDF publication, role-based access, audit trail, and database backups are implemented. Discovery with representative real school data remains in progress.
 
 Project documentation:
 
@@ -38,6 +38,7 @@ Project documentation:
 - [Operator user interface](docs/user-interface/README.md)
 - [Manual timetable editing](docs/manual-editing/README.md)
 - [Timetable publication](docs/publication/README.md)
+- [Users and security](docs/security/README.md)
 - [Contributing guide](CONTRIBUTING.md)
 - [Architecture decisions](docs/adr/README.md)
 

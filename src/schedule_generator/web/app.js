@@ -1,10 +1,14 @@
-const state = { datasets: [], jobs: [], drafts: [], publications: [], dataset: null, collection: "classes", poller: null };
+const state = { datasets: [], jobs: [], drafts: [], publications: [], permissions: [], currentUser: null, dataset: null, collection: "classes", poller: null, initialized: false };
 const collections = [
   ["classes", "Classes"], ["teachers", "Teachers"], ["subjects", "Subjects"],
   ["classrooms", "Classrooms"], ["groups", "Groups"], ["cohorts", "Cohorts"],
   ["curriculum_requirements", "Curriculum"], ["resource_availability", "Availability"]
 ];
-const titles = { overview: "Overview", data: "School data", rules: "Rules", generate: "Generate", results: "Results" };
+const titles = { overview: "Overview", data: "School data", rules: "Rules", generate: "Generate", results: "Results", admin: "Security" };
+
+function can(permission) {
+  return state.permissions.includes("*") || state.permissions.includes(permission);
+}
 
 function html(value) {
   return String(value).replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
@@ -16,7 +20,10 @@ async function api(path, options = {}) {
     headers: { "Content-Type": "application/json", ...(options.headers || {}) }
   });
   const payload = await response.json();
-  if (!response.ok) throw new Error(payload.detail || payload.error || "Request failed");
+  if (!response.ok) {
+    if (response.status === 401 && !path.startsWith("/api/security/")) showAuth(true);
+    throw new Error(payload.detail || payload.error || "Request failed");
+  }
   return payload;
 }
 
@@ -30,11 +37,49 @@ function notice(message, error = false) {
 }
 
 function showView(name) {
+  if (name === "admin" && !can("security:admin")) name = "overview";
   document.querySelectorAll(".view").forEach((view) => view.classList.toggle("active", view.id === `view-${name}`));
   document.querySelectorAll(".nav-item").forEach((item) => item.classList.toggle("active", item.dataset.view === name));
   document.querySelector("#page-title").textContent = titles[name];
   location.hash = name;
   if (name === "results") renderResults();
+  if (name === "admin") loadSecurity();
+}
+
+function showAuth(initialized) {
+  state.initialized = initialized;
+  document.querySelector("#auth-gate").hidden = false;
+  document.querySelector("#auth-title").textContent = initialized ? "Sign in" : "Create administrator";
+  document.querySelector("#auth-description").textContent = initialized ? "Use your workspace account to continue." : "Initialize this workspace with its first administrator account.";
+  document.querySelector("#auth-submit").textContent = initialized ? "Sign in" : "Create workspace";
+  document.querySelector("#auth-password").autocomplete = initialized ? "current-password" : "new-password";
+}
+
+async function initialize() {
+  try {
+    const status = await api("/api/security/status");
+    if (!status.initialized || !status.authenticated) return showAuth(status.initialized);
+    document.querySelector("#auth-gate").hidden = true;
+    await loadState(true);
+  } catch (error) { showAuth(true); }
+}
+
+async function authenticate(event) {
+  event.preventDefault();
+  const error = document.querySelector("#auth-error");
+  error.hidden = true;
+  try {
+    await api(state.initialized ? "/api/security/login" : "/api/security/bootstrap", {
+      method: "POST",
+      body: JSON.stringify({username: document.querySelector("#auth-username").value, password: document.querySelector("#auth-password").value})
+    });
+    document.querySelector("#auth-form").reset();
+    document.querySelector("#auth-gate").hidden = true;
+    await loadState(true);
+  } catch (exception) {
+    error.textContent = exception.message;
+    error.hidden = false;
+  }
 }
 
 async function loadState(quiet = false) {
@@ -44,6 +89,8 @@ async function loadState(quiet = false) {
     state.jobs = payload.jobs;
     state.drafts = payload.drafts || [];
     state.publications = payload.publications || [];
+    state.permissions = payload.permissions || [];
+    state.currentUser = payload.current_user || null;
     state.dataset = state.datasets[0] || null;
     render();
     if (!quiet) notice("Workspace refreshed");
@@ -52,6 +99,12 @@ async function loadState(quiet = false) {
 
 function render() {
   const data = state.dataset?.data;
+  document.querySelector("#user-badge").textContent = state.currentUser ? `${state.currentUser.username} · ${state.currentUser.role}` : "";
+  document.querySelector("#admin-nav").hidden = !can("security:admin");
+  document.querySelector("#save-collection").hidden = !can("data:write");
+  document.querySelector("#collection-json").readOnly = !can("data:write");
+  document.querySelector("#load-demo").hidden = !can("data:write");
+  document.querySelectorAll("#generation-form input, #generation-form button").forEach((element) => { element.disabled = !can("generation:write"); });
   document.querySelector("#empty-state").hidden = Boolean(data);
   document.querySelector("#dashboard").hidden = !data;
   document.querySelector("#dataset-badge").textContent = data ? `Revision ${state.dataset.revision} · ${data.dataset_id}` : "No dataset";
@@ -179,10 +232,11 @@ function renderEditing(draft) {
   const regenerate = document.querySelector("#regenerate-draft");
   const historyPanel = document.querySelector("#history-panel");
   const conflict = document.querySelector("#conflict-banner");
-  start.hidden = Boolean(draft);
-  undo.disabled = !draft || draft.current_version === 0;
-  redo.disabled = !draft || draft.current_version >= draft.latest_version;
-  regenerate.hidden = !draft;
+  const editable = can("draft:write");
+  start.hidden = Boolean(draft) || !editable;
+  undo.disabled = !editable || !draft || draft.current_version === 0;
+  redo.disabled = !editable || !draft || draft.current_version >= draft.latest_version;
+  regenerate.hidden = !editable || !draft;
   historyPanel.hidden = !draft;
   document.querySelector("#version-label").textContent = draft ? `Draft version ${draft.current_version}` : "Generated result";
   const errors = draft?.version.validation_errors || [];
@@ -208,21 +262,25 @@ function renderPublication(draft) {
   const publication = state.publications.find((item) => item.draft_id === draft.draft_id && item.version === draft.current_version);
   if (!publication) {
     const blocked = draft.version.validation_errors.length > 0;
-    target.innerHTML = `<p>Version ${draft.current_version} is a draft${blocked ? " with unresolved conflicts" : " ready for review"}.</p><button id="approve-publication" class="primary-button" ${blocked ? "disabled" : ""}>Approve version</button>`;
+    const action = can("publication:write") ? `<button id="approve-publication" class="primary-button" ${blocked ? "disabled" : ""}>Approve version</button>` : "";
+    target.innerHTML = `<p>Version ${draft.current_version} is a draft${blocked ? " with unresolved conflicts" : " ready for review"}.</p>${action}`;
     target.querySelector("#approve-publication")?.addEventListener("click", approvePublication);
     return;
   }
   if (publication.status === "APPROVED") {
-    target.innerHTML = `<p><span class="status-pill approved">Approved</span> Version ${publication.version} is immutable and ready to publish.</p><button id="publish-publication" class="primary-button">Publish XLSX and PDF</button>`;
+    const action = can("publication:write") ? `<button id="publish-publication" class="primary-button">Publish XLSX and PDF</button>` : "";
+    target.innerHTML = `<p><span class="status-pill approved">Approved</span> Version ${publication.version} is immutable and ready to publish.</p>${action}`;
     target.querySelector("#publish-publication")?.addEventListener("click", () => changePublication(publication.publication_id, "publish"));
     return;
   }
   const links = Object.entries(publication.artifacts).map(([kind, artifact]) => `<a href="/downloads/${encodeURIComponent(artifact.filename)}">Download ${html(kind.toUpperCase())}</a>`).join("");
   if (publication.status === "PUBLISHED") {
-    target.innerHTML = `<p><span class="status-pill published">Published</span> Version ${publication.version} is available for distribution.</p><div class="download-links">${links}</div><button id="unpublish-publication" class="text-button">Unpublish</button>`;
+    const action = can("publication:write") ? `<button id="unpublish-publication" class="text-button">Unpublish</button>` : "";
+    target.innerHTML = `<p><span class="status-pill published">Published</span> Version ${publication.version} is available for distribution.</p><div class="download-links">${links}</div>${action}`;
     target.querySelector("#unpublish-publication")?.addEventListener("click", () => changePublication(publication.publication_id, "unpublish"));
   } else {
-    target.innerHTML = `<p><span class="status-pill unpublished">Unpublished</span> Version ${publication.version} is no longer available for download.</p><button id="republish-publication" class="primary-button">Publish again</button>`;
+    const action = can("publication:write") ? `<button id="republish-publication" class="primary-button">Publish again</button>` : "";
+    target.innerHTML = `<p><span class="status-pill unpublished">Unpublished</span> Version ${publication.version} is no longer available for download.</p>${action}`;
     target.querySelector("#republish-publication")?.addEventListener("click", () => changePublication(publication.publication_id, "publish"));
   }
 }
@@ -423,6 +481,50 @@ async function cancelJob(jobId) {
   catch (error) { notice(error.message, true); }
 }
 
+async function loadSecurity() {
+  if (!can("security:admin")) return;
+  try {
+    const [users, audit] = await Promise.all([api("/api/users"), api("/api/audit")]);
+    document.querySelector("#user-list").innerHTML = users.users.map((user) => `<div class="user-row ${user.enabled ? "" : "disabled"}" data-user-id="${html(user.user_id)}"><div><strong>${html(user.username)}</strong><small>${user.enabled ? "Enabled" : "Disabled"}</small></div><select data-user-role>${["administrator", "scheduler", "reviewer", "reader"].map((role) => `<option value="${role}" ${role === user.role ? "selected" : ""}>${role}</option>`).join("")}</select><button class="text-button" data-toggle-user>${user.enabled ? "Disable" : "Enable"}</button></div>`).join("");
+    document.querySelectorAll("[data-user-role]").forEach((select) => select.addEventListener("change", () => updateUser(select.closest("[data-user-id]").dataset.userId, {role: select.value})));
+    document.querySelectorAll("[data-toggle-user]").forEach((button) => button.addEventListener("click", () => updateUser(button.closest("[data-user-id]").dataset.userId, {enabled: button.textContent === "Enable"})));
+    document.querySelector("#audit-list").innerHTML = audit.events.length ? audit.events.map((event) => `<div class="audit-row ${html(event.outcome)}"><strong>${html(event.action)}</strong><small>${html(event.actor_username || "system")} · ${html(event.target_type)}${event.target_id ? ` · ${html(event.target_id)}` : ""} · ${html(event.created_at)}</small></div>`).join("") : `<div class="run-placeholder">No audit events.</div>`;
+  } catch (error) { notice(error.message, true); }
+}
+
+async function createUser(event) {
+  event.preventDefault();
+  try {
+    await api("/api/users", {method: "POST", body: JSON.stringify({username: document.querySelector("#new-username").value, role: document.querySelector("#new-role").value, password: document.querySelector("#new-password").value})});
+    event.target.reset();
+    await loadSecurity();
+    notice("User created");
+  } catch (error) { notice(error.message, true); }
+}
+
+async function updateUser(userId, changes) {
+  try {
+    await api(`/api/users/${encodeURIComponent(userId)}`, {method: "PUT", body: JSON.stringify(changes)});
+    await loadSecurity();
+    notice("User updated");
+  } catch (error) { await loadSecurity(); notice(error.message, true); }
+}
+
+async function createBackup() {
+  try {
+    const backup = await api("/api/admin/backup", {method: "POST"});
+    await loadSecurity();
+    notice(`Backup ${backup.filename} created`);
+  } catch (error) { notice(error.message, true); }
+}
+
+async function logout() {
+  try { await api("/api/security/logout", {method: "POST"}); } catch (_error) { /* Session may already be gone. */ }
+  state.currentUser = null;
+  state.permissions = [];
+  showAuth(true);
+}
+
 function startPolling() {
   if (state.poller) return;
   state.poller = setInterval(() => loadState(true), 1200);
@@ -432,6 +534,8 @@ function stopPolling() { clearInterval(state.poller); state.poller = null; }
 document.querySelectorAll(".nav-item").forEach((item) => item.addEventListener("click", () => showView(item.dataset.view)));
 document.querySelectorAll("[data-go]").forEach((item) => item.addEventListener("click", () => showView(item.dataset.go)));
 document.querySelector("#refresh").addEventListener("click", () => loadState());
+document.querySelector("#auth-form").addEventListener("submit", authenticate);
+document.querySelector("#logout").addEventListener("click", logout);
 document.querySelector("#load-demo").addEventListener("click", async () => { try { await api("/api/demo", { method: "POST" }); await loadState(true); notice("Demonstration school loaded"); } catch (error) { notice(error.message, true); } });
 document.querySelector("#save-collection").addEventListener("click", saveCollection);
 document.querySelector("#generation-form").addEventListener("submit", startGeneration);
@@ -443,6 +547,9 @@ document.querySelector("#undo-edit").addEventListener("click", async () => { try
 document.querySelector("#redo-edit").addEventListener("click", async () => { try { await draftAction("redo"); notice("Redid change"); } catch (error) { notice(error.message, true); } });
 document.querySelector("#regenerate-draft").addEventListener("click", async () => { try { notice("Regenerating unlocked lessons…"); await draftAction("regenerate", {time_limit_seconds: 10, seed: 1, workers: 1}); notice("Unlocked lessons regenerated"); } catch (error) { notice(error.message, true); } });
 document.querySelector("#compare-versions").addEventListener("click", compareVersions);
+document.querySelector("#user-form").addEventListener("submit", createUser);
+document.querySelector("#refresh-security").addEventListener("click", loadSecurity);
+document.querySelector("#create-backup").addEventListener("click", createBackup);
 document.querySelector("#close-move").addEventListener("click", () => document.querySelector("#move-dialog").close());
 document.querySelector("#toggle-lock").addEventListener("click", toggleCurrentLock);
 document.querySelector("#move-form").addEventListener("submit", async (event) => {
@@ -456,4 +563,4 @@ document.querySelector("#move-form").addEventListener("submit", async (event) =>
   );
 });
 showView(location.hash.slice(1) in titles ? location.hash.slice(1) : "overview");
-loadState(true);
+initialize();

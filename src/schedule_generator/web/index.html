@@ -7,6 +7,18 @@
   <link rel="stylesheet" href="/assets/styles.css">
 </head>
 <body>
+  <section id="auth-gate" class="auth-gate" hidden>
+    <form id="auth-form" class="auth-card">
+      <span class="brand-mark">SG</span>
+      <p class="eyebrow" id="auth-eyebrow">Protected workspace</p>
+      <h1 id="auth-title">Sign in</h1>
+      <p id="auth-description">Use your workspace account to continue.</p>
+      <div class="field"><label for="auth-username">Username</label><input id="auth-username" autocomplete="username" required minlength="3" maxlength="64"></div>
+      <div class="field"><label for="auth-password">Password</label><input id="auth-password" type="password" autocomplete="current-password" required minlength="12"></div>
+      <button id="auth-submit" class="primary-button large" type="submit">Sign in</button>
+      <p id="auth-error" class="auth-error" hidden></p>
+    </form>
+  </section>
   <div class="app-shell">
     <aside class="sidebar">
       <a class="brand" href="#overview" aria-label="ScheduleGenerator home">
@@ -19,6 +31,7 @@
         <button class="nav-item" data-view="rules"><span>03</span> Rules</button>
         <button class="nav-item" data-view="generate"><span>04</span> Generate</button>
         <button class="nav-item" data-view="results"><span>05</span> Results</button>
+        <button id="admin-nav" class="nav-item" data-view="admin" hidden><span>06</span> Security</button>
       </nav>
       <div class="sidebar-note">
         <span class="status-dot"></span>
@@ -34,6 +47,8 @@
         </div>
         <div class="top-actions">
           <span id="dataset-badge" class="dataset-badge">No dataset</span>
+          <span id="user-badge" class="dataset-badge"></span>
+          <button id="logout" class="text-button">Sign out</button>
           <button id="refresh" class="icon-button" title="Refresh data" aria-label="Refresh data">↻</button>
         </div>
       </header>
@@ -137,6 +152,26 @@
               <article id="publication-panel" class="panel"><div class="panel-heading"><div><p class="eyebrow">Distribution</p><h3>Publish timetable</h3></div></div><div id="publication-status" class="publication-status"></div></article>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section id="view-admin" class="view">
+        <div class="section-intro"><div><p class="eyebrow">Access control</p><h2>Users and audit</h2><p>Manage workspace accounts, review important actions, and create a verified database backup.</p></div><button id="create-backup" class="primary-button">Create backup</button></div>
+        <div class="two-column admin-grid">
+          <article class="panel">
+            <div class="panel-heading"><div><p class="eyebrow">Accounts</p><h3>Workspace users</h3></div></div>
+            <form id="user-form" class="user-form">
+              <div class="field"><label for="new-username">Username</label><input id="new-username" required minlength="3" maxlength="64"></div>
+              <div class="field"><label for="new-role">Role</label><select id="new-role"><option value="reader">Reader</option><option value="scheduler">Scheduler</option><option value="reviewer">Reviewer</option><option value="administrator">Administrator</option></select></div>
+              <div class="field"><label for="new-password">Initial password</label><input id="new-password" type="password" required minlength="12"></div>
+              <button class="primary-button" type="submit">Create user</button>
+            </form>
+            <div id="user-list" class="user-list"></div>
+          </article>
+          <article class="panel">
+            <div class="panel-heading"><div><p class="eyebrow">Audit trail</p><h3>Recent events</h3></div><button id="refresh-security" class="text-button">Refresh</button></div>
+            <div id="audit-list" class="audit-list"></div>
+          </article>
         </div>
       </section>
     </main>

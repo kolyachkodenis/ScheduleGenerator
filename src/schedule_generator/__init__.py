@@ -26,6 +26,16 @@ from schedule_generator.publication import (
     export_xlsx,
     timetable_views,
 )
+from schedule_generator.security import (
+    ROLE_PERMISSIONS,
+    ROLES,
+    AuditEvent,
+    AuthenticationError,
+    AuthorizationError,
+    SecurityService,
+    Session,
+    User,
+)
 from schedule_generator.storage import DatasetStore, StoredDataset
 
 __all__ = [
@@ -56,6 +66,14 @@ __all__ = [
     "timetable_views",
     "export_xlsx",
     "export_pdf",
+    "ROLES",
+    "ROLE_PERMISSIONS",
+    "User",
+    "Session",
+    "AuditEvent",
+    "SecurityService",
+    "AuthenticationError",
+    "AuthorizationError",
 ]
 
-__version__ = "0.7.0"
+__version__ = "0.8.0"

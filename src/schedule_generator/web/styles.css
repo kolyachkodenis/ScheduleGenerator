@@ -15,6 +15,12 @@
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 body { margin: 0; background: var(--paper); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+.auth-gate { position: fixed; z-index: 100; inset: 0; display: grid; place-items: center; padding: 24px; background: #102a49; }
+.auth-card { width: min(430px, 100%); display: grid; gap: 17px; padding: 38px; background: var(--white); box-shadow: 0 24px 70px rgba(0,0,0,.28); }
+.auth-card .brand-mark { color: var(--navy); border-color: var(--line); }
+.auth-card h1 { margin: -8px 0 0; font-size: 31px; }
+.auth-card > p:not(.eyebrow) { margin: -8px 0 2px; color: var(--muted); line-height: 1.5; }
+.auth-error { color: var(--red) !important; font-size: 13px; }
 button, input, select, textarea { font: inherit; }
 button { cursor: pointer; }
 .app-shell { min-height: 100vh; display: grid; grid-template-columns: 242px 1fr; }
@@ -160,6 +166,18 @@ textarea:focus, input:focus, select:focus { outline: 2px solid #8dbce8; outline-
 .status-pill.unpublished { color: var(--muted); background: #eef1f4; }
 .download-links { display: flex; flex-wrap: wrap; gap: 8px; }
 .download-links a { color: var(--blue); background: var(--sky); padding: 8px 10px; font-weight: 700; text-decoration: none; }
+.admin-grid { grid-template-columns: 1fr 1.1fr; align-items: start; }
+.user-form { display: grid; grid-template-columns: 1fr 150px; gap: 12px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.user-form .field:nth-child(3), .user-form button { grid-column: 1 / -1; }
+.user-form button { justify-self: start; }
+.user-list, .audit-list { display: grid; gap: 8px; margin-top: 18px; max-height: 520px; overflow-y: auto; }
+.user-row, .audit-row { padding: 11px; background: #f7f9fb; border-left: 3px solid var(--line); font-size: 12px; }
+.user-row { display: grid; grid-template-columns: 1fr 140px auto; gap: 9px; align-items: center; }
+.user-row strong, .user-row small, .audit-row strong, .audit-row small { display: block; }
+.user-row small, .audit-row small { margin-top: 3px; color: var(--muted); }
+.user-row.disabled { opacity: .55; }
+.audit-row.success { border-left-color: var(--green); }
+.audit-row.denied { border-left-color: var(--red); }
 dialog { width: min(520px, calc(100vw - 30px)); border: 0; padding: 0; color: var(--ink); box-shadow: 0 24px 70px rgba(15, 35, 58, .26); }
 dialog::backdrop { background: rgba(14, 30, 50, .62); }
 dialog form { display: grid; gap: 15px; padding: 25px; }
@@ -176,6 +194,7 @@ dialog form { display: grid; gap: 15px; padding: 25px; }
   main { padding: 0 24px 40px; }
   .metric-grid { grid-template-columns: repeat(2, 1fr); }
   .two-column, .generate-grid, .result-grid { grid-template-columns: 1fr; }
+  .admin-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 660px) {
   .app-shell { display: block; }

@@ -74,6 +74,8 @@ The JSON Schema validates shapes and primitive ranges. The semantic validator ad
 
 A `day` is a recurring teaching day in the academic period. A `period` defines an ordinal lesson position and optional clock times. A `shift` selects the periods available to its classes. A time slot is a `day_id` and `period_id` pair.
 
+Local access control is stored separately from school reference data. `app_users` contains the username, password hash, role, enabled state, lockout counters, and security timestamps. `user_sessions` stores only hashed, expiring, revocable session tokens. `audit_events` records an actor, action, target, outcome, selected non-secret metadata, and timestamp.
+
 Calendar exceptions and alternating-week patterns are intentionally not modeled in version 0.1.0 because discovery has not confirmed their MVP semantics.
 
 ## Student grouping without personal data
@@ -127,6 +129,6 @@ Without `jsonschema`, the command still performs JSON parsing and semantic check
 - grade-specific subject workload values;
 - building locations and travel time;
 - the boundary between dataset policy and generation-run configuration;
-- immutable version storage and detailed audit-event format.
+- external identity-provider integration and long-term audit retention policy.
 
 These decisions must be resolved with discovery evidence before Stage 3 is marked complete.

@@ -122,6 +122,47 @@ MIGRATIONS = (
             ON timetable_publications(status, approved_at);
         """,
     ),
+    (
+        5,
+        """
+        CREATE TABLE IF NOT EXISTS app_users (
+            user_id TEXT PRIMARY KEY,
+            username TEXT NOT NULL UNIQUE COLLATE NOCASE,
+            password_hash TEXT NOT NULL,
+            role TEXT NOT NULL CHECK (role IN ('administrator', 'scheduler', 'reviewer', 'reader')),
+            enabled INTEGER NOT NULL DEFAULT 1 CHECK (enabled IN (0, 1)),
+            failed_login_count INTEGER NOT NULL DEFAULT 0,
+            locked_until TEXT,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            last_login_at TEXT
+        );
+        CREATE TABLE IF NOT EXISTS user_sessions (
+            session_id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            token_hash TEXT NOT NULL UNIQUE,
+            expires_at TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            revoked_at TEXT,
+            FOREIGN KEY (user_id) REFERENCES app_users(user_id) ON DELETE CASCADE
+        );
+        CREATE INDEX IF NOT EXISTS user_sessions_lookup
+            ON user_sessions(token_hash, expires_at);
+        CREATE TABLE IF NOT EXISTS audit_events (
+            event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            actor_user_id TEXT,
+            action TEXT NOT NULL,
+            target_type TEXT NOT NULL,
+            target_id TEXT,
+            outcome TEXT NOT NULL,
+            details_json TEXT NOT NULL DEFAULT '{}',
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (actor_user_id) REFERENCES app_users(user_id) ON DELETE SET NULL
+        );
+        CREATE INDEX IF NOT EXISTS audit_events_created_at
+            ON audit_events(created_at, event_id);
+        """,
+    ),
 )
 
 

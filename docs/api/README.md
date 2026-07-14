@@ -41,6 +41,12 @@ Pass edited assignment dictionaries to `validate_assignments`. The independent h
 
 `PublicationService` approves a conflict-free immutable draft version, generates class and teacher views in XLSX and PDF, and controls whether those files are available for download. Artifact metadata includes a SHA-256 digest so distributed files can be verified. See the [publication workflow](../publication/README.md) for lifecycle and route details.
 
+## Authentication and authorization
+
+All workspace routes require a valid server-side session. `SecurityService` owns local accounts, role permissions, password hashing, session lifecycle, lockout, and audit records. The public surface is limited to security status, one-time bootstrap, login, and static assets. Published downloads still require reader access.
+
+Administrators can list and update users, inspect recent audit events, and create an online SQLite backup. Passwords and session tokens are accepted only by their dedicated endpoints and never appear in returned user or audit objects. See the [security baseline](../security/README.md) for the role matrix and recovery procedure.
+
 ## Reference data
 
 The service exposes read/save operations for complete school datasets and validated replacement of top-level reference collections. Invalid changes are rejected before a storage transaction begins.

@@ -1,9 +1,5 @@
 # Contributing
 
-## Language
-
-Repository content, including code, comments, commit messages, issues, and documentation, must be written in English.
-
 ## Workflow
 
 1. Start from the latest `main` branch.
@@ -41,4 +37,3 @@ python scripts/check_docs.py
 ```
 
 The script validates required documents, whitespace, and local Markdown links.
-

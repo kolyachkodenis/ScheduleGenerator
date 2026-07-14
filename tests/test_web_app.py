@@ -73,6 +73,19 @@ class WebApplicationTests(unittest.TestCase):
             service_factory=service_factory,
             editing_factory=editing_factory,
         )
+        original_dispatch = self.application.dispatch
+        bootstrap = original_dispatch(
+            "POST",
+            "/api/security/bootstrap",
+            json.dumps(
+                {"username": "admin", "password": "Long-Initial-Password!42"}
+            ).encode(),
+        )
+        cookie = dict(bootstrap.headers)["Set-Cookie"].split(";", 1)[0]
+        self.raw_dispatch = original_dispatch
+        self.application.dispatch = lambda method, path, body=b"": original_dispatch(
+            method, path, body, {"Cookie": cookie}
+        )
 
     def tearDown(self) -> None:
         self.temporary.cleanup()
@@ -89,6 +102,41 @@ class WebApplicationTests(unittest.TestCase):
         self.assertIn(b"School data", page.body)
         self.assertIn(b"startGeneration", script.body)
         self.assertIn(b".timetable", style.body)
+
+    def test_authentication_and_role_authorization(self) -> None:
+        unauthenticated = self.raw_dispatch("GET", "/api/state")
+        self.assertEqual(unauthenticated.status, HTTPStatus.UNAUTHORIZED)
+        created = self.application.dispatch(
+            "POST",
+            "/api/users",
+            json.dumps(
+                {
+                    "username": "reader",
+                    "password": "Distinct-Viewing-Key!42",
+                    "role": "reader",
+                }
+            ).encode(),
+        )
+        self.assertEqual(created.status, HTTPStatus.CREATED)
+        login = self.raw_dispatch(
+            "POST",
+            "/api/security/login",
+            json.dumps(
+                {"username": "reader", "password": "Distinct-Viewing-Key!42"}
+            ).encode(),
+        )
+        reader_cookie = dict(login.headers)["Set-Cookie"].split(";", 1)[0]
+        readable = self.raw_dispatch("GET", "/api/state", headers={"Cookie": reader_cookie})
+        forbidden = self.raw_dispatch("POST", "/api/demo", headers={"Cookie": reader_cookie})
+        self.assertEqual(readable.status, HTTPStatus.OK)
+        self.assertEqual(forbidden.status, HTTPStatus.FORBIDDEN)
+
+    def test_admin_routes_create_backup_and_expose_audit(self) -> None:
+        self.application.dispatch("POST", "/api/demo")
+        backup = self.application.dispatch("POST", "/api/admin/backup")
+        audit = self.payload(self.application.dispatch("GET", "/api/audit"))
+        self.assertEqual(backup.status, HTTPStatus.CREATED)
+        self.assertTrue(any(item["action"] == "backup.created" for item in audit["events"]))
 
     def test_demo_setup_and_state_endpoint(self) -> None:
         created = self.application.dispatch("POST", "/api/demo")

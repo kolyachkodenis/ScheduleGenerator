@@ -20,3 +20,4 @@ Architecture decision records (ADRs) document technical choices that would other
 - [ADR 0005: Use persistent transport-neutral generation jobs](0005-use-persistent-generation-jobs.md)
 - [ADR 0006: Use a build-free local web interface](0006-use-local-web-interface.md)
 - [ADR 0007: Use linear version history for timetable drafts](0007-use-linear-timetable-draft-history.md)
+- [ADR 0008: Use local role-based access control](0008-use-local-role-based-access-control.md)

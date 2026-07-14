@@ -7,16 +7,25 @@ import json
 import mimetypes
 import threading
 from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
 from http import HTTPStatus
+from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, Mapping
 from urllib.parse import unquote, urlparse
 
 from schedule_generator.api import GenerationOptions
 from schedule_generator.editing import TimetableDraft, TimetableEditingService
 from schedule_generator.jobs import GenerationJob, GenerationRequest, SchedulingService
 from schedule_generator.publication import PublicationService
+from schedule_generator.security import (
+    ROLE_PERMISSIONS,
+    AuthenticationError,
+    AuthorizationError,
+    SecurityService,
+    User,
+)
 from schedule_generator.storage import DatasetStore
 
 
@@ -30,14 +39,21 @@ class WebResponse:
     status: int
     body: bytes
     content_type: str = "application/json; charset=utf-8"
+    headers: tuple[tuple[str, str], ...] = ()
 
     @classmethod
-    def json(cls, status: int, value: Any) -> WebResponse:
+    def json(
+        cls,
+        status: int,
+        value: Any,
+        headers: tuple[tuple[str, str], ...] = (),
+    ) -> WebResponse:
         return cls(
             status,
             (json.dumps(value, ensure_ascii=False, separators=(",", ":")) + "\n").encode(
                 "utf-8"
             ),
+            headers=headers,
         )
 
 
@@ -82,11 +98,13 @@ class WebApplication:
         self,
         database: str | Path,
         run_in_background: bool = True,
+        secure_cookie: bool = False,
         service_factory: Callable[[DatasetStore], SchedulingService] = SchedulingService,
         editing_factory: Callable[[DatasetStore], TimetableEditingService] = TimetableEditingService,
     ) -> None:
         self.database = Path(database)
         self.run_in_background = run_in_background
+        self.secure_cookie = secure_cookie
         self.service_factory = service_factory
         self.editing_factory = editing_factory
 
@@ -102,46 +120,94 @@ class WebApplication:
         store = DatasetStore(self.database)
         return store, PublicationService(store, self.database.parent / "published")
 
-    def dispatch(self, method: str, raw_path: str, body: bytes = b"") -> WebResponse:
+    def dispatch(
+        self,
+        method: str,
+        raw_path: str,
+        body: bytes = b"",
+        headers: Mapping[str, str] | None = None,
+    ) -> WebResponse:
         path = unquote(urlparse(raw_path).path)
+        request_headers = {key.casefold(): value for key, value in (headers or {}).items()}
         try:
             if method == "GET" and path in {"/", "/index.html"}:
                 return self._asset("index.html")
             if method == "GET" and path.startswith("/assets/"):
                 return self._asset(path.removeprefix("/assets/"))
-            if method == "GET" and path.startswith("/downloads/"):
-                return self._download(path.removeprefix("/downloads/"))
             payload = json.loads(body.decode("utf-8")) if body else {}
             if not isinstance(payload, dict):
                 raise ValueError("request body must be a JSON object")
+            if method == "GET" and path == "/api/security/status":
+                return self._security_status(request_headers)
+            if method == "POST" and path == "/api/security/bootstrap":
+                return self._bootstrap(payload)
+            if method == "POST" and path == "/api/security/login":
+                return self._login(payload)
+            if method == "POST" and path == "/api/security/logout":
+                user, token = self._authorize(request_headers, "workspace:read")
+                return self._logout(user, token)
+            if method == "GET" and path.startswith("/downloads/"):
+                user, _token = self._authorize(request_headers, "workspace:read")
+                return self._download(path.removeprefix("/downloads/"), user)
             if method == "GET" and path == "/api/state":
-                return self._state()
+                user, _token = self._authorize(request_headers, "workspace:read")
+                return self._state(user)
+            if method == "GET" and path == "/api/users":
+                user, _token = self._authorize(request_headers, "security:admin")
+                return self._list_users(user)
+            if method == "POST" and path == "/api/users":
+                user, _token = self._authorize(request_headers, "security:admin")
+                return self._create_user(payload, user)
+            if method == "PUT" and path.startswith("/api/users/"):
+                user, _token = self._authorize(request_headers, "security:admin")
+                return self._update_user(path.removeprefix("/api/users/"), payload, user)
+            if method == "GET" and path == "/api/audit":
+                user, _token = self._authorize(request_headers, "security:admin")
+                return self._audit_events(user)
+            if method == "POST" and path == "/api/admin/backup":
+                user, _token = self._authorize(request_headers, "security:admin")
+                return self._backup(user)
             if method == "POST" and path == "/api/demo":
-                return self._load_demo()
+                user, _token = self._authorize(request_headers, "data:write")
+                return self._load_demo(user)
             if method == "POST" and path == "/api/jobs":
-                return self._create_job(payload)
+                user, _token = self._authorize(request_headers, "generation:write")
+                return self._create_job(payload, user)
             if path.startswith("/api/jobs/"):
                 job_id, action = self._job_path(path)
                 if method == "GET" and action is None:
+                    self._authorize(request_headers, "workspace:read")
                     return self._get_job(job_id)
                 if method == "POST" and action == "cancel":
-                    return self._cancel_job(job_id)
+                    user, _token = self._authorize(request_headers, "generation:write")
+                    return self._cancel_job(job_id, user)
                 if method == "POST" and action == "draft":
-                    return self._create_draft(job_id)
+                    user, _token = self._authorize(request_headers, "draft:write")
+                    return self._create_draft(job_id, user)
             if path.startswith("/api/drafts/"):
                 draft_id, action = self._draft_path(path)
                 if method == "GET" and action is None:
+                    self._authorize(request_headers, "workspace:read")
                     return self._get_draft(draft_id)
                 if method == "POST":
-                    return self._edit_draft(draft_id, action, payload)
+                    permission = "publication:write" if action == "approve" else "draft:write"
+                    user, _token = self._authorize(request_headers, permission)
+                    return self._edit_draft(draft_id, action, payload, user)
             if method == "POST" and path.startswith("/api/publications/"):
                 publication_id, action = self._publication_path(path)
-                return self._change_publication(publication_id, action)
+                user, _token = self._authorize(request_headers, "publication:write")
+                return self._change_publication(publication_id, action, user)
             if method == "PUT" and path.startswith("/api/datasets/"):
-                return self._replace_collection(path, payload)
+                user, _token = self._authorize(request_headers, "data:write")
+                return self._replace_collection(path, payload, user)
             if method == "POST" and path == "/api/validate":
+                self._authorize(request_headers, "draft:write")
                 return self._validate(payload)
             return WebResponse.json(HTTPStatus.NOT_FOUND, {"error": "route not found"})
+        except AuthenticationError as error:
+            return WebResponse.json(HTTPStatus.UNAUTHORIZED, {"error": str(error)})
+        except AuthorizationError as error:
+            return WebResponse.json(HTTPStatus.FORBIDDEN, {"error": str(error)})
         except (KeyError, ValueError, json.JSONDecodeError, UnicodeError) as error:
             return WebResponse.json(HTTPStatus.BAD_REQUEST, {"error": str(error)})
         except Exception as error:
@@ -149,6 +215,114 @@ class WebApplication:
                 HTTPStatus.INTERNAL_SERVER_ERROR,
                 {"error": "request failed", "detail": str(error)},
             )
+
+    @staticmethod
+    def _session_token(headers: Mapping[str, str]) -> str | None:
+        authorization = headers.get("authorization", "")
+        if authorization.startswith("Bearer "):
+            return authorization.removeprefix("Bearer ").strip()
+        cookie = SimpleCookie()
+        cookie.load(headers.get("cookie", ""))
+        return cookie["sg_session"].value if "sg_session" in cookie else None
+
+    def _authorize(
+        self, headers: Mapping[str, str], permission: str
+    ) -> tuple[User, str]:
+        token = self._session_token(headers)
+        store = DatasetStore(self.database)
+        try:
+            security = SecurityService(store)
+            user = security.authenticate(token)
+            security.require(user, permission)
+            return user, token or ""
+        finally:
+            store.close()
+
+    def _session_cookie(self, token: str, max_age: int = 43_200) -> tuple[str, str]:
+        value = (
+            f"sg_session={token}; Path=/; HttpOnly; SameSite=Strict; Max-Age={max_age}"
+            if token
+            else "sg_session=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0"
+        )
+        if self.secure_cookie:
+            value += "; Secure"
+        return "Set-Cookie", value
+
+    def _security_status(self, headers: Mapping[str, str]) -> WebResponse:
+        store = DatasetStore(self.database)
+        try:
+            security = SecurityService(store)
+            user = None
+            try:
+                user = security.authenticate(self._session_token(headers))
+            except AuthenticationError:
+                pass
+            return WebResponse.json(
+                HTTPStatus.OK,
+                {
+                    "initialized": security.has_users(),
+                    "authenticated": user is not None,
+                    "user": user.to_dict() if user else None,
+                },
+            )
+        finally:
+            store.close()
+
+    def _bootstrap(self, payload: dict[str, Any]) -> WebResponse:
+        store = DatasetStore(self.database)
+        try:
+            security = SecurityService(store)
+            user = security.bootstrap(
+                str(payload.get("username", "")), str(payload.get("password", ""))
+            )
+            session = security.login(user.username, str(payload.get("password", "")))
+            return WebResponse.json(
+                HTTPStatus.CREATED,
+                {"user": session.user.to_dict(), "expires_at": session.expires_at},
+                (self._session_cookie(session.token),),
+            )
+        finally:
+            store.close()
+
+    def _login(self, payload: dict[str, Any]) -> WebResponse:
+        store = DatasetStore(self.database)
+        try:
+            session = SecurityService(store).login(
+                str(payload.get("username", "")), str(payload.get("password", ""))
+            )
+            return WebResponse.json(
+                HTTPStatus.OK,
+                {"user": session.user.to_dict(), "expires_at": session.expires_at},
+                (self._session_cookie(session.token),),
+            )
+        finally:
+            store.close()
+
+    def _logout(self, user: User, token: str) -> WebResponse:
+        store = DatasetStore(self.database)
+        try:
+            SecurityService(store).logout(token, user)
+            return WebResponse.json(
+                HTTPStatus.OK, {"logged_out": True}, (self._session_cookie("", 0),)
+            )
+        finally:
+            store.close()
+
+    def _audit(
+        self,
+        user: User,
+        action: str,
+        target_type: str,
+        target_id: str | None = None,
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        store = DatasetStore(self.database)
+        try:
+            SecurityService(store).audit(
+                user.user_id, action, target_type, target_id, details=details
+            )
+        finally:
+            store.close()
 
     def _asset(self, name: str) -> WebResponse:
         assets = {
@@ -164,7 +338,7 @@ class WebApplication:
             content_type += "; charset=utf-8"
         return WebResponse(HTTPStatus.OK, path.read_bytes(), content_type)
 
-    def _state(self) -> WebResponse:
+    def _state(self, user: User) -> WebResponse:
         store, service = self._service()
         try:
             datasets = [
@@ -192,25 +366,29 @@ class WebApplication:
                     "jobs": jobs,
                     "drafts": drafts,
                     "publications": publications,
+                    "current_user": user.to_dict(),
+                    "permissions": sorted(ROLE_PERMISSIONS[user.role]),
                 },
             )
         finally:
             store.close()
 
-    def _load_demo(self) -> WebResponse:
+    def _load_demo(self, user: User) -> WebResponse:
         dataset = json.loads(DEMO_PATH.read_text(encoding="utf-8"))
         store, service = self._service()
         try:
             saved = service.save_reference_data(dataset)
-            return WebResponse.json(
+            response = WebResponse.json(
                 HTTPStatus.CREATED,
                 {"dataset_id": saved.dataset_id, "revision": saved.revision},
             )
+            self._audit(user, "dataset.demo_loaded", "dataset", saved.dataset_id)
+            return response
         finally:
             store.close()
 
     def _replace_collection(
-        self, path: str, payload: dict[str, Any]
+        self, path: str, payload: dict[str, Any], user: User
     ) -> WebResponse:
         parts = path.strip("/").split("/")
         if len(parts) != 5 or parts[3] != "collections":
@@ -222,14 +400,22 @@ class WebApplication:
         store, service = self._service()
         try:
             saved = service.replace_reference_collection(dataset_id, collection, records)
-            return WebResponse.json(
+            response = WebResponse.json(
                 HTTPStatus.OK,
                 {"dataset_id": saved.dataset_id, "revision": saved.revision},
             )
+            self._audit(
+                user,
+                "dataset.collection_replaced",
+                "dataset",
+                saved.dataset_id,
+                {"collection": collection, "revision": saved.revision},
+            )
+            return response
         finally:
             store.close()
 
-    def _create_job(self, payload: dict[str, Any]) -> WebResponse:
+    def _create_job(self, payload: dict[str, Any], user: User) -> WebResponse:
         request = GenerationRequest(
             dataset_id=str(payload.get("dataset_id", "")),
             alternatives=int(payload.get("alternatives", 1)),
@@ -251,7 +437,10 @@ class WebApplication:
             ).start()
         else:
             self._run_job(job.job_id)
-            return self._get_job(job.job_id, status=HTTPStatus.CREATED)
+            response = self._get_job(job.job_id, status=HTTPStatus.CREATED)
+            self._audit(user, "generation.created", "job", job.job_id)
+            return response
+        self._audit(user, "generation.created", "job", job.job_id)
         return WebResponse.json(HTTPStatus.ACCEPTED, job_to_dict(job))
 
     def _run_job(self, job_id: str) -> None:
@@ -277,12 +466,14 @@ class WebApplication:
         finally:
             store.close()
 
-    def _cancel_job(self, job_id: str) -> WebResponse:
+    def _cancel_job(self, job_id: str, user: User) -> WebResponse:
         store, service = self._service()
         try:
-            return WebResponse.json(
+            response = WebResponse.json(
                 HTTPStatus.OK, job_to_dict(service.cancel_job(job_id))
             )
+            self._audit(user, "generation.cancelled", "job", job_id)
+            return response
         finally:
             store.close()
 
@@ -293,12 +484,13 @@ class WebApplication:
             raise ValueError("invalid draft route")
         return parts[2], parts[3] if len(parts) == 4 else None
 
-    def _create_draft(self, job_id: str) -> WebResponse:
+    def _create_draft(self, job_id: str, user: User) -> WebResponse:
         store, editing = self._editing()
         try:
-            return WebResponse.json(
-                HTTPStatus.CREATED, draft_to_dict(editing.create_from_job(job_id))
-            )
+            draft = editing.create_from_job(job_id)
+            response = WebResponse.json(HTTPStatus.CREATED, draft_to_dict(draft))
+            self._audit(user, "draft.created", "draft", draft.draft_id, {"job_id": job_id})
+            return response
         finally:
             store.close()
 
@@ -310,7 +502,11 @@ class WebApplication:
             store.close()
 
     def _edit_draft(
-        self, draft_id: str, action: str | None, payload: dict[str, Any]
+        self,
+        draft_id: str,
+        action: str | None,
+        payload: dict[str, Any],
+        user: User,
     ) -> WebResponse:
         store, editing = self._editing()
         try:
@@ -323,28 +519,35 @@ class WebApplication:
                     payload.get("teacher_id"),
                     payload.get("classroom_id"),
                 )
-                return WebResponse.json(HTTPStatus.OK, draft_to_dict(draft))
+                response = WebResponse.json(HTTPStatus.OK, draft_to_dict(draft))
+                self._audit(user, "draft.moved", "draft", draft_id, {"assignment_id": payload.get("assignment_id")})
+                return response
             if action == "lock":
                 draft = editing.set_lock(
                     draft_id,
                     str(payload.get("assignment_id", "")),
                     bool(payload.get("locked", True)),
                 )
-                return WebResponse.json(HTTPStatus.OK, draft_to_dict(draft))
+                response = WebResponse.json(HTTPStatus.OK, draft_to_dict(draft))
+                self._audit(user, "draft.lock_changed", "draft", draft_id, {"assignment_id": payload.get("assignment_id"), "locked": bool(payload.get("locked", True))})
+                return response
             if action == "undo":
-                return WebResponse.json(HTTPStatus.OK, draft_to_dict(editing.undo(draft_id)))
+                draft = editing.undo(draft_id)
+                self._audit(user, "draft.undo", "draft", draft_id)
+                return WebResponse.json(HTTPStatus.OK, draft_to_dict(draft))
             if action == "redo":
-                return WebResponse.json(HTTPStatus.OK, draft_to_dict(editing.redo(draft_id)))
+                draft = editing.redo(draft_id)
+                self._audit(user, "draft.redo", "draft", draft_id)
+                return WebResponse.json(HTTPStatus.OK, draft_to_dict(draft))
             if action == "regenerate":
                 options = GenerationOptions(
                     float(payload.get("time_limit_seconds", 10)),
                     int(payload.get("seed", 1)),
                     int(payload.get("workers", 1)),
                 )
-                return WebResponse.json(
-                    HTTPStatus.OK,
-                    draft_to_dict(editing.regenerate(draft_id, options)),
-                )
+                draft = editing.regenerate(draft_id, options)
+                self._audit(user, "draft.regenerated", "draft", draft_id)
+                return WebResponse.json(HTTPStatus.OK, draft_to_dict(draft))
             if action == "compare":
                 return WebResponse.json(
                     HTTPStatus.OK,
@@ -356,9 +559,15 @@ class WebApplication:
                 publications = PublicationService(
                     store, self.database.parent / "published"
                 )
-                return WebResponse.json(
-                    HTTPStatus.CREATED, publications.approve(draft_id).to_dict()
+                publication = publications.approve(draft_id)
+                self._audit(
+                    user,
+                    "publication.approved",
+                    "publication",
+                    publication.publication_id,
+                    {"draft_id": draft_id, "version": publication.version},
                 )
+                return WebResponse.json(HTTPStatus.CREATED, publication.to_dict())
             raise ValueError("unknown draft action")
         finally:
             store.close()
@@ -370,7 +579,9 @@ class WebApplication:
             raise ValueError("invalid publication route")
         return parts[2], parts[3]
 
-    def _change_publication(self, publication_id: str, action: str) -> WebResponse:
+    def _change_publication(
+        self, publication_id: str, action: str, user: User
+    ) -> WebResponse:
         store, publications = self._publication()
         try:
             publication = (
@@ -378,15 +589,111 @@ class WebApplication:
                 if action == "publish"
                 else publications.unpublish(publication_id)
             )
+            self._audit(
+                user,
+                f"publication.{action}ed",
+                "publication",
+                publication_id,
+                {"version": publication.version},
+            )
             return WebResponse.json(HTTPStatus.OK, publication.to_dict())
         finally:
             store.close()
 
-    def _download(self, filename: str) -> WebResponse:
+    def _download(self, filename: str, user: User) -> WebResponse:
         store, publications = self._publication()
         try:
             path, content_type = publications.download(filename)
-            return WebResponse(HTTPStatus.OK, path.read_bytes(), content_type)
+            response = WebResponse(HTTPStatus.OK, path.read_bytes(), content_type)
+            self._audit(user, "publication.downloaded", "artifact", filename)
+            return response
+        finally:
+            store.close()
+
+    def _list_users(self, _actor: User) -> WebResponse:
+        store = DatasetStore(self.database)
+        try:
+            return WebResponse.json(
+                HTTPStatus.OK,
+                {"users": [item.to_dict() for item in SecurityService(store).list_users()]},
+            )
+        finally:
+            store.close()
+
+    def _create_user(self, payload: dict[str, Any], actor: User) -> WebResponse:
+        store = DatasetStore(self.database)
+        try:
+            security = SecurityService(store)
+            user = security.create_user(
+                str(payload.get("username", "")),
+                str(payload.get("password", "")),
+                str(payload.get("role", "reader")),
+            )
+            security.audit(
+                actor.user_id,
+                "user.created",
+                "user",
+                user.user_id,
+                details={"role": user.role},
+            )
+            return WebResponse.json(HTTPStatus.CREATED, user.to_dict())
+        finally:
+            store.close()
+
+    def _update_user(
+        self, user_id: str, payload: dict[str, Any], actor: User
+    ) -> WebResponse:
+        store = DatasetStore(self.database)
+        try:
+            security = SecurityService(store)
+            if "password" in payload and ({"role", "enabled"} & payload.keys()):
+                raise ValueError("password reset must be a separate request")
+            if "password" in payload:
+                security.reset_password(user_id, str(payload["password"]))
+                security.audit(actor.user_id, "user.password_reset", "user", user_id)
+            user = security.update_user(
+                user_id,
+                role=str(payload["role"]) if "role" in payload else None,
+                enabled=bool(payload["enabled"]) if "enabled" in payload else None,
+            )
+            security.audit(
+                actor.user_id,
+                "user.updated",
+                "user",
+                user_id,
+                details={"role": user.role, "enabled": user.enabled},
+            )
+            return WebResponse.json(HTTPStatus.OK, user.to_dict())
+        finally:
+            store.close()
+
+    def _audit_events(self, _actor: User) -> WebResponse:
+        store = DatasetStore(self.database)
+        try:
+            events = SecurityService(store).list_audit_events()
+            return WebResponse.json(
+                HTTPStatus.OK, {"events": [event.to_dict() for event in events]}
+            )
+        finally:
+            store.close()
+
+    def _backup(self, actor: User) -> WebResponse:
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        destination = self.database.parent / "backups" / f"schedule-generator-{timestamp}.db"
+        store = DatasetStore(self.database)
+        try:
+            path = store.backup(destination)
+            SecurityService(store).audit(
+                actor.user_id,
+                "backup.created",
+                "backup",
+                path.name,
+                details={"size": path.stat().st_size},
+            )
+            return WebResponse.json(
+                HTTPStatus.CREATED,
+                {"filename": path.name, "size": path.stat().st_size},
+            )
         finally:
             store.close()
 
@@ -417,11 +724,22 @@ def make_handler(application: WebApplication) -> type[BaseHTTPRequestHandler]:
                     HTTPStatus.REQUEST_ENTITY_TOO_LARGE, {"error": "request too large"}
                 )
             else:
-                response = application.dispatch(self.command, self.path, self.rfile.read(length))
+                response = application.dispatch(
+                    self.command,
+                    self.path,
+                    self.rfile.read(length),
+                    {key: value for key, value in self.headers.items()},
+                )
             self.send_response(response.status)
             self.send_header("Content-Type", response.content_type)
             self.send_header("Content-Length", str(len(response.body)))
             self.send_header("Cache-Control", "no-store")
+            self.send_header("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'")
+            self.send_header("X-Content-Type-Options", "nosniff")
+            self.send_header("Referrer-Policy", "no-referrer")
+            self.send_header("X-Frame-Options", "DENY")
+            for key, value in response.headers:
+                self.send_header(key, value)
             self.end_headers()
             self.wfile.write(response.body)
 
@@ -435,8 +753,13 @@ def make_handler(application: WebApplication) -> type[BaseHTTPRequestHandler]:
     return RequestHandler
 
 
-def serve(database: str | Path, host: str = "127.0.0.1", port: int = 8765) -> None:
-    application = WebApplication(database)
+def serve(
+    database: str | Path,
+    host: str = "127.0.0.1",
+    port: int = 8765,
+    secure_cookie: bool = False,
+) -> None:
+    application = WebApplication(database, secure_cookie=secure_cookie)
     server = ThreadingHTTPServer((host, port), make_handler(application))
     print(f"ScheduleGenerator UI: http://{host}:{port}")
     try:
@@ -452,8 +775,13 @@ def main() -> None:
     parser.add_argument("--database", type=Path, default=Path("schedule-generator.db"))
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8765)
+    parser.add_argument(
+        "--secure-cookie",
+        action="store_true",
+        help="mark session cookies Secure when the application is served through HTTPS",
+    )
     args = parser.parse_args()
-    serve(args.database, args.host, args.port)
+    serve(args.database, args.host, args.port, args.secure_cookie)
 
 
 if __name__ == "__main__":
