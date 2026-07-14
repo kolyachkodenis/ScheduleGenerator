@@ -131,6 +131,25 @@ class WebApplicationTests(unittest.TestCase):
         self.assertEqual(readable.status, HTTPStatus.OK)
         self.assertEqual(forbidden.status, HTTPStatus.FORBIDDEN)
 
+    def test_health_and_protected_metrics_endpoints(self) -> None:
+        live = self.raw_dispatch("GET", "/health/live")
+        ready = self.raw_dispatch("GET", "/health/ready")
+        protected = WebApplication(
+            Path(self.temporary.name) / "metrics.db", metrics_token="monitoring-secret"
+        )
+        denied = protected.dispatch("GET", "/metrics")
+        metrics = protected.dispatch(
+            "GET",
+            "/metrics",
+            headers={"Authorization": "Bearer monitoring-secret"},
+        )
+        self.assertEqual(live.status, HTTPStatus.OK)
+        self.assertEqual(ready.status, HTTPStatus.OK)
+        self.assertEqual(self.payload(ready)["checks"]["database"], "ok")
+        self.assertEqual(denied.status, HTTPStatus.UNAUTHORIZED)
+        self.assertEqual(metrics.status, HTTPStatus.OK)
+        self.assertIn(b"schedule_generator_up 1", metrics.body)
+
     def test_admin_routes_create_backup_and_expose_audit(self) -> None:
         self.application.dispatch("POST", "/api/demo")
         backup = self.application.dispatch("POST", "/api/admin/backup")

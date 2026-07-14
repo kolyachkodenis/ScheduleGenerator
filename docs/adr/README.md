@@ -21,3 +21,4 @@ Architecture decision records (ADRs) document technical choices that would other
 - [ADR 0006: Use a build-free local web interface](0006-use-local-web-interface.md)
 - [ADR 0007: Use linear version history for timetable drafts](0007-use-linear-timetable-draft-history.md)
 - [ADR 0008: Use local role-based access control](0008-use-local-role-based-access-control.md)
+- [ADR 0009: Use process-local operational telemetry](0009-use-process-local-observability.md)

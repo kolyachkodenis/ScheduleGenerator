@@ -47,6 +47,15 @@ All workspace routes require a valid server-side session. `SecurityService` owns
 
 Administrators can list and update users, inspect recent audit events, and create an online SQLite backup. Passwords and session tokens are accepted only by their dedicated endpoints and never appear in returned user or audit objects. See the [security baseline](../security/README.md) for the role matrix and recovery procedure.
 
+## Operational endpoints
+
+- `GET /health/live` reports process liveness.
+- `GET /health/ready` verifies database and data-directory readiness.
+- `GET /metrics` returns Prometheus metrics and accepts the deployment metrics bearer token.
+
+The health endpoints do not expose school data or account state. Production configuration requires
+the metrics token; it is independent of user sessions and must be held by the monitoring system.
+
 ## Reference data
 
 The service exposes read/save operations for complete school datasets and validated replacement of top-level reference collections. Invalid changes are rejected before a storage transaction begins.

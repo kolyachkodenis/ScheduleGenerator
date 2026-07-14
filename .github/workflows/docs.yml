@@ -15,12 +15,22 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
       - name: Validate documentation
         run: python scripts/check_docs.py
       - name: Validate constraint coverage
         run: python scripts/check_constraint_coverage.py
       - name: Install validation dependencies
         run: python -m pip install --requirement requirements-dev.txt
+      - name: Lint Python sources
+        run: ruff check src tests scripts
+      - name: Compile Python sources
+        run: python -m compileall -q src tests scripts
       - name: Validate example datasets
         run: python scripts/validate_dataset.py --require-schema examples/small-school.json
       - name: Test validation rules
@@ -31,3 +41,15 @@ jobs:
         run: python -m schedule_generator examples/small-school.json --output generation-result.json --time-limit 10
         env:
           PYTHONPATH: src
+      - name: Build deployment image
+        run: |
+          docker build --tag schedule-generator:${{ github.sha }} .
+          trap 'docker rm --force schedule-generator-ci >/dev/null 2>&1 || true' EXIT
+          docker run --detach --name schedule-generator-ci --publish 8765:8765 \
+            --env SG_ENVIRONMENT=test --env SG_DATABASE=/tmp/ci.db \
+            --env SG_HOST=0.0.0.0 schedule-generator:${{ github.sha }}
+          if ! curl --fail --retry 60 --retry-all-errors --retry-delay 1 \
+            http://127.0.0.1:8765/health/ready; then
+            docker logs schedule-generator-ci
+            exit 1
+          fi

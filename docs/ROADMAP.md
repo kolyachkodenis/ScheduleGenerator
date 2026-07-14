@@ -162,6 +162,8 @@ The roadmap is divided into small, verifiable stages. Each stage must end with a
 
 ## Stage 11: Export and publication
 
+**Status:** Complete for controlled publication 0.7.0
+
 - Export timetables to XLSX and PDF.
 - Produce printer-friendly layouts.
 - Provide separate views for classes and teachers.
@@ -173,6 +175,8 @@ The roadmap is divided into small, verifiable stages. Each stage must end with a
 
 ## Stage 12: Users and security
 
+**Status:** Complete for local role-based access 0.8.0
+
 - Define administrator, scheduler, reviewer, and reader roles.
 - Implement authentication and authorization.
 - Audit important actions.
@@ -183,6 +187,8 @@ The roadmap is divided into small, verifiable stages. Each stage must end with a
 **Deliverable:** the system can safely handle real school data.
 
 ## Stage 13: Operations and observability
+
+**Status:** Complete for single-process deployment 0.9.0
 
 - Provide containers and a reproducible local setup.
 - Configure separate development, test, and production environments.
@@ -243,4 +249,4 @@ Integrations, mobile applications, teacher substitutions, and complex alternatin
 
 ## Next milestone
 
-Complete discovery with representative real school data while starting Stage 13: reproducible deployment, observability, health checks, and operational procedures.
+Complete discovery with representative real school data and prepare Stage 14 pilot entry criteria, anonymized data handling, and comparison measurements.

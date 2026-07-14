@@ -1,0 +1,15 @@
+services:
+  application:
+    build:
+      context: .
+    env_file:
+      - ./config/environments/${SG_ENVIRONMENT:-development}.env
+    ports:
+      - "${SG_PORT:-8765}:8765"
+    volumes:
+      - schedule-generator-data:/data
+    restart: unless-stopped
+    init: true
+
+volumes:
+  schedule-generator-data:

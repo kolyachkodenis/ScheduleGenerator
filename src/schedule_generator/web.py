@@ -3,21 +3,32 @@
 from __future__ import annotations
 
 import argparse
+import hmac
 import json
+import logging
 import mimetypes
+import os
 import threading
+import uuid
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from http import HTTPStatus
 from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from time import perf_counter
 from typing import Any, Callable, Mapping
 from urllib.parse import unquote, urlparse
 
 from schedule_generator.api import GenerationOptions
 from schedule_generator.editing import TimetableDraft, TimetableEditingService
 from schedule_generator.jobs import GenerationJob, GenerationRequest, SchedulingService
+from schedule_generator.operations import (
+    AppConfig,
+    OperationalMetrics,
+    configure_logging,
+    normalized_route,
+)
 from schedule_generator.publication import PublicationService
 from schedule_generator.security import (
     ROLE_PERMISSIONS,
@@ -32,6 +43,7 @@ from schedule_generator.storage import DatasetStore
 ASSET_ROOT = Path(__file__).with_name("web")
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEMO_PATH = PROJECT_ROOT / "examples" / "small-school.json"
+LOGGER = logging.getLogger("schedule_generator.web")
 
 
 @dataclass(frozen=True)
@@ -99,12 +111,18 @@ class WebApplication:
         database: str | Path,
         run_in_background: bool = True,
         secure_cookie: bool = False,
+        environment: str = "development",
+        metrics_token: str | None = None,
+        metrics: OperationalMetrics | None = None,
         service_factory: Callable[[DatasetStore], SchedulingService] = SchedulingService,
         editing_factory: Callable[[DatasetStore], TimetableEditingService] = TimetableEditingService,
     ) -> None:
         self.database = Path(database)
         self.run_in_background = run_in_background
         self.secure_cookie = secure_cookie
+        self.environment = environment
+        self.metrics_token = metrics_token
+        self.metrics = metrics or OperationalMetrics()
         self.service_factory = service_factory
         self.editing_factory = editing_factory
 
@@ -130,6 +148,12 @@ class WebApplication:
         path = unquote(urlparse(raw_path).path)
         request_headers = {key.casefold(): value for key, value in (headers or {}).items()}
         try:
+            if method == "GET" and path == "/health/live":
+                return self._health_live()
+            if method == "GET" and path == "/health/ready":
+                return self._health_ready()
+            if method == "GET" and path == "/metrics":
+                return self._metrics(request_headers)
             if method == "GET" and path in {"/", "/index.html"}:
                 return self._asset("index.html")
             if method == "GET" and path.startswith("/assets/"):
@@ -211,10 +235,53 @@ class WebApplication:
         except (KeyError, ValueError, json.JSONDecodeError, UnicodeError) as error:
             return WebResponse.json(HTTPStatus.BAD_REQUEST, {"error": str(error)})
         except Exception as error:
-            return WebResponse.json(
-                HTTPStatus.INTERNAL_SERVER_ERROR,
-                {"error": "request failed", "detail": str(error)},
+            LOGGER.exception(
+                "request failed",
+                extra={"event": "request.failed", "method": method, "path": path},
             )
+            payload = {"error": "request failed"}
+            if self.environment == "development":
+                payload["detail"] = str(error)
+            return WebResponse.json(HTTPStatus.INTERNAL_SERVER_ERROR, payload)
+
+    def _health_live(self) -> WebResponse:
+        return WebResponse.json(
+            HTTPStatus.OK,
+            {"status": "ok", "environment": self.environment},
+        )
+
+    def _health_ready(self) -> WebResponse:
+        checks: dict[str, str] = {}
+        try:
+            self.database.parent.mkdir(parents=True, exist_ok=True)
+            store = DatasetStore(self.database)
+            try:
+                store.connection.execute("SELECT 1").fetchone()
+                checks["database"] = "ok"
+            finally:
+                store.close()
+            checks["data_directory"] = (
+                "ok" if os.access(self.database.parent, os.W_OK) else "not_writable"
+            )
+        except Exception:
+            LOGGER.exception("readiness check failed", extra={"event": "health.not_ready"})
+            checks.setdefault("database", "error")
+        ready = all(value == "ok" for value in checks.values())
+        return WebResponse.json(
+            HTTPStatus.OK if ready else HTTPStatus.SERVICE_UNAVAILABLE,
+            {"status": "ready" if ready else "not_ready", "checks": checks},
+        )
+
+    def _metrics(self, headers: Mapping[str, str]) -> WebResponse:
+        if self.metrics_token:
+            supplied = headers.get("authorization", "").removeprefix("Bearer ").strip()
+            if not hmac.compare_digest(supplied, self.metrics_token):
+                return WebResponse.json(HTTPStatus.UNAUTHORIZED, {"error": "invalid metrics token"})
+        return WebResponse(
+            HTTPStatus.OK,
+            self.metrics.render().encode("utf-8"),
+            "text/plain; version=0.0.4; charset=utf-8",
+        )
 
     @staticmethod
     def _session_token(headers: Mapping[str, str]) -> str | None:
@@ -444,9 +511,27 @@ class WebApplication:
         return WebResponse.json(HTTPStatus.ACCEPTED, job_to_dict(job))
 
     def _run_job(self, job_id: str) -> None:
+        started = perf_counter()
         store, service = self._service()
         try:
-            service.run_job(job_id)
+            job = service.run_job(job_id)
+            self.metrics.observe_job(job.status.value, perf_counter() - started)
+            LOGGER.info(
+                "generation job finished",
+                extra={
+                    "event": "generation.finished",
+                    "job_id": job_id,
+                    "status": job.status.value,
+                    "duration_seconds": round(perf_counter() - started, 6),
+                },
+            )
+        except Exception:
+            self.metrics.observe_job("ERROR", perf_counter() - started)
+            LOGGER.exception(
+                "generation job crashed",
+                extra={"event": "generation.crashed", "job_id": job_id},
+            )
+            raise
         finally:
             store.close()
 
@@ -718,6 +803,8 @@ class WebApplication:
 def make_handler(application: WebApplication) -> type[BaseHTTPRequestHandler]:
     class RequestHandler(BaseHTTPRequestHandler):
         def _respond(self) -> None:
+            started = perf_counter()
+            request_id = self.headers.get("X-Request-ID") or uuid.uuid4().hex
             length = int(self.headers.get("Content-Length", "0"))
             if length > 10_000_000:
                 response = WebResponse.json(
@@ -738,17 +825,33 @@ def make_handler(application: WebApplication) -> type[BaseHTTPRequestHandler]:
             self.send_header("X-Content-Type-Options", "nosniff")
             self.send_header("Referrer-Policy", "no-referrer")
             self.send_header("X-Frame-Options", "DENY")
+            self.send_header("X-Request-ID", request_id)
             for key, value in response.headers:
                 self.send_header(key, value)
             self.end_headers()
             self.wfile.write(response.body)
+            duration = perf_counter() - started
+            application.metrics.observe_http(
+                self.command, self.path, response.status, duration
+            )
+            LOGGER.info(
+                "request completed",
+                extra={
+                    "event": "http.request",
+                    "request_id": request_id,
+                    "method": self.command,
+                    "path": normalized_route(self.path),
+                    "status": response.status,
+                    "duration_seconds": round(duration, 6),
+                },
+            )
 
         do_GET = _respond
         do_POST = _respond
         do_PUT = _respond
 
         def log_message(self, format: str, *args: object) -> None:
-            print(f"{self.address_string()} - {format % args}")
+            return
 
     return RequestHandler
 
@@ -758,30 +861,76 @@ def serve(
     host: str = "127.0.0.1",
     port: int = 8765,
     secure_cookie: bool = False,
+    environment: str = "development",
+    log_level: str = "INFO",
+    log_format: str = "text",
+    metrics_token: str | None = None,
 ) -> None:
-    application = WebApplication(database, secure_cookie=secure_cookie)
+    configure_logging(log_level, log_format)
+    application = WebApplication(
+        database,
+        secure_cookie=secure_cookie,
+        environment=environment,
+        metrics_token=metrics_token,
+    )
     server = ThreadingHTTPServer((host, port), make_handler(application))
-    print(f"ScheduleGenerator UI: http://{host}:{port}")
+    LOGGER.info(
+        "server started",
+        extra={
+            "event": "server.started",
+            "environment": environment,
+            "host": host,
+            "port": port,
+            "database": str(database),
+        },
+    )
     try:
         server.serve_forever()
     except KeyboardInterrupt:
         pass
     finally:
         server.server_close()
+        LOGGER.info("server stopped", extra={"event": "server.stopped"})
 
 
 def main() -> None:
+    config = AppConfig.from_env()
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--database", type=Path, default=Path("schedule-generator.db"))
-    parser.add_argument("--host", default="127.0.0.1")
-    parser.add_argument("--port", type=int, default=8765)
+    parser.add_argument("--database", type=Path, default=config.database)
+    parser.add_argument("--host", default=config.host)
+    parser.add_argument("--port", type=int, default=config.port)
+    parser.add_argument("--environment", default=config.environment)
+    parser.add_argument("--log-level", default=config.log_level)
+    parser.add_argument("--log-format", choices=("text", "json"), default=config.log_format)
+    parser.add_argument("--metrics-token", default=config.metrics_token)
     parser.add_argument(
         "--secure-cookie",
         action="store_true",
+        default=config.secure_cookie,
         help="mark session cookies Secure when the application is served through HTTPS",
     )
     args = parser.parse_args()
-    serve(args.database, args.host, args.port, args.secure_cookie)
+    effective = AppConfig(
+        environment=args.environment,
+        database=args.database,
+        host=args.host,
+        port=args.port,
+        secure_cookie=args.secure_cookie,
+        log_level=args.log_level.upper(),
+        log_format=args.log_format,
+        metrics_token=args.metrics_token,
+    )
+    effective.validate()
+    serve(
+        effective.database,
+        effective.host,
+        effective.port,
+        effective.secure_cookie,
+        effective.environment,
+        effective.log_level,
+        effective.log_format,
+        effective.metrics_token,
+    )
 
 
 if __name__ == "__main__":

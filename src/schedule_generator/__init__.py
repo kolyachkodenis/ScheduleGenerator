@@ -19,6 +19,7 @@ from schedule_generator.jobs import (
     JobStatus,
     SchedulingService,
 )
+from schedule_generator.operations import AppConfig, OperationalMetrics
 from schedule_generator.publication import (
     Publication,
     PublicationService,
@@ -74,6 +75,8 @@ __all__ = [
     "SecurityService",
     "AuthenticationError",
     "AuthorizationError",
+    "AppConfig",
+    "OperationalMetrics",
 ]
 
-__version__ = "0.8.0"
+__version__ = "0.9.0"

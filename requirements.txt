@@ -1,6 +1,4 @@
 jsonschema==4.26.0
 ortools==9.15.6755
-hypothesis==6.156.4
 reportlab==4.4.9
 pypdf==6.10.0
-ruff==0.12.5
