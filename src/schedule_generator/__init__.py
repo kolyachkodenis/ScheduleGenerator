@@ -11,6 +11,13 @@ from schedule_generator.api import (
     generate_schedule,
 )
 from schedule_generator.data_import import ImportIssue, ImportPreview, apply_import, preview_import
+from schedule_generator.jobs import (
+    GenerationAlternative,
+    GenerationJob,
+    GenerationRequest,
+    JobStatus,
+    SchedulingService,
+)
 from schedule_generator.storage import DatasetStore, StoredDataset
 
 __all__ = [
@@ -28,6 +35,11 @@ __all__ = [
     "ImportPreview",
     "preview_import",
     "apply_import",
+    "GenerationAlternative",
+    "GenerationJob",
+    "GenerationRequest",
+    "JobStatus",
+    "SchedulingService",
 ]
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"

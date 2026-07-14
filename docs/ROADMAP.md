@@ -121,6 +121,8 @@ The roadmap is divided into small, verifiable stages. Each stage must end with a
 
 ## Stage 8: Build the API and generation workflow
 
+**Status:** Complete for the transport-neutral application API 0.4.0
+
 - Design APIs for reference data, rules, and preferences.
 - Create and manage timetable generation jobs.
 - Support progress reporting, cancellation, and time limits.
@@ -237,4 +239,4 @@ Integrations, mobile applications, teacher substitutions, and complex alternatin
 
 ## Next milestone
 
-Complete discovery with representative real school data while starting Stage 8: expose the scheduling core and configuration storage through a stable API and generation-job workflow.
+Complete discovery with representative real school data while starting Stage 9: build the first operator user interface on the stable application API.

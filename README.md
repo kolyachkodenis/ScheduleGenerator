@@ -34,6 +34,7 @@ Project documentation:
 - [Scheduling core](docs/scheduling-core/README.md)
 - [Testing strategy](docs/testing/README.md)
 - [School data storage and import](docs/data-import/README.md)
+- [Application API and generation workflow](docs/api/README.md)
 - [Contributing guide](CONTRIBUTING.md)
 - [Architecture decisions](docs/adr/README.md)
 

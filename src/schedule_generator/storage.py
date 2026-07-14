@@ -34,6 +34,41 @@ MIGRATIONS = (
         );
         """,
     ),
+    (
+        2,
+        """
+        CREATE TABLE IF NOT EXISTS generation_jobs (
+            job_id TEXT PRIMARY KEY,
+            dataset_id TEXT NOT NULL,
+            dataset_revision INTEGER NOT NULL,
+            dataset_fingerprint TEXT NOT NULL,
+            status TEXT NOT NULL,
+            parameters_json TEXT NOT NULL,
+            progress_completed INTEGER NOT NULL DEFAULT 0,
+            progress_total INTEGER NOT NULL,
+            cancellation_requested INTEGER NOT NULL DEFAULT 0,
+            best_alternative INTEGER,
+            result_json TEXT,
+            diagnostics_json TEXT NOT NULL DEFAULT '[]',
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            started_at TEXT,
+            finished_at TEXT
+        );
+        CREATE INDEX IF NOT EXISTS generation_jobs_dataset_id
+            ON generation_jobs(dataset_id, created_at);
+        CREATE TABLE IF NOT EXISTS generation_alternatives (
+            job_id TEXT NOT NULL,
+            alternative_index INTEGER NOT NULL,
+            seed INTEGER NOT NULL,
+            status TEXT NOT NULL,
+            quality_penalty INTEGER,
+            result_json TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (job_id, alternative_index),
+            FOREIGN KEY (job_id) REFERENCES generation_jobs(job_id) ON DELETE CASCADE
+        );
+        """,
+    ),
 )
 
 
