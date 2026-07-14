@@ -12,6 +12,12 @@ python scripts/run_web_app.py --database schedule-generator.db
 
 Open `http://127.0.0.1:8765`. A new database first asks for its administrator account. After signing in, use **Load demonstration school** to create a safe synthetic workspace.
 
+The complete operator interface is available in English and Russian. The EN/RU switch remains
+available before sign-in and throughout the workspace, and the selected language is retained in
+the browser for later sessions. School-provided names and timetable data are displayed exactly as
+entered; interface controls, statuses, dates, validation messages, and operational feedback follow
+the selected locale.
+
 ## Operator workflow
 
 1. Review configuration readiness on **Overview**.

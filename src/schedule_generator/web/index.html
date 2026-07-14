@@ -7,6 +7,10 @@
   <link rel="stylesheet" href="/assets/styles.css">
 </head>
 <body>
+  <div class="language-switcher" role="group" aria-label="Interface language">
+    <button type="button" data-language="en" aria-pressed="true">EN</button>
+    <button type="button" data-language="ru" aria-pressed="false">RU</button>
+  </div>
   <section id="auth-gate" class="auth-gate" hidden>
     <form id="auth-form" class="auth-card">
       <span class="brand-mark">SG</span>
@@ -187,6 +191,7 @@
       <div class="dialog-actions"><button id="toggle-lock" class="text-button" type="button">Lock lesson</button><button class="primary-button" type="submit">Apply move</button></div>
     </form>
   </dialog>
+  <script src="/assets/i18n.js" defer></script>
   <script src="/assets/app.js" defer></script>
 </body>
 </html>

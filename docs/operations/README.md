@@ -1,6 +1,6 @@
 # Operations and observability
 
-This guide is the operational contract for ScheduleGenerator 0.9.0. The application is a
+This guide is the operational contract for ScheduleGenerator 0.9.1. The application is a
 single Python process backed by one persistent SQLite database and generated artifact folders.
 
 ## Runtime environments

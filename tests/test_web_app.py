@@ -97,10 +97,15 @@ class WebApplicationTests(unittest.TestCase):
     def test_static_operator_interface_is_served(self) -> None:
         page = self.application.dispatch("GET", "/")
         script = self.application.dispatch("GET", "/assets/app.js")
+        translations = self.application.dispatch("GET", "/assets/i18n.js")
         style = self.application.dispatch("GET", "/assets/styles.css")
         self.assertEqual(page.status, HTTPStatus.OK)
         self.assertIn(b"School data", page.body)
         self.assertIn(b"startGeneration", script.body)
+        self.assertEqual(translations.status, HTTPStatus.OK)
+        self.assertIn("Составить расписание".encode(), translations.body)
+        self.assertIn(b"schedule-generator-language", translations.body)
+        self.assertIn(b'data-language="ru"', page.body)
         self.assertIn(b".timetable", style.body)
 
     def test_authentication_and_role_authorization(self) -> None:

@@ -395,6 +395,7 @@ class WebApplication:
         assets = {
             "index.html": ASSET_ROOT / "index.html",
             "app.js": ASSET_ROOT / "app.js",
+            "i18n.js": ASSET_ROOT / "i18n.js",
             "styles.css": ASSET_ROOT / "styles.css",
         }
         path = assets.get(name)
