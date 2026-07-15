@@ -21,9 +21,9 @@ The timetable represents a five-day teaching week for 18 class sections across g
 through 11:
 
 - grades 10 and 11 have sections A and B;
-- grade 9 has sections A, B, and C;
+- grade 9 has sections A, B, and V (Cyrillic `В`);
 - grade 8 has sections A and B;
-- grades 5, 6, and 7 have sections A, B, and C;
+- grades 5, 6, and 7 have sections A, B, and V (Cyrillic `В`);
 - days contain up to seven numbered lesson periods;
 - younger classes generally have fewer lessons than older classes;
 - some classes have an empty first period;

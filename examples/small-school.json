@@ -80,13 +80,20 @@
         "ordinal": 6,
         "start_time": "12:55",
         "end_time": "13:40"
+      },
+      {
+        "id": "p7",
+        "label": "Period 7",
+        "ordinal": 7,
+        "start_time": "13:50",
+        "end_time": "14:35"
       }
     ],
     "shifts": [
       {
         "id": "morning",
         "label": "Morning shift",
-        "period_ids": ["p1", "p2", "p3", "p4", "p5", "p6"]
+        "period_ids": ["p1", "p2", "p3", "p4", "p5", "p6", "p7"]
       }
     ]
   },
@@ -458,14 +465,14 @@
           "type": "class",
           "id": "class_7a"
         },
-        "maximum": 6
+        "maximum": 7
       },
       {
         "resource": {
           "type": "class",
           "id": "class_8a"
         },
-        "maximum": 6
+        "maximum": 7
       },
       {
         "resource": {

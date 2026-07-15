@@ -21,10 +21,11 @@ MARKDOWN_LINK = re.compile(r"(?<!!)\[[^]]*]\(([^)]+)\)")
 
 
 def markdown_files() -> list[Path]:
+    excluded_directories = {".git", ".venv", "node_modules"}
     return sorted(
         path
         for path in ROOT.rglob("*.md")
-        if ".git" not in path.parts
+        if not excluded_directories.intersection(path.parts)
     )
 
 

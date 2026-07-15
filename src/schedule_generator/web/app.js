@@ -10,6 +10,7 @@ const titles = { overview: "Overview", data: "School data", rules: "Rules", gene
 function collectionLabel(key) { return t(collections.find(([item]) => item === key)?.[1] || key); }
 function roleLabel(role) { return t(role); }
 function statusLabel(status) { return t(status); }
+function dataLabel(label) { return t(label); }
 function locale() { return window.ScheduleI18n.language === "ru" ? "ru-RU" : "en-US"; }
 function formatDate(value) { return new Intl.DateTimeFormat(locale(), {dateStyle: "medium"}).format(new Date(`${value}T00:00:00`)); }
 function formatDateTime(value) { return new Intl.DateTimeFormat(locale(), {dateStyle: "short", timeStyle: "short"}).format(new Date(value.endsWith("Z") ? value : `${value}Z`)); }
@@ -117,8 +118,8 @@ function render() {
   document.querySelector("#dashboard").hidden = !data;
   document.querySelector("#dataset-badge").textContent = data ? t("Revision {{revision}} · {{dataset}}", {revision: state.dataset.revision, dataset: data.dataset_id}) : t("No dataset");
   if (!data) return;
-  document.querySelector("#school-name").textContent = data.school.label;
-  document.querySelector("#period-label").textContent = `${data.academic_period.label} · ${formatDate(data.academic_period.start_date)} — ${formatDate(data.academic_period.end_date)}`;
+  document.querySelector("#school-name").textContent = dataLabel(data.school.label);
+  document.querySelector("#period-label").textContent = `${dataLabel(data.academic_period.label)} · ${formatDate(data.academic_period.start_date)} — ${formatDate(data.academic_period.end_date)}`;
   for (const key of ["classes", "teachers", "subjects"]) document.querySelector(`#metric-${key}`).textContent = data[key].length;
   document.querySelector("#metric-requirements").textContent = data.curriculum_requirements.length;
   renderChecklist(data);
@@ -165,7 +166,7 @@ function renderEditor() {
 }
 
 function renderRules(data) {
-  document.querySelector("#difficulty-list").innerHTML = data.subjects.map((subject) => `<div class="form-row"><div><strong>${html(subject.label)}</strong><small>${html(subject.id)}</small></div><span class="level">${t("Level {{level}}", {level: subject.default_workload})}</span></div>`).join("");
+  document.querySelector("#difficulty-list").innerHTML = data.subjects.map((subject) => `<div class="form-row"><div><strong>${html(dataLabel(subject.label))}</strong><small>${html(subject.id)}</small></div><span class="level">${t("Level {{level}}", {level: subject.default_workload})}</span></div>`).join("");
   document.querySelector("#priority-list").innerHTML = data.policies.soft_constraint_weights.map((rule) => `<div class="form-row"><div><strong>${html(rule.constraint_id)}</strong><small>${html(t(rule.priority))}</small></div><span class="level">${t("Weight {{weight}}", {weight: rule.weight})}</span></div>`).join("");
   const summary = [
     [data.curriculum_requirements.length, "Curriculum rules"],
@@ -317,7 +318,7 @@ function renderResourceOptions() {
   const resources = mode === "class" ? data.classes : mode === "teacher" ? data.teachers : data.classrooms;
   const select = document.querySelector("#resource-select");
   const previous = select.value;
-  select.innerHTML = resources.map((item) => `<option value="${html(item.id)}">${html(item.label)}</option>`).join("");
+  select.innerHTML = resources.map((item) => `<option value="${html(item.id)}">${html(dataLabel(item.label))}</option>`).join("");
   if (resources.some((item) => item.id === previous)) select.value = previous;
 }
 
@@ -344,15 +345,15 @@ function renderTimetable(assignments, draft = null) {
     const lesson = filtered.find((item) => item.slot.day_id === day.id && item.occupied_period_ids.includes(period.id));
     if (!lesson) return "";
     const requirement = data.curriculum_requirements.find((item) => item.id === lesson.requirement_id);
-    const subject = data.subjects.find((item) => item.id === requirement?.subject_id)?.label || lesson.requirement_id;
-    const teacher = data.teachers.find((item) => item.id === lesson.teacher_id)?.label || lesson.teacher_id;
-    const room = data.classrooms.find((item) => item.id === lesson.classroom_id)?.label || lesson.classroom_id;
+    const subject = dataLabel(data.subjects.find((item) => item.id === requirement?.subject_id)?.label || lesson.requirement_id);
+    const teacher = dataLabel(data.teachers.find((item) => item.id === lesson.teacher_id)?.label || lesson.teacher_id);
+    const room = dataLabel(data.classrooms.find((item) => item.id === lesson.classroom_id)?.label || lesson.classroom_id);
     const startsHere = lesson.slot.period_id === period.id;
     const classes = `lesson ${draft && startsHere ? "editable" : ""} ${locked.has(lesson.id) ? "locked" : ""}`;
     return `<span class="${classes}" ${draft && startsHere && !locked.has(lesson.id) ? `draggable="true" data-assignment-id="${html(lesson.id)}"` : ""}>${html(subject)}<small>${html(teacher)} · ${html(room)}</small>${draft && startsHere ? `<button type="button" data-edit-assignment="${html(lesson.id)}" aria-label="${t("Edit {{subject}}", {subject: html(subject)})}">${locked.has(lesson.id) ? "◆" : "✎"}</button>` : ""}</span>`;
   };
   const timetable = document.querySelector("#timetable");
-  timetable.innerHTML = `<table><thead><tr><th>${t("Period")}</th>${days.map((day) => `<th>${html(day.label)}</th>`).join("")}</tr></thead><tbody>${periods.map((period) => `<tr><th>${html(period.label)}<br><small>${html(period.start_time)}</small></th>${days.map((day) => `<td class="${draft ? "drop-target" : ""}" data-day-id="${html(day.id)}" data-period-id="${html(period.id)}">${cells(day, period)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+  timetable.innerHTML = `<table><thead><tr><th>${t("Period")}</th>${days.map((day) => `<th>${html(dataLabel(day.label))}</th>`).join("")}</tr></thead><tbody>${periods.map((period) => `<tr><th>${html(dataLabel(period.label))}<br><small>${html(period.start_time)}</small></th>${days.map((day) => `<td class="${draft ? "drop-target" : ""}" data-day-id="${html(day.id)}" data-period-id="${html(period.id)}">${cells(day, period)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
   timetable.querySelectorAll("[data-edit-assignment]").forEach((button) => button.addEventListener("click", () => openMoveDialog(button.dataset.editAssignment)));
   if (draft) bindDragAndDrop(timetable);
 }
@@ -380,7 +381,7 @@ function openMoveDialog(assignmentId) {
   const data = state.dataset.data;
   const fill = (selector, items, selected) => {
     const select = document.querySelector(selector);
-    select.innerHTML = items.map((item) => `<option value="${html(item.id)}">${html(item.label)}</option>`).join("");
+    select.innerHTML = items.map((item) => `<option value="${html(item.id)}">${html(dataLabel(item.label))}</option>`).join("");
     select.value = selected;
   };
   document.querySelector("#move-assignment-id").value = assignmentId;

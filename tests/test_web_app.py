@@ -104,7 +104,12 @@ class WebApplicationTests(unittest.TestCase):
         self.assertIn(b"startGeneration", script.body)
         self.assertEqual(translations.status, HTTPStatus.OK)
         self.assertIn("Составить расписание".encode(), translations.body)
+        self.assertIn("Понедельник".encode(), translations.body)
+        self.assertIn("Математика".encode(), translations.body)
+        self.assertIn("7-й урок".encode(), translations.body)
         self.assertIn(b"schedule-generator-language", translations.body)
+        self.assertIn(b"dataLabel(day.label)", script.body)
+        self.assertIn(b"dataLabel(subject.label)", script.body)
         self.assertIn(b'data-language="ru"', page.body)
         self.assertIn(b".timetable", style.body)
 
@@ -169,6 +174,9 @@ class WebApplicationTests(unittest.TestCase):
         self.assertEqual(len(state["datasets"]), 1)
         self.assertEqual(state["datasets"][0]["dataset_id"], "small_school_demo")
         self.assertEqual(state["datasets"][0]["data"]["classes"][0]["id"], "class_7a")
+        periods = state["datasets"][0]["data"]["academic_period"]["periods"]
+        self.assertEqual(periods[-1]["id"], "p7")
+        self.assertEqual(periods[-1]["ordinal"], 7)
 
     def test_collection_edit_creates_validated_revision(self) -> None:
         self.application.dispatch("POST", "/api/demo")

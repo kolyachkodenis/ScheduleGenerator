@@ -9,6 +9,7 @@ This directory is the working package for Roadmap Stage 1. It separates confirme
 - [Interview guide](INTERVIEW_GUIDE.md): questions for the scheduler and school representatives.
 - [Data request](DATA_REQUEST.md): sanitized examples needed to validate requirements.
 - [Timetable sample analysis](TIMETABLE_SAMPLE_ANALYSIS.md): observations and limitations from the first supplied weekly timetable.
+- [Weekly lesson counts](WEEKLY_LESSON_COUNTS.md): reconstructed grade curricula, profile variants, and daily totals from the sample.
 - [Quality criteria](QUALITY_CRITERIA.md): candidate metrics and the process for approving targets.
 - [Open questions](OPEN_QUESTIONS.md): unresolved decisions that can change product behavior.
 
