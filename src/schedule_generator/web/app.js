@@ -10,7 +10,18 @@ const titles = { overview: "Overview", data: "School data", rules: "Rules", gene
 function collectionLabel(key) { return t(collections.find(([item]) => item === key)?.[1] || key); }
 function roleLabel(role) { return t(role); }
 function statusLabel(status) { return t(status); }
-function dataLabel(label) { return t(label); }
+function dataLabel(label) {
+  const translated = t(label);
+  if (translated !== label || window.ScheduleI18n.language !== "ru") return translated;
+  const section = (value) => ({ A: "А", B: "Б", V: "В" }[value] || value);
+  let match = label.match(/^Class (\d+)([ABV])$/);
+  if (match) return `${match[1]} «${section(match[2])}» класс`;
+  match = label.match(/^Teacher T-(\d+)([ABV])$/);
+  if (match) return `Учитель ${match[1]} «${section(match[2])}»`;
+  match = label.match(/^Room (\d+)([ABV])$/);
+  if (match) return `Кабинет ${match[1]}${section(match[2])}`;
+  return translated;
+}
 function locale() { return window.ScheduleI18n.language === "ru" ? "ru-RU" : "en-US"; }
 function formatDate(value) { return new Intl.DateTimeFormat(locale(), {dateStyle: "medium"}).format(new Date(`${value}T00:00:00`)); }
 function formatDateTime(value) { return new Intl.DateTimeFormat(locale(), {dateStyle: "short", timeStyle: "short"}).format(new Date(value.endsWith("Z") ? value : `${value}Z`)); }

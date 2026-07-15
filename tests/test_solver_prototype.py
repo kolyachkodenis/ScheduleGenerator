@@ -61,8 +61,44 @@ class SolverPrototypeTests(unittest.TestCase):
             if item["requirement_id"] == "req_joint_advisory"
         )
         self.assertEqual(assignment["slot"], {"day_id": "mon", "period_id": "p1"})
-        self.assertEqual(assignment["teacher_id"], "t_history")
-        self.assertEqual(assignment["classroom_id"], "hall")
+        self.assertEqual(assignment["teacher_id"], "t_7a")
+        self.assertEqual(assignment["classroom_id"], "room_7a")
+
+    def test_class_timetables_have_expected_daily_loads_without_gaps(self) -> None:
+        dataset = load_example()
+        requirements = {
+            item["id"]: item for item in dataset["curriculum_requirements"]
+        }
+        period_ordinals = {
+            item["id"]: item["ordinal"] for item in dataset["academic_period"]["periods"]
+        }
+        expected_by_grade = {
+            5: [6, 6, 6, 6, 5],
+            6: [6, 6, 6, 6, 6],
+            7: [6, 6, 7, 6, 6],
+            8: [7, 7, 7, 6, 6],
+            9: [7, 7, 7, 6, 6],
+            10: [7, 7, 6, 6, 6],
+            11: [7, 7, 6, 6, 6],
+        }
+        for class_item in dataset["classes"]:
+            occupied_by_day = {day["id"]: set() for day in dataset["academic_period"]["days"]}
+            for assignment in self.result["assignments"]:
+                requirement = requirements[assignment["requirement_id"]]
+                if requirement["participant"] != {"type": "class", "id": class_item["id"]}:
+                    continue
+                occupied_by_day[assignment["slot"]["day_id"]].update(
+                    period_ordinals[period_id]
+                    for period_id in assignment["occupied_period_ids"]
+                )
+            daily_loads = [len(periods) for periods in occupied_by_day.values()]
+            self.assertEqual(daily_loads, expected_by_grade[class_item["grade"]])
+            self.assertTrue(
+                all(
+                    not periods or max(periods) - min(periods) + 1 == len(periods)
+                    for periods in occupied_by_day.values()
+                )
+            )
 
     def test_public_result_contains_quality_report_and_fingerprint(self) -> None:
         self.assertEqual(

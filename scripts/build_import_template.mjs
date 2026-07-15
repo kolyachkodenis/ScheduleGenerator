@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import { fileURLToPath } from "node:url";
-import { SpreadsheetFile, Workbook } from "@oai/artifact-tool";
+import { FileBlob, SpreadsheetFile, Workbook } from "@oai/artifact-tool";
 
 const root = new URL("../", import.meta.url);
 const dataset = JSON.parse(await fs.readFile(new URL("examples/small-school.json", root), "utf8"));
@@ -45,14 +45,28 @@ sheet.freezePanes.freezeColumns(1);
 
 const outputDir = new URL("outputs/stage-7/", root);
 await fs.mkdir(outputDir, { recursive: true });
-const output = await SpreadsheetFile.exportXlsx(workbook);
-await output.save(fileURLToPath(new URL("school-data-import-template.xlsx", outputDir)));
-
+const outputUrl = new URL("school-data-import-template.xlsx", outputDir);
 const previewDir = process.argv[2];
 if (previewDir) {
   await fs.mkdir(previewDir, { recursive: true });
+  try {
+    const existing = await SpreadsheetFile.importXlsx(await FileBlob.load(fileURLToPath(outputUrl)));
+    const preview = await existing.render({ sheetName: "Guide", autoCrop: "all", scale: 1, format: "png" });
+    await fs.writeFile(`${previewDir}/existing-guide.png`, new Uint8Array(await preview.arrayBuffer()));
+  } catch (error) {
+    if (error?.code !== "ENOENT") throw error;
+  }
+}
+const output = await SpreadsheetFile.exportXlsx(workbook);
+await output.save(fileURLToPath(outputUrl));
+
+if (previewDir) {
   for (const name of ["Guide", "Dataset"]) {
     const preview = await workbook.render({ sheetName: name, autoCrop: "all", scale: 1, format: "png" });
     await fs.writeFile(`${previewDir}/${name.toLowerCase()}.png`, new Uint8Array(await preview.arrayBuffer()));
   }
+  const inspection = await workbook.inspect({ kind: "table", range: "Dataset!A1:B8", include: "values,formulas", tableMaxRows: 8, tableMaxCols: 2 });
+  const formulaErrors = await workbook.inspect({ kind: "match", searchTerm: "#REF!|#DIV/0!|#VALUE!|#NAME\\?|#N/A", options: { useRegex: true, maxResults: 50 }, summary: "final formula error scan" });
+  console.log(inspection.ndjson);
+  console.log(formulaErrors.ndjson);
 }

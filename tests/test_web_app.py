@@ -173,7 +173,7 @@ class WebApplicationTests(unittest.TestCase):
         state = self.payload(self.application.dispatch("GET", "/api/state"))
         self.assertEqual(len(state["datasets"]), 1)
         self.assertEqual(state["datasets"][0]["dataset_id"], "small_school_demo")
-        self.assertEqual(state["datasets"][0]["data"]["classes"][0]["id"], "class_7a")
+        self.assertEqual(state["datasets"][0]["data"]["classes"][0]["id"], "class_5a")
         periods = state["datasets"][0]["data"]["academic_period"]["periods"]
         self.assertEqual(periods[-1]["id"], "p7")
         self.assertEqual(periods[-1]["ordinal"], 7)

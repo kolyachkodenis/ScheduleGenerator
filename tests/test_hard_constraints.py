@@ -110,6 +110,7 @@ class HardConstraintTests(unittest.TestCase):
         )
 
     def test_hc007_teacher_unavailability_removes_candidates(self) -> None:
+        self.builder.availability[("teacher", "t_7a")]["unavailable"].add(("tue", "p1"))
         item = occurrence(self.builder, "req_7a_math")
         candidates = self.builder.enumerate_candidates(item)
         self.assertNotIn(
@@ -118,6 +119,10 @@ class HardConstraintTests(unittest.TestCase):
         )
 
     def test_hc008_classroom_unavailability_removes_candidates(self) -> None:
+        self.builder.availability[("classroom", "room_7a")] = {
+            "unavailable": {("fri", "p6")},
+            "preferred": set(),
+        }
         item = occurrence(self.builder, "req_7a_physics")
         candidates = self.builder.enumerate_candidates(item)
         self.assertNotIn(
@@ -137,7 +142,7 @@ class HardConstraintTests(unittest.TestCase):
                 candidate.teacher_id,
                 candidate.classroom_id,
             ),
-            ("mon", "p1", "t_history", "hall"),
+            ("mon", "p1", "t_7a", "room_7a"),
         )
 
     def test_hc010_only_eligible_teachers_receive_candidates(self) -> None:
@@ -145,16 +150,16 @@ class HardConstraintTests(unittest.TestCase):
         candidates = self.builder.enumerate_candidates(item)
         self.assertEqual(
             {candidate.teacher_id for candidate in candidates},
-            {"t_english_a", "t_english_b"},
+            {"t_8a"},
         )
 
     def test_hc011_room_capability_filters_candidates(self) -> None:
         item = occurrence(self.builder, "req_7a_physics")
         candidates = self.builder.enumerate_candidates(item)
-        self.assertEqual({candidate.classroom_id for candidate in candidates}, {"science_lab"})
+        self.assertEqual({candidate.classroom_id for candidate in candidates}, {"room_7a"})
 
     def test_hc012_room_capacity_filters_candidates(self) -> None:
-        self.builder.rooms["science_lab"]["capacity"] = 20
+        self.builder.rooms["room_7a"]["capacity"] = 20
         item = occurrence(self.builder, "req_7a_physics")
         self.assertEqual(self.builder.enumerate_candidates(item), [])
 

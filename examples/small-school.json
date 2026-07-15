@@ -3,12 +3,12 @@
   "dataset_id": "small_school_demo",
   "school": {
     "id": "demo_school",
-    "label": "Synthetic Demonstration School",
+    "label": "Representative Demonstration School",
     "timezone": "Europe/Minsk"
   },
   "academic_period": {
     "id": "term_1_2026",
-    "label": "Synthetic Term 1",
+    "label": "Demonstration Term 1",
     "start_date": "2026-09-01",
     "end_date": "2026-12-24",
     "days": [
@@ -93,7 +93,15 @@
       {
         "id": "morning",
         "label": "Morning shift",
-        "period_ids": ["p1", "p2", "p3", "p4", "p5", "p6", "p7"]
+        "period_ids": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5",
+          "p6",
+          "p7"
+        ]
       }
     ]
   },
@@ -102,6 +110,81 @@
       "id": "mathematics",
       "label": "Mathematics",
       "default_workload": 3
+    },
+    {
+      "id": "russian_language",
+      "label": "Russian Language",
+      "default_workload": 3
+    },
+    {
+      "id": "russian_literature",
+      "label": "Russian Literature",
+      "default_workload": 2
+    },
+    {
+      "id": "belarusian_language",
+      "label": "Belarusian Language",
+      "default_workload": 3
+    },
+    {
+      "id": "belarusian_literature",
+      "label": "Belarusian Literature",
+      "default_workload": 2
+    },
+    {
+      "id": "english",
+      "label": "English",
+      "default_workload": 2
+    },
+    {
+      "id": "physical_education",
+      "label": "Physical Education",
+      "default_workload": 1
+    },
+    {
+      "id": "technology",
+      "label": "Technology",
+      "default_workload": 1
+    },
+    {
+      "id": "informatics",
+      "label": "Informatics",
+      "default_workload": 2
+    },
+    {
+      "id": "art",
+      "label": "Art",
+      "default_workload": 1
+    },
+    {
+      "id": "human_and_world",
+      "label": "Human and the World",
+      "default_workload": 1
+    },
+    {
+      "id": "life_safety",
+      "label": "Life Safety",
+      "default_workload": 1
+    },
+    {
+      "id": "biology",
+      "label": "Biology",
+      "default_workload": 3
+    },
+    {
+      "id": "geography",
+      "label": "Geography",
+      "default_workload": 2
+    },
+    {
+      "id": "history_belarus",
+      "label": "History of Belarus",
+      "default_workload": 2
+    },
+    {
+      "id": "world_history",
+      "label": "World History",
+      "default_workload": 2
     },
     {
       "id": "physics",
@@ -114,94 +197,909 @@
       "default_workload": 3
     },
     {
-      "id": "english",
-      "label": "English",
+      "id": "social_studies",
+      "label": "Social Studies",
       "default_workload": 2
     },
     {
-      "id": "history",
-      "label": "History",
+      "id": "technical_drawing",
+      "label": "Technical Drawing",
       "default_workload": 2
     },
     {
-      "id": "physical_education",
-      "label": "Physical Education",
-      "default_workload": 1
+      "id": "astronomy",
+      "label": "Astronomy",
+      "default_workload": 3
     },
     {
-      "id": "advisory",
-      "label": "Advisory",
+      "id": "defense_medical",
+      "label": "Defense and Medical Training",
       "default_workload": 1
     }
   ],
   "teachers": [
     {
       "id": "t_math",
-      "label": "Teacher T-Math",
-      "qualified_subject_ids": ["mathematics"]
+      "label": "Teacher T-5A",
+      "qualified_subject_ids": [
+        "mathematics",
+        "russian_language",
+        "russian_literature",
+        "belarusian_language",
+        "belarusian_literature",
+        "english",
+        "physical_education",
+        "technology",
+        "informatics",
+        "art",
+        "human_and_world",
+        "life_safety",
+        "biology",
+        "geography",
+        "history_belarus",
+        "world_history",
+        "physics",
+        "chemistry",
+        "social_studies",
+        "technical_drawing",
+        "astronomy",
+        "defense_medical"
+      ]
+    },
+    {
+      "id": "t_5b",
+      "label": "Teacher T-5B",
+      "qualified_subject_ids": [
+        "mathematics",
+        "russian_language",
+        "russian_literature",
+        "belarusian_language",
+        "belarusian_literature",
+        "english",
+        "physical_education",
+        "technology",
+        "informatics",
+        "art",
+        "human_and_world",
+        "life_safety",
+        "biology",
+        "geography",
+        "history_belarus",
+        "world_history",
+        "physics",
+        "chemistry",
+        "social_studies",
+        "technical_drawing",
+        "astronomy",
+        "defense_medical"
+      ]
+    },
+    {
+      "id": "t_5v",
+      "label": "Teacher T-5V",
+      "qualified_subject_ids": [
+        "mathematics",
+        "russian_language",
+        "russian_literature",
+        "belarusian_language",
+        "belarusian_literature",
+        "english",
+        "physical_education",
+        "technology",
+        "informatics",
+        "art",
+        "human_and_world",
+        "life_safety",
+        "biology",
+        "geography",
+        "history_belarus",
+        "world_history",
+        "physics",
+        "chemistry",
+        "social_studies",
+        "technical_drawing",
+        "astronomy",
+        "defense_medical"
+      ]
+    },
+    {
+      "id": "t_6a",
+      "label": "Teacher T-6A",
+      "qualified_subject_ids": [
+        "mathematics",
+        "russian_language",
+        "russian_literature",
+        "belarusian_language",
+        "belarusian_literature",
+        "english",
+        "physical_education",
+        "technology",
+        "informatics",
+        "art",
+        "human_and_world",
+        "life_safety",
+        "biology",
+        "geography",
+        "history_belarus",
+        "world_history",
+        "physics",
+        "chemistry",
+        "social_studies",
+        "technical_drawing",
+        "astronomy",
+        "defense_medical"
+      ]
+    },
+    {
+      "id": "t_6b",
+      "label": "Teacher T-6B",
+      "qualified_subject_ids": [
+        "mathematics",
+        "russian_language",
+        "russian_literature",
+        "belarusian_language",
+        "belarusian_literature",
+        "english",
+        "physical_education",
+        "technology",
+        "informatics",
+        "art",
+        "human_and_world",
+        "life_safety",
+        "biology",
+        "geography",
+        "history_belarus",
+        "world_history",
+        "physics",
+        "chemistry",
+        "social_studies",
+        "technical_drawing",
+        "astronomy",
+        "defense_medical"
+      ]
+    },
+    {
+      "id": "t_6v",
+      "label": "Teacher T-6V",
+      "qualified_subject_ids": [
+        "mathematics",
+        "russian_language",
+        "russian_literature",
+        "belarusian_language",
+        "belarusian_literature",
+        "english",
+        "physical_education",
+        "technology",
+        "informatics",
+        "art",
+        "human_and_world",
+        "life_safety",
+        "biology",
+        "geography",
+        "history_belarus",
+        "world_history",
+        "physics",
+        "chemistry",
+        "social_studies",
+        "technical_drawing",
+        "astronomy",
+        "defense_medical"
+      ]
+    },
+    {
+      "id": "t_7a",
+      "label": "Teacher T-7A",
+      "qualified_subject_ids": [
+        "mathematics",
+        "russian_language",
+        "russian_literature",
+        "belarusian_language",
+        "belarusian_literature",
+        "english",
+        "physical_education",
+        "technology",
+        "informatics",
+        "art",
+        "human_and_world",
+        "life_safety",
+        "biology",
+        "geography",
+        "history_belarus",
+        "world_history",
+        "physics",
+        "chemistry",
+        "social_studies",
+        "technical_drawing",
+        "astronomy",
+        "defense_medical"
+      ]
+    },
+    {
+      "id": "t_7b",
+      "label": "Teacher T-7B",
+      "qualified_subject_ids": [
+        "mathematics",
+        "russian_language",
+        "russian_literature",
+        "belarusian_language",
+        "belarusian_literature",
+        "english",
+        "physical_education",
+        "technology",
+        "informatics",
+        "art",
+        "human_and_world",
+        "life_safety",
+        "biology",
+        "geography",
+        "history_belarus",
+        "world_history",
+        "physics",
+        "chemistry",
+        "social_studies",
+        "technical_drawing",
+        "astronomy",
+        "defense_medical"
+      ]
+    },
+    {
+      "id": "t_7v",
+      "label": "Teacher T-7V",
+      "qualified_subject_ids": [
+        "mathematics",
+        "russian_language",
+        "russian_literature",
+        "belarusian_language",
+        "belarusian_literature",
+        "english",
+        "physical_education",
+        "technology",
+        "informatics",
+        "art",
+        "human_and_world",
+        "life_safety",
+        "biology",
+        "geography",
+        "history_belarus",
+        "world_history",
+        "physics",
+        "chemistry",
+        "social_studies",
+        "technical_drawing",
+        "astronomy",
+        "defense_medical"
+      ]
+    },
+    {
+      "id": "t_8a",
+      "label": "Teacher T-8A",
+      "qualified_subject_ids": [
+        "mathematics",
+        "russian_language",
+        "russian_literature",
+        "belarusian_language",
+        "belarusian_literature",
+        "english",
+        "physical_education",
+        "technology",
+        "informatics",
+        "art",
+        "human_and_world",
+        "life_safety",
+        "biology",
+        "geography",
+        "history_belarus",
+        "world_history",
+        "physics",
+        "chemistry",
+        "social_studies",
+        "technical_drawing",
+        "astronomy",
+        "defense_medical"
+      ]
+    },
+    {
+      "id": "t_8b",
+      "label": "Teacher T-8B",
+      "qualified_subject_ids": [
+        "mathematics",
+        "russian_language",
+        "russian_literature",
+        "belarusian_language",
+        "belarusian_literature",
+        "english",
+        "physical_education",
+        "technology",
+        "informatics",
+        "art",
+        "human_and_world",
+        "life_safety",
+        "biology",
+        "geography",
+        "history_belarus",
+        "world_history",
+        "physics",
+        "chemistry",
+        "social_studies",
+        "technical_drawing",
+        "astronomy",
+        "defense_medical"
+      ]
+    },
+    {
+      "id": "t_9a",
+      "label": "Teacher T-9A",
+      "qualified_subject_ids": [
+        "mathematics",
+        "russian_language",
+        "russian_literature",
+        "belarusian_language",
+        "belarusian_literature",
+        "english",
+        "physical_education",
+        "technology",
+        "informatics",
+        "art",
+        "human_and_world",
+        "life_safety",
+        "biology",
+        "geography",
+        "history_belarus",
+        "world_history",
+        "physics",
+        "chemistry",
+        "social_studies",
+        "technical_drawing",
+        "astronomy",
+        "defense_medical"
+      ]
+    },
+    {
+      "id": "t_9b",
+      "label": "Teacher T-9B",
+      "qualified_subject_ids": [
+        "mathematics",
+        "russian_language",
+        "russian_literature",
+        "belarusian_language",
+        "belarusian_literature",
+        "english",
+        "physical_education",
+        "technology",
+        "informatics",
+        "art",
+        "human_and_world",
+        "life_safety",
+        "biology",
+        "geography",
+        "history_belarus",
+        "world_history",
+        "physics",
+        "chemistry",
+        "social_studies",
+        "technical_drawing",
+        "astronomy",
+        "defense_medical"
+      ]
+    },
+    {
+      "id": "t_9v",
+      "label": "Teacher T-9V",
+      "qualified_subject_ids": [
+        "mathematics",
+        "russian_language",
+        "russian_literature",
+        "belarusian_language",
+        "belarusian_literature",
+        "english",
+        "physical_education",
+        "technology",
+        "informatics",
+        "art",
+        "human_and_world",
+        "life_safety",
+        "biology",
+        "geography",
+        "history_belarus",
+        "world_history",
+        "physics",
+        "chemistry",
+        "social_studies",
+        "technical_drawing",
+        "astronomy",
+        "defense_medical"
+      ]
+    },
+    {
+      "id": "t_10a",
+      "label": "Teacher T-10A",
+      "qualified_subject_ids": [
+        "mathematics",
+        "russian_language",
+        "russian_literature",
+        "belarusian_language",
+        "belarusian_literature",
+        "english",
+        "physical_education",
+        "technology",
+        "informatics",
+        "art",
+        "human_and_world",
+        "life_safety",
+        "biology",
+        "geography",
+        "history_belarus",
+        "world_history",
+        "physics",
+        "chemistry",
+        "social_studies",
+        "technical_drawing",
+        "astronomy",
+        "defense_medical"
+      ]
+    },
+    {
+      "id": "t_10b",
+      "label": "Teacher T-10B",
+      "qualified_subject_ids": [
+        "mathematics",
+        "russian_language",
+        "russian_literature",
+        "belarusian_language",
+        "belarusian_literature",
+        "english",
+        "physical_education",
+        "technology",
+        "informatics",
+        "art",
+        "human_and_world",
+        "life_safety",
+        "biology",
+        "geography",
+        "history_belarus",
+        "world_history",
+        "physics",
+        "chemistry",
+        "social_studies",
+        "technical_drawing",
+        "astronomy",
+        "defense_medical"
+      ]
+    },
+    {
+      "id": "t_11a",
+      "label": "Teacher T-11A",
+      "qualified_subject_ids": [
+        "mathematics",
+        "russian_language",
+        "russian_literature",
+        "belarusian_language",
+        "belarusian_literature",
+        "english",
+        "physical_education",
+        "technology",
+        "informatics",
+        "art",
+        "human_and_world",
+        "life_safety",
+        "biology",
+        "geography",
+        "history_belarus",
+        "world_history",
+        "physics",
+        "chemistry",
+        "social_studies",
+        "technical_drawing",
+        "astronomy",
+        "defense_medical"
+      ]
+    },
+    {
+      "id": "t_11b",
+      "label": "Teacher T-11B",
+      "qualified_subject_ids": [
+        "mathematics",
+        "russian_language",
+        "russian_literature",
+        "belarusian_language",
+        "belarusian_literature",
+        "english",
+        "physical_education",
+        "technology",
+        "informatics",
+        "art",
+        "human_and_world",
+        "life_safety",
+        "biology",
+        "geography",
+        "history_belarus",
+        "world_history",
+        "physics",
+        "chemistry",
+        "social_studies",
+        "technical_drawing",
+        "astronomy",
+        "defense_medical"
+      ]
     },
     {
       "id": "t_science",
       "label": "Teacher T-Science",
-      "qualified_subject_ids": ["physics", "chemistry"]
+      "qualified_subject_ids": [
+        "physics",
+        "chemistry"
+      ]
     },
     {
       "id": "t_english_a",
       "label": "Teacher T-English-A",
-      "qualified_subject_ids": ["english"]
+      "qualified_subject_ids": [
+        "english"
+      ]
     },
     {
       "id": "t_english_b",
       "label": "Teacher T-English-B",
-      "qualified_subject_ids": ["english"]
+      "qualified_subject_ids": [
+        "english"
+      ]
     },
     {
       "id": "t_history",
       "label": "Teacher T-History",
-      "qualified_subject_ids": ["history", "advisory"]
-    },
-    {
-      "id": "t_pe",
-      "label": "Teacher T-PE",
-      "qualified_subject_ids": ["physical_education"]
+      "qualified_subject_ids": [
+        "art"
+      ]
     }
   ],
   "classrooms": [
     {
-      "id": "room_101",
-      "label": "Room 101",
+      "id": "room_5a",
+      "label": "Room 5A",
       "capacity": 30,
-      "capabilities": ["general"]
+      "capabilities": [
+        "general",
+        "sports",
+        "physics_lab",
+        "chemistry_lab",
+        "computer_lab",
+        "workshop",
+        "art"
+      ]
     },
     {
-      "id": "room_102",
-      "label": "Room 102",
+      "id": "room_5b",
+      "label": "Room 5B",
       "capacity": 30,
-      "capabilities": ["general"]
+      "capabilities": [
+        "general",
+        "sports",
+        "physics_lab",
+        "chemistry_lab",
+        "computer_lab",
+        "workshop",
+        "art"
+      ]
+    },
+    {
+      "id": "room_5v",
+      "label": "Room 5V",
+      "capacity": 30,
+      "capabilities": [
+        "general",
+        "sports",
+        "physics_lab",
+        "chemistry_lab",
+        "computer_lab",
+        "workshop",
+        "art"
+      ]
+    },
+    {
+      "id": "room_6a",
+      "label": "Room 6A",
+      "capacity": 30,
+      "capabilities": [
+        "general",
+        "sports",
+        "physics_lab",
+        "chemistry_lab",
+        "computer_lab",
+        "workshop",
+        "art"
+      ]
+    },
+    {
+      "id": "room_6b",
+      "label": "Room 6B",
+      "capacity": 30,
+      "capabilities": [
+        "general",
+        "sports",
+        "physics_lab",
+        "chemistry_lab",
+        "computer_lab",
+        "workshop",
+        "art"
+      ]
+    },
+    {
+      "id": "room_6v",
+      "label": "Room 6V",
+      "capacity": 30,
+      "capabilities": [
+        "general",
+        "sports",
+        "physics_lab",
+        "chemistry_lab",
+        "computer_lab",
+        "workshop",
+        "art"
+      ]
+    },
+    {
+      "id": "room_7a",
+      "label": "Room 7A",
+      "capacity": 30,
+      "capabilities": [
+        "general",
+        "sports",
+        "physics_lab",
+        "chemistry_lab",
+        "computer_lab",
+        "workshop",
+        "art"
+      ]
+    },
+    {
+      "id": "room_7b",
+      "label": "Room 7B",
+      "capacity": 30,
+      "capabilities": [
+        "general",
+        "sports",
+        "physics_lab",
+        "chemistry_lab",
+        "computer_lab",
+        "workshop",
+        "art"
+      ]
+    },
+    {
+      "id": "room_7v",
+      "label": "Room 7V",
+      "capacity": 30,
+      "capabilities": [
+        "general",
+        "sports",
+        "physics_lab",
+        "chemistry_lab",
+        "computer_lab",
+        "workshop",
+        "art"
+      ]
+    },
+    {
+      "id": "room_8a",
+      "label": "Room 8A",
+      "capacity": 30,
+      "capabilities": [
+        "general",
+        "sports",
+        "physics_lab",
+        "chemistry_lab",
+        "computer_lab",
+        "workshop",
+        "art"
+      ]
+    },
+    {
+      "id": "room_8b",
+      "label": "Room 8B",
+      "capacity": 30,
+      "capabilities": [
+        "general",
+        "sports",
+        "physics_lab",
+        "chemistry_lab",
+        "computer_lab",
+        "workshop",
+        "art"
+      ]
+    },
+    {
+      "id": "room_9a",
+      "label": "Room 9A",
+      "capacity": 30,
+      "capabilities": [
+        "general",
+        "sports",
+        "physics_lab",
+        "chemistry_lab",
+        "computer_lab",
+        "workshop",
+        "art"
+      ]
+    },
+    {
+      "id": "room_9b",
+      "label": "Room 9B",
+      "capacity": 30,
+      "capabilities": [
+        "general",
+        "sports",
+        "physics_lab",
+        "chemistry_lab",
+        "computer_lab",
+        "workshop",
+        "art"
+      ]
+    },
+    {
+      "id": "room_9v",
+      "label": "Room 9V",
+      "capacity": 30,
+      "capabilities": [
+        "general",
+        "sports",
+        "physics_lab",
+        "chemistry_lab",
+        "computer_lab",
+        "workshop",
+        "art"
+      ]
+    },
+    {
+      "id": "room_10a",
+      "label": "Room 10A",
+      "capacity": 30,
+      "capabilities": [
+        "general",
+        "sports",
+        "physics_lab",
+        "chemistry_lab",
+        "computer_lab",
+        "workshop",
+        "art"
+      ]
+    },
+    {
+      "id": "room_10b",
+      "label": "Room 10B",
+      "capacity": 30,
+      "capabilities": [
+        "general",
+        "sports",
+        "physics_lab",
+        "chemistry_lab",
+        "computer_lab",
+        "workshop",
+        "art"
+      ]
+    },
+    {
+      "id": "room_11a",
+      "label": "Room 11A",
+      "capacity": 30,
+      "capabilities": [
+        "general",
+        "sports",
+        "physics_lab",
+        "chemistry_lab",
+        "computer_lab",
+        "workshop",
+        "art"
+      ]
+    },
+    {
+      "id": "room_11b",
+      "label": "Room 11B",
+      "capacity": 30,
+      "capabilities": [
+        "general",
+        "sports",
+        "physics_lab",
+        "chemistry_lab",
+        "computer_lab",
+        "workshop",
+        "art"
+      ]
     },
     {
       "id": "science_lab",
       "label": "Science Laboratory",
-      "capacity": 24,
-      "capabilities": ["general", "physics_lab", "chemistry_lab"]
-    },
-    {
-      "id": "gym",
-      "label": "Gymnasium",
-      "capacity": 60,
-      "capabilities": ["sports"]
+      "capacity": 30,
+      "capabilities": [
+        "general",
+        "physics_lab",
+        "chemistry_lab"
+      ]
     },
     {
       "id": "hall",
       "label": "Assembly Hall",
       "capacity": 60,
-      "capabilities": ["assembly"]
+      "capabilities": [
+        "assembly"
+      ]
+    },
+    {
+      "id": "language_room_a",
+      "label": "Language Room A",
+      "capacity": 30,
+      "capabilities": [
+        "general"
+      ]
+    },
+    {
+      "id": "language_room_b",
+      "label": "Language Room B",
+      "capacity": 30,
+      "capabilities": [
+        "general"
+      ]
     }
   ],
   "classes": [
     {
+      "id": "class_5a",
+      "label": "Class 5A",
+      "grade": 5,
+      "student_count": 26,
+      "shift_id": "morning"
+    },
+    {
+      "id": "class_5b",
+      "label": "Class 5B",
+      "grade": 5,
+      "student_count": 27,
+      "shift_id": "morning"
+    },
+    {
+      "id": "class_5v",
+      "label": "Class 5V",
+      "grade": 5,
+      "student_count": 27,
+      "shift_id": "morning"
+    },
+    {
+      "id": "class_6a",
+      "label": "Class 6A",
+      "grade": 6,
+      "student_count": 27,
+      "shift_id": "morning"
+    },
+    {
+      "id": "class_6b",
+      "label": "Class 6B",
+      "grade": 6,
+      "student_count": 28,
+      "shift_id": "morning"
+    },
+    {
+      "id": "class_6v",
+      "label": "Class 6V",
+      "grade": 6,
+      "student_count": 28,
+      "shift_id": "morning"
+    },
+    {
       "id": "class_7a",
       "label": "Class 7A",
+      "grade": 7,
+      "student_count": 28,
+      "shift_id": "morning"
+    },
+    {
+      "id": "class_7b",
+      "label": "Class 7B",
+      "grade": 7,
+      "student_count": 24,
+      "shift_id": "morning"
+    },
+    {
+      "id": "class_7v",
+      "label": "Class 7V",
       "grade": 7,
       "student_count": 24,
       "shift_id": "morning"
@@ -210,7 +1108,63 @@
       "id": "class_8a",
       "label": "Class 8A",
       "grade": 8,
-      "student_count": 22,
+      "student_count": 24,
+      "shift_id": "morning"
+    },
+    {
+      "id": "class_8b",
+      "label": "Class 8B",
+      "grade": 8,
+      "student_count": 25,
+      "shift_id": "morning"
+    },
+    {
+      "id": "class_9a",
+      "label": "Class 9A",
+      "grade": 9,
+      "student_count": 25,
+      "shift_id": "morning"
+    },
+    {
+      "id": "class_9b",
+      "label": "Class 9B",
+      "grade": 9,
+      "student_count": 26,
+      "shift_id": "morning"
+    },
+    {
+      "id": "class_9v",
+      "label": "Class 9V",
+      "grade": 9,
+      "student_count": 26,
+      "shift_id": "morning"
+    },
+    {
+      "id": "class_10a",
+      "label": "Class 10A",
+      "grade": 10,
+      "student_count": 26,
+      "shift_id": "morning"
+    },
+    {
+      "id": "class_10b",
+      "label": "Class 10B",
+      "grade": 10,
+      "student_count": 27,
+      "shift_id": "morning"
+    },
+    {
+      "id": "class_11a",
+      "label": "Class 11A",
+      "grade": 11,
+      "student_count": 27,
+      "shift_id": "morning"
+    },
+    {
+      "id": "class_11b",
+      "label": "Class 11B",
+      "grade": 11,
+      "student_count": 28,
       "shift_id": "morning"
     }
   ],
@@ -228,14 +1182,14 @@
       "label": "Class 7A English Group 1",
       "class_id": "class_7a",
       "partition_id": "partition_7a_english",
-      "student_count": 12
+      "student_count": 14
     },
     {
       "id": "group_7a_en_2",
       "label": "Class 7A English Group 2",
       "class_id": "class_7a",
       "partition_id": "partition_7a_english",
-      "student_count": 12
+      "student_count": 14
     }
   ],
   "cohorts": [
@@ -256,17 +1210,1752 @@
   ],
   "curriculum_requirements": [
     {
+      "id": "req_5a_mathematics",
+      "participant": {
+        "type": "class",
+        "id": "class_5a"
+      },
+      "subject_id": "mathematics",
+      "eligible_teacher_ids": [
+        "t_math"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5a"
+      ]
+    },
+    {
+      "id": "req_5a_russian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_5a"
+      },
+      "subject_id": "russian_language",
+      "eligible_teacher_ids": [
+        "t_math"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5a"
+      ]
+    },
+    {
+      "id": "req_5a_russian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_5a"
+      },
+      "subject_id": "russian_literature",
+      "eligible_teacher_ids": [
+        "t_math"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5a"
+      ]
+    },
+    {
+      "id": "req_5a_belarusian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_5a"
+      },
+      "subject_id": "belarusian_language",
+      "eligible_teacher_ids": [
+        "t_math"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5a"
+      ]
+    },
+    {
+      "id": "req_5a_belarusian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_5a"
+      },
+      "subject_id": "belarusian_literature",
+      "eligible_teacher_ids": [
+        "t_math"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5a"
+      ]
+    },
+    {
+      "id": "req_5a_english",
+      "participant": {
+        "type": "class",
+        "id": "class_5a"
+      },
+      "subject_id": "english",
+      "eligible_teacher_ids": [
+        "t_math"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5a"
+      ]
+    },
+    {
+      "id": "req_5a_physical_education",
+      "participant": {
+        "type": "class",
+        "id": "class_5a"
+      },
+      "subject_id": "physical_education",
+      "eligible_teacher_ids": [
+        "t_math"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5a"
+      ]
+    },
+    {
+      "id": "req_5a_technology",
+      "participant": {
+        "type": "class",
+        "id": "class_5a"
+      },
+      "subject_id": "technology",
+      "eligible_teacher_ids": [
+        "t_math"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5a"
+      ]
+    },
+    {
+      "id": "req_5a_art",
+      "participant": {
+        "type": "class",
+        "id": "class_5a"
+      },
+      "subject_id": "art",
+      "eligible_teacher_ids": [
+        "t_math"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5a"
+      ]
+    },
+    {
+      "id": "req_5a_human_and_world",
+      "participant": {
+        "type": "class",
+        "id": "class_5a"
+      },
+      "subject_id": "human_and_world",
+      "eligible_teacher_ids": [
+        "t_math"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5a"
+      ]
+    },
+    {
+      "id": "req_5a_life_safety",
+      "participant": {
+        "type": "class",
+        "id": "class_5a"
+      },
+      "subject_id": "life_safety",
+      "eligible_teacher_ids": [
+        "t_math"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5a"
+      ]
+    },
+    {
+      "id": "req_5a_world_history",
+      "participant": {
+        "type": "class",
+        "id": "class_5a"
+      },
+      "subject_id": "world_history",
+      "eligible_teacher_ids": [
+        "t_math"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5a"
+      ]
+    },
+    {
+      "id": "req_5b_mathematics",
+      "participant": {
+        "type": "class",
+        "id": "class_5b"
+      },
+      "subject_id": "mathematics",
+      "eligible_teacher_ids": [
+        "t_5b"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5b"
+      ]
+    },
+    {
+      "id": "req_5b_russian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_5b"
+      },
+      "subject_id": "russian_language",
+      "eligible_teacher_ids": [
+        "t_5b"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5b"
+      ]
+    },
+    {
+      "id": "req_5b_russian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_5b"
+      },
+      "subject_id": "russian_literature",
+      "eligible_teacher_ids": [
+        "t_5b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5b"
+      ]
+    },
+    {
+      "id": "req_5b_belarusian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_5b"
+      },
+      "subject_id": "belarusian_language",
+      "eligible_teacher_ids": [
+        "t_5b"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5b"
+      ]
+    },
+    {
+      "id": "req_5b_belarusian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_5b"
+      },
+      "subject_id": "belarusian_literature",
+      "eligible_teacher_ids": [
+        "t_5b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5b"
+      ]
+    },
+    {
+      "id": "req_5b_english",
+      "participant": {
+        "type": "class",
+        "id": "class_5b"
+      },
+      "subject_id": "english",
+      "eligible_teacher_ids": [
+        "t_5b"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5b"
+      ]
+    },
+    {
+      "id": "req_5b_physical_education",
+      "participant": {
+        "type": "class",
+        "id": "class_5b"
+      },
+      "subject_id": "physical_education",
+      "eligible_teacher_ids": [
+        "t_5b"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5b"
+      ]
+    },
+    {
+      "id": "req_5b_technology",
+      "participant": {
+        "type": "class",
+        "id": "class_5b"
+      },
+      "subject_id": "technology",
+      "eligible_teacher_ids": [
+        "t_5b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5b"
+      ]
+    },
+    {
+      "id": "req_5b_art",
+      "participant": {
+        "type": "class",
+        "id": "class_5b"
+      },
+      "subject_id": "art",
+      "eligible_teacher_ids": [
+        "t_5b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5b"
+      ]
+    },
+    {
+      "id": "req_5b_human_and_world",
+      "participant": {
+        "type": "class",
+        "id": "class_5b"
+      },
+      "subject_id": "human_and_world",
+      "eligible_teacher_ids": [
+        "t_5b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5b"
+      ]
+    },
+    {
+      "id": "req_5b_life_safety",
+      "participant": {
+        "type": "class",
+        "id": "class_5b"
+      },
+      "subject_id": "life_safety",
+      "eligible_teacher_ids": [
+        "t_5b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5b"
+      ]
+    },
+    {
+      "id": "req_5b_world_history",
+      "participant": {
+        "type": "class",
+        "id": "class_5b"
+      },
+      "subject_id": "world_history",
+      "eligible_teacher_ids": [
+        "t_5b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5b"
+      ]
+    },
+    {
+      "id": "req_5v_mathematics",
+      "participant": {
+        "type": "class",
+        "id": "class_5v"
+      },
+      "subject_id": "mathematics",
+      "eligible_teacher_ids": [
+        "t_5v"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5v"
+      ]
+    },
+    {
+      "id": "req_5v_russian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_5v"
+      },
+      "subject_id": "russian_language",
+      "eligible_teacher_ids": [
+        "t_5v"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5v"
+      ]
+    },
+    {
+      "id": "req_5v_russian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_5v"
+      },
+      "subject_id": "russian_literature",
+      "eligible_teacher_ids": [
+        "t_5v"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5v"
+      ]
+    },
+    {
+      "id": "req_5v_belarusian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_5v"
+      },
+      "subject_id": "belarusian_language",
+      "eligible_teacher_ids": [
+        "t_5v"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5v"
+      ]
+    },
+    {
+      "id": "req_5v_belarusian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_5v"
+      },
+      "subject_id": "belarusian_literature",
+      "eligible_teacher_ids": [
+        "t_5v"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5v"
+      ]
+    },
+    {
+      "id": "req_5v_english",
+      "participant": {
+        "type": "class",
+        "id": "class_5v"
+      },
+      "subject_id": "english",
+      "eligible_teacher_ids": [
+        "t_5v"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5v"
+      ]
+    },
+    {
+      "id": "req_5v_physical_education",
+      "participant": {
+        "type": "class",
+        "id": "class_5v"
+      },
+      "subject_id": "physical_education",
+      "eligible_teacher_ids": [
+        "t_5v"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5v"
+      ]
+    },
+    {
+      "id": "req_5v_technology",
+      "participant": {
+        "type": "class",
+        "id": "class_5v"
+      },
+      "subject_id": "technology",
+      "eligible_teacher_ids": [
+        "t_5v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5v"
+      ]
+    },
+    {
+      "id": "req_5v_art",
+      "participant": {
+        "type": "class",
+        "id": "class_5v"
+      },
+      "subject_id": "art",
+      "eligible_teacher_ids": [
+        "t_5v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5v"
+      ]
+    },
+    {
+      "id": "req_5v_human_and_world",
+      "participant": {
+        "type": "class",
+        "id": "class_5v"
+      },
+      "subject_id": "human_and_world",
+      "eligible_teacher_ids": [
+        "t_5v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5v"
+      ]
+    },
+    {
+      "id": "req_5v_life_safety",
+      "participant": {
+        "type": "class",
+        "id": "class_5v"
+      },
+      "subject_id": "life_safety",
+      "eligible_teacher_ids": [
+        "t_5v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5v"
+      ]
+    },
+    {
+      "id": "req_5v_world_history",
+      "participant": {
+        "type": "class",
+        "id": "class_5v"
+      },
+      "subject_id": "world_history",
+      "eligible_teacher_ids": [
+        "t_5v"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_5v"
+      ]
+    },
+    {
+      "id": "req_6a_mathematics",
+      "participant": {
+        "type": "class",
+        "id": "class_6a"
+      },
+      "subject_id": "mathematics",
+      "eligible_teacher_ids": [
+        "t_6a"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6a"
+      ]
+    },
+    {
+      "id": "req_6a_russian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_6a"
+      },
+      "subject_id": "russian_language",
+      "eligible_teacher_ids": [
+        "t_6a"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6a"
+      ]
+    },
+    {
+      "id": "req_6a_russian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_6a"
+      },
+      "subject_id": "russian_literature",
+      "eligible_teacher_ids": [
+        "t_6a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6a"
+      ]
+    },
+    {
+      "id": "req_6a_belarusian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_6a"
+      },
+      "subject_id": "belarusian_language",
+      "eligible_teacher_ids": [
+        "t_6a"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6a"
+      ]
+    },
+    {
+      "id": "req_6a_belarusian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_6a"
+      },
+      "subject_id": "belarusian_literature",
+      "eligible_teacher_ids": [
+        "t_6a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6a"
+      ]
+    },
+    {
+      "id": "req_6a_english",
+      "participant": {
+        "type": "class",
+        "id": "class_6a"
+      },
+      "subject_id": "english",
+      "eligible_teacher_ids": [
+        "t_6a"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6a"
+      ]
+    },
+    {
+      "id": "req_6a_physical_education",
+      "participant": {
+        "type": "class",
+        "id": "class_6a"
+      },
+      "subject_id": "physical_education",
+      "eligible_teacher_ids": [
+        "t_6a"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6a"
+      ]
+    },
+    {
+      "id": "req_6a_technology",
+      "participant": {
+        "type": "class",
+        "id": "class_6a"
+      },
+      "subject_id": "technology",
+      "eligible_teacher_ids": [
+        "t_6a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6a"
+      ]
+    },
+    {
+      "id": "req_6a_informatics",
+      "participant": {
+        "type": "class",
+        "id": "class_6a"
+      },
+      "subject_id": "informatics",
+      "eligible_teacher_ids": [
+        "t_6a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6a"
+      ]
+    },
+    {
+      "id": "req_6a_art",
+      "participant": {
+        "type": "class",
+        "id": "class_6a"
+      },
+      "subject_id": "art",
+      "eligible_teacher_ids": [
+        "t_6a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6a"
+      ]
+    },
+    {
+      "id": "req_6a_biology",
+      "participant": {
+        "type": "class",
+        "id": "class_6a"
+      },
+      "subject_id": "biology",
+      "eligible_teacher_ids": [
+        "t_6a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6a"
+      ]
+    },
+    {
+      "id": "req_6a_geography",
+      "participant": {
+        "type": "class",
+        "id": "class_6a"
+      },
+      "subject_id": "geography",
+      "eligible_teacher_ids": [
+        "t_6a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6a"
+      ]
+    },
+    {
+      "id": "req_6a_history_belarus",
+      "participant": {
+        "type": "class",
+        "id": "class_6a"
+      },
+      "subject_id": "history_belarus",
+      "eligible_teacher_ids": [
+        "t_6a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6a"
+      ]
+    },
+    {
+      "id": "req_6a_world_history",
+      "participant": {
+        "type": "class",
+        "id": "class_6a"
+      },
+      "subject_id": "world_history",
+      "eligible_teacher_ids": [
+        "t_6a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6a"
+      ]
+    },
+    {
+      "id": "req_6b_mathematics",
+      "participant": {
+        "type": "class",
+        "id": "class_6b"
+      },
+      "subject_id": "mathematics",
+      "eligible_teacher_ids": [
+        "t_6b"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6b"
+      ]
+    },
+    {
+      "id": "req_6b_russian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_6b"
+      },
+      "subject_id": "russian_language",
+      "eligible_teacher_ids": [
+        "t_6b"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6b"
+      ]
+    },
+    {
+      "id": "req_6b_russian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_6b"
+      },
+      "subject_id": "russian_literature",
+      "eligible_teacher_ids": [
+        "t_6b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6b"
+      ]
+    },
+    {
+      "id": "req_6b_belarusian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_6b"
+      },
+      "subject_id": "belarusian_language",
+      "eligible_teacher_ids": [
+        "t_6b"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6b"
+      ]
+    },
+    {
+      "id": "req_6b_belarusian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_6b"
+      },
+      "subject_id": "belarusian_literature",
+      "eligible_teacher_ids": [
+        "t_6b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6b"
+      ]
+    },
+    {
+      "id": "req_6b_english",
+      "participant": {
+        "type": "class",
+        "id": "class_6b"
+      },
+      "subject_id": "english",
+      "eligible_teacher_ids": [
+        "t_6b"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6b"
+      ]
+    },
+    {
+      "id": "req_6b_physical_education",
+      "participant": {
+        "type": "class",
+        "id": "class_6b"
+      },
+      "subject_id": "physical_education",
+      "eligible_teacher_ids": [
+        "t_6b"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6b"
+      ]
+    },
+    {
+      "id": "req_6b_technology",
+      "participant": {
+        "type": "class",
+        "id": "class_6b"
+      },
+      "subject_id": "technology",
+      "eligible_teacher_ids": [
+        "t_6b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6b"
+      ]
+    },
+    {
+      "id": "req_6b_informatics",
+      "participant": {
+        "type": "class",
+        "id": "class_6b"
+      },
+      "subject_id": "informatics",
+      "eligible_teacher_ids": [
+        "t_6b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6b"
+      ]
+    },
+    {
+      "id": "req_6b_art",
+      "participant": {
+        "type": "class",
+        "id": "class_6b"
+      },
+      "subject_id": "art",
+      "eligible_teacher_ids": [
+        "t_6b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6b"
+      ]
+    },
+    {
+      "id": "req_6b_biology",
+      "participant": {
+        "type": "class",
+        "id": "class_6b"
+      },
+      "subject_id": "biology",
+      "eligible_teacher_ids": [
+        "t_6b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6b"
+      ]
+    },
+    {
+      "id": "req_6b_geography",
+      "participant": {
+        "type": "class",
+        "id": "class_6b"
+      },
+      "subject_id": "geography",
+      "eligible_teacher_ids": [
+        "t_6b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6b"
+      ]
+    },
+    {
+      "id": "req_6b_history_belarus",
+      "participant": {
+        "type": "class",
+        "id": "class_6b"
+      },
+      "subject_id": "history_belarus",
+      "eligible_teacher_ids": [
+        "t_6b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6b"
+      ]
+    },
+    {
+      "id": "req_6b_world_history",
+      "participant": {
+        "type": "class",
+        "id": "class_6b"
+      },
+      "subject_id": "world_history",
+      "eligible_teacher_ids": [
+        "t_6b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6b"
+      ]
+    },
+    {
+      "id": "req_6v_mathematics",
+      "participant": {
+        "type": "class",
+        "id": "class_6v"
+      },
+      "subject_id": "mathematics",
+      "eligible_teacher_ids": [
+        "t_6v"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6v"
+      ]
+    },
+    {
+      "id": "req_6v_russian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_6v"
+      },
+      "subject_id": "russian_language",
+      "eligible_teacher_ids": [
+        "t_6v"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6v"
+      ]
+    },
+    {
+      "id": "req_6v_russian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_6v"
+      },
+      "subject_id": "russian_literature",
+      "eligible_teacher_ids": [
+        "t_6v"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6v"
+      ]
+    },
+    {
+      "id": "req_6v_belarusian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_6v"
+      },
+      "subject_id": "belarusian_language",
+      "eligible_teacher_ids": [
+        "t_6v"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6v"
+      ]
+    },
+    {
+      "id": "req_6v_belarusian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_6v"
+      },
+      "subject_id": "belarusian_literature",
+      "eligible_teacher_ids": [
+        "t_6v"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6v"
+      ]
+    },
+    {
+      "id": "req_6v_english",
+      "participant": {
+        "type": "class",
+        "id": "class_6v"
+      },
+      "subject_id": "english",
+      "eligible_teacher_ids": [
+        "t_6v"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6v"
+      ]
+    },
+    {
+      "id": "req_6v_physical_education",
+      "participant": {
+        "type": "class",
+        "id": "class_6v"
+      },
+      "subject_id": "physical_education",
+      "eligible_teacher_ids": [
+        "t_6v"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6v"
+      ]
+    },
+    {
+      "id": "req_6v_technology",
+      "participant": {
+        "type": "class",
+        "id": "class_6v"
+      },
+      "subject_id": "technology",
+      "eligible_teacher_ids": [
+        "t_6v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6v"
+      ]
+    },
+    {
+      "id": "req_6v_informatics",
+      "participant": {
+        "type": "class",
+        "id": "class_6v"
+      },
+      "subject_id": "informatics",
+      "eligible_teacher_ids": [
+        "t_6v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6v"
+      ]
+    },
+    {
+      "id": "req_6v_art",
+      "participant": {
+        "type": "class",
+        "id": "class_6v"
+      },
+      "subject_id": "art",
+      "eligible_teacher_ids": [
+        "t_6v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6v"
+      ]
+    },
+    {
+      "id": "req_6v_biology",
+      "participant": {
+        "type": "class",
+        "id": "class_6v"
+      },
+      "subject_id": "biology",
+      "eligible_teacher_ids": [
+        "t_6v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6v"
+      ]
+    },
+    {
+      "id": "req_6v_geography",
+      "participant": {
+        "type": "class",
+        "id": "class_6v"
+      },
+      "subject_id": "geography",
+      "eligible_teacher_ids": [
+        "t_6v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6v"
+      ]
+    },
+    {
+      "id": "req_6v_history_belarus",
+      "participant": {
+        "type": "class",
+        "id": "class_6v"
+      },
+      "subject_id": "history_belarus",
+      "eligible_teacher_ids": [
+        "t_6v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6v"
+      ]
+    },
+    {
+      "id": "req_6v_world_history",
+      "participant": {
+        "type": "class",
+        "id": "class_6v"
+      },
+      "subject_id": "world_history",
+      "eligible_teacher_ids": [
+        "t_6v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_6v"
+      ]
+    },
+    {
       "id": "req_7a_math",
       "participant": {
         "type": "class",
         "id": "class_7a"
       },
       "subject_id": "mathematics",
-      "eligible_teacher_ids": ["t_math"],
-      "weekly_lessons": 4,
+      "eligible_teacher_ids": [
+        "t_7a"
+      ],
+      "weekly_lessons": 5,
       "block_length": 1,
-      "required_room_capabilities": ["general"],
-      "allowed_classroom_ids": []
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7a"
+      ]
+    },
+    {
+      "id": "req_7a_russian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_7a"
+      },
+      "subject_id": "russian_language",
+      "eligible_teacher_ids": [
+        "t_7a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7a"
+      ]
+    },
+    {
+      "id": "req_7a_russian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_7a"
+      },
+      "subject_id": "russian_literature",
+      "eligible_teacher_ids": [
+        "t_7a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7a"
+      ]
+    },
+    {
+      "id": "req_7a_belarusian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_7a"
+      },
+      "subject_id": "belarusian_language",
+      "eligible_teacher_ids": [
+        "t_7a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7a"
+      ]
+    },
+    {
+      "id": "req_7a_belarusian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_7a"
+      },
+      "subject_id": "belarusian_literature",
+      "eligible_teacher_ids": [
+        "t_7a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7a"
+      ]
+    },
+    {
+      "id": "req_7a_en_1",
+      "participant": {
+        "type": "class",
+        "id": "class_7a"
+      },
+      "subject_id": "english",
+      "eligible_teacher_ids": [
+        "t_7a"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7a"
+      ]
+    },
+    {
+      "id": "req_7a_physical_education",
+      "participant": {
+        "type": "class",
+        "id": "class_7a"
+      },
+      "subject_id": "physical_education",
+      "eligible_teacher_ids": [
+        "t_7a"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7a"
+      ]
+    },
+    {
+      "id": "req_7a_technology",
+      "participant": {
+        "type": "class",
+        "id": "class_7a"
+      },
+      "subject_id": "technology",
+      "eligible_teacher_ids": [
+        "t_7a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7a"
+      ]
+    },
+    {
+      "id": "req_7a_informatics",
+      "participant": {
+        "type": "class",
+        "id": "class_7a"
+      },
+      "subject_id": "informatics",
+      "eligible_teacher_ids": [
+        "t_7a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7a"
+      ]
+    },
+    {
+      "id": "req_joint_advisory",
+      "participant": {
+        "type": "class",
+        "id": "class_7a"
+      },
+      "subject_id": "art",
+      "eligible_teacher_ids": [
+        "t_7a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7a"
+      ]
+    },
+    {
+      "id": "req_7a_biology",
+      "participant": {
+        "type": "class",
+        "id": "class_7a"
+      },
+      "subject_id": "biology",
+      "eligible_teacher_ids": [
+        "t_7a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7a"
+      ]
+    },
+    {
+      "id": "req_7a_geography",
+      "participant": {
+        "type": "class",
+        "id": "class_7a"
+      },
+      "subject_id": "geography",
+      "eligible_teacher_ids": [
+        "t_7a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7a"
+      ]
+    },
+    {
+      "id": "req_7a_history_belarus",
+      "participant": {
+        "type": "class",
+        "id": "class_7a"
+      },
+      "subject_id": "history_belarus",
+      "eligible_teacher_ids": [
+        "t_7a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7a"
+      ]
+    },
+    {
+      "id": "req_7a_world_history",
+      "participant": {
+        "type": "class",
+        "id": "class_7a"
+      },
+      "subject_id": "world_history",
+      "eligible_teacher_ids": [
+        "t_7a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7a"
+      ]
     },
     {
       "id": "req_7a_physics",
@@ -275,89 +2964,739 @@
         "id": "class_7a"
       },
       "subject_id": "physics",
-      "eligible_teacher_ids": ["t_science"],
+      "eligible_teacher_ids": [
+        "t_7a"
+      ],
       "weekly_lessons": 2,
       "block_length": 1,
-      "required_room_capabilities": ["physics_lab"],
-      "allowed_classroom_ids": ["science_lab"]
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7a"
+      ]
     },
     {
-      "id": "req_7a_en_1",
-      "participant": {
-        "type": "group",
-        "id": "group_7a_en_1"
-      },
-      "subject_id": "english",
-      "eligible_teacher_ids": ["t_english_a"],
-      "weekly_lessons": 2,
-      "block_length": 1,
-      "required_room_capabilities": ["general"],
-      "allowed_classroom_ids": []
-    },
-    {
-      "id": "req_7a_en_2",
-      "participant": {
-        "type": "group",
-        "id": "group_7a_en_2"
-      },
-      "subject_id": "english",
-      "eligible_teacher_ids": ["t_english_b"],
-      "weekly_lessons": 2,
-      "block_length": 1,
-      "required_room_capabilities": ["general"],
-      "allowed_classroom_ids": []
-    },
-    {
-      "id": "req_7a_history",
+      "id": "req_7a_chemistry",
       "participant": {
         "type": "class",
         "id": "class_7a"
       },
-      "subject_id": "history",
-      "eligible_teacher_ids": ["t_history"],
-      "weekly_lessons": 2,
+      "subject_id": "chemistry",
+      "eligible_teacher_ids": [
+        "t_7a"
+      ],
+      "weekly_lessons": 1,
       "block_length": 1,
-      "required_room_capabilities": ["general"],
-      "allowed_classroom_ids": []
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7a"
+      ]
     },
     {
-      "id": "req_7a_pe",
+      "id": "req_7b_mathematics",
       "participant": {
         "type": "class",
-        "id": "class_7a"
+        "id": "class_7b"
+      },
+      "subject_id": "mathematics",
+      "eligible_teacher_ids": [
+        "t_7b"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7b"
+      ]
+    },
+    {
+      "id": "req_7b_russian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_7b"
+      },
+      "subject_id": "russian_language",
+      "eligible_teacher_ids": [
+        "t_7b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7b"
+      ]
+    },
+    {
+      "id": "req_7b_russian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_7b"
+      },
+      "subject_id": "russian_literature",
+      "eligible_teacher_ids": [
+        "t_7b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7b"
+      ]
+    },
+    {
+      "id": "req_7b_belarusian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_7b"
+      },
+      "subject_id": "belarusian_language",
+      "eligible_teacher_ids": [
+        "t_7b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7b"
+      ]
+    },
+    {
+      "id": "req_7b_belarusian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_7b"
+      },
+      "subject_id": "belarusian_literature",
+      "eligible_teacher_ids": [
+        "t_7b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7b"
+      ]
+    },
+    {
+      "id": "req_7b_english",
+      "participant": {
+        "type": "class",
+        "id": "class_7b"
+      },
+      "subject_id": "english",
+      "eligible_teacher_ids": [
+        "t_7b"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7b"
+      ]
+    },
+    {
+      "id": "req_7b_physical_education",
+      "participant": {
+        "type": "class",
+        "id": "class_7b"
       },
       "subject_id": "physical_education",
-      "eligible_teacher_ids": ["t_pe"],
-      "weekly_lessons": 2,
+      "eligible_teacher_ids": [
+        "t_7b"
+      ],
+      "weekly_lessons": 3,
       "block_length": 1,
-      "required_room_capabilities": ["sports"],
-      "allowed_classroom_ids": ["gym"]
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7b"
+      ]
     },
     {
-      "id": "req_8a_math",
+      "id": "req_7b_technology",
+      "participant": {
+        "type": "class",
+        "id": "class_7b"
+      },
+      "subject_id": "technology",
+      "eligible_teacher_ids": [
+        "t_7b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7b"
+      ]
+    },
+    {
+      "id": "req_7b_informatics",
+      "participant": {
+        "type": "class",
+        "id": "class_7b"
+      },
+      "subject_id": "informatics",
+      "eligible_teacher_ids": [
+        "t_7b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7b"
+      ]
+    },
+    {
+      "id": "req_7b_art",
+      "participant": {
+        "type": "class",
+        "id": "class_7b"
+      },
+      "subject_id": "art",
+      "eligible_teacher_ids": [
+        "t_7b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7b"
+      ]
+    },
+    {
+      "id": "req_7b_biology",
+      "participant": {
+        "type": "class",
+        "id": "class_7b"
+      },
+      "subject_id": "biology",
+      "eligible_teacher_ids": [
+        "t_7b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7b"
+      ]
+    },
+    {
+      "id": "req_7b_geography",
+      "participant": {
+        "type": "class",
+        "id": "class_7b"
+      },
+      "subject_id": "geography",
+      "eligible_teacher_ids": [
+        "t_7b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7b"
+      ]
+    },
+    {
+      "id": "req_7b_history_belarus",
+      "participant": {
+        "type": "class",
+        "id": "class_7b"
+      },
+      "subject_id": "history_belarus",
+      "eligible_teacher_ids": [
+        "t_7b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7b"
+      ]
+    },
+    {
+      "id": "req_7b_world_history",
+      "participant": {
+        "type": "class",
+        "id": "class_7b"
+      },
+      "subject_id": "world_history",
+      "eligible_teacher_ids": [
+        "t_7b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7b"
+      ]
+    },
+    {
+      "id": "req_7b_physics",
+      "participant": {
+        "type": "class",
+        "id": "class_7b"
+      },
+      "subject_id": "physics",
+      "eligible_teacher_ids": [
+        "t_7b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7b"
+      ]
+    },
+    {
+      "id": "req_7b_chemistry",
+      "participant": {
+        "type": "class",
+        "id": "class_7b"
+      },
+      "subject_id": "chemistry",
+      "eligible_teacher_ids": [
+        "t_7b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7b"
+      ]
+    },
+    {
+      "id": "req_7v_mathematics",
+      "participant": {
+        "type": "class",
+        "id": "class_7v"
+      },
+      "subject_id": "mathematics",
+      "eligible_teacher_ids": [
+        "t_7v"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7v"
+      ]
+    },
+    {
+      "id": "req_7v_russian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_7v"
+      },
+      "subject_id": "russian_language",
+      "eligible_teacher_ids": [
+        "t_7v"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7v"
+      ]
+    },
+    {
+      "id": "req_7v_russian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_7v"
+      },
+      "subject_id": "russian_literature",
+      "eligible_teacher_ids": [
+        "t_7v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7v"
+      ]
+    },
+    {
+      "id": "req_7v_belarusian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_7v"
+      },
+      "subject_id": "belarusian_language",
+      "eligible_teacher_ids": [
+        "t_7v"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7v"
+      ]
+    },
+    {
+      "id": "req_7v_belarusian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_7v"
+      },
+      "subject_id": "belarusian_literature",
+      "eligible_teacher_ids": [
+        "t_7v"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7v"
+      ]
+    },
+    {
+      "id": "req_7v_english",
+      "participant": {
+        "type": "class",
+        "id": "class_7v"
+      },
+      "subject_id": "english",
+      "eligible_teacher_ids": [
+        "t_7v"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7v"
+      ]
+    },
+    {
+      "id": "req_7v_physical_education",
+      "participant": {
+        "type": "class",
+        "id": "class_7v"
+      },
+      "subject_id": "physical_education",
+      "eligible_teacher_ids": [
+        "t_7v"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7v"
+      ]
+    },
+    {
+      "id": "req_7v_technology",
+      "participant": {
+        "type": "class",
+        "id": "class_7v"
+      },
+      "subject_id": "technology",
+      "eligible_teacher_ids": [
+        "t_7v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7v"
+      ]
+    },
+    {
+      "id": "req_7v_informatics",
+      "participant": {
+        "type": "class",
+        "id": "class_7v"
+      },
+      "subject_id": "informatics",
+      "eligible_teacher_ids": [
+        "t_7v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7v"
+      ]
+    },
+    {
+      "id": "req_7v_art",
+      "participant": {
+        "type": "class",
+        "id": "class_7v"
+      },
+      "subject_id": "art",
+      "eligible_teacher_ids": [
+        "t_7v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7v"
+      ]
+    },
+    {
+      "id": "req_7v_biology",
+      "participant": {
+        "type": "class",
+        "id": "class_7v"
+      },
+      "subject_id": "biology",
+      "eligible_teacher_ids": [
+        "t_7v"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7v"
+      ]
+    },
+    {
+      "id": "req_7v_geography",
+      "participant": {
+        "type": "class",
+        "id": "class_7v"
+      },
+      "subject_id": "geography",
+      "eligible_teacher_ids": [
+        "t_7v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7v"
+      ]
+    },
+    {
+      "id": "req_7v_history_belarus",
+      "participant": {
+        "type": "class",
+        "id": "class_7v"
+      },
+      "subject_id": "history_belarus",
+      "eligible_teacher_ids": [
+        "t_7v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7v"
+      ]
+    },
+    {
+      "id": "req_7v_world_history",
+      "participant": {
+        "type": "class",
+        "id": "class_7v"
+      },
+      "subject_id": "world_history",
+      "eligible_teacher_ids": [
+        "t_7v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7v"
+      ]
+    },
+    {
+      "id": "req_7v_physics",
+      "participant": {
+        "type": "class",
+        "id": "class_7v"
+      },
+      "subject_id": "physics",
+      "eligible_teacher_ids": [
+        "t_7v"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7v"
+      ]
+    },
+    {
+      "id": "req_7v_chemistry",
+      "participant": {
+        "type": "class",
+        "id": "class_7v"
+      },
+      "subject_id": "chemistry",
+      "eligible_teacher_ids": [
+        "t_7v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_7v"
+      ]
+    },
+    {
+      "id": "req_8a_mathematics",
       "participant": {
         "type": "class",
         "id": "class_8a"
       },
       "subject_id": "mathematics",
-      "eligible_teacher_ids": ["t_math"],
-      "weekly_lessons": 4,
+      "eligible_teacher_ids": [
+        "t_8a"
+      ],
+      "weekly_lessons": 5,
       "block_length": 1,
-      "required_room_capabilities": ["general"],
-      "allowed_classroom_ids": []
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8a"
+      ]
     },
     {
-      "id": "req_8a_chemistry",
+      "id": "req_8a_russian_language",
       "participant": {
         "type": "class",
         "id": "class_8a"
       },
-      "subject_id": "chemistry",
-      "eligible_teacher_ids": ["t_science"],
+      "subject_id": "russian_language",
+      "eligible_teacher_ids": [
+        "t_8a"
+      ],
       "weekly_lessons": 2,
-      "block_length": 2,
-      "required_room_capabilities": ["chemistry_lab"],
-      "allowed_classroom_ids": ["science_lab"]
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8a"
+      ]
+    },
+    {
+      "id": "req_8a_russian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_8a"
+      },
+      "subject_id": "russian_literature",
+      "eligible_teacher_ids": [
+        "t_8a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8a"
+      ]
+    },
+    {
+      "id": "req_8a_belarusian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_8a"
+      },
+      "subject_id": "belarusian_language",
+      "eligible_teacher_ids": [
+        "t_8a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8a"
+      ]
+    },
+    {
+      "id": "req_8a_belarusian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_8a"
+      },
+      "subject_id": "belarusian_literature",
+      "eligible_teacher_ids": [
+        "t_8a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8a"
+      ]
     },
     {
       "id": "req_8a_english",
@@ -366,70 +3705,3087 @@
         "id": "class_8a"
       },
       "subject_id": "english",
-      "eligible_teacher_ids": ["t_english_a", "t_english_b"],
-      "weekly_lessons": 3,
+      "eligible_teacher_ids": [
+        "t_8a"
+      ],
+      "weekly_lessons": 5,
       "block_length": 1,
-      "required_room_capabilities": ["general"],
-      "allowed_classroom_ids": []
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8a"
+      ]
     },
     {
-      "id": "req_8a_history",
-      "participant": {
-        "type": "class",
-        "id": "class_8a"
-      },
-      "subject_id": "history",
-      "eligible_teacher_ids": ["t_history"],
-      "weekly_lessons": 2,
-      "block_length": 1,
-      "required_room_capabilities": ["general"],
-      "allowed_classroom_ids": []
-    },
-    {
-      "id": "req_8a_pe",
+      "id": "req_8a_physical_education",
       "participant": {
         "type": "class",
         "id": "class_8a"
       },
       "subject_id": "physical_education",
-      "eligible_teacher_ids": ["t_pe"],
-      "weekly_lessons": 2,
+      "eligible_teacher_ids": [
+        "t_8a"
+      ],
+      "weekly_lessons": 3,
       "block_length": 1,
-      "required_room_capabilities": ["sports"],
-      "allowed_classroom_ids": ["gym"]
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8a"
+      ]
     },
     {
-      "id": "req_joint_advisory",
+      "id": "req_8a_technology",
       "participant": {
-        "type": "cohort",
-        "id": "cohort_7a_8a_advisory"
+        "type": "class",
+        "id": "class_8a"
       },
-      "subject_id": "advisory",
-      "eligible_teacher_ids": ["t_history"],
+      "subject_id": "technology",
+      "eligible_teacher_ids": [
+        "t_8a"
+      ],
       "weekly_lessons": 1,
       "block_length": 1,
-      "required_room_capabilities": ["assembly"],
-      "allowed_classroom_ids": ["hall"]
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8a"
+      ]
+    },
+    {
+      "id": "req_8a_informatics",
+      "participant": {
+        "type": "class",
+        "id": "class_8a"
+      },
+      "subject_id": "informatics",
+      "eligible_teacher_ids": [
+        "t_8a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8a"
+      ]
+    },
+    {
+      "id": "req_8a_art",
+      "participant": {
+        "type": "class",
+        "id": "class_8a"
+      },
+      "subject_id": "art",
+      "eligible_teacher_ids": [
+        "t_8a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8a"
+      ]
+    },
+    {
+      "id": "req_8a_biology",
+      "participant": {
+        "type": "class",
+        "id": "class_8a"
+      },
+      "subject_id": "biology",
+      "eligible_teacher_ids": [
+        "t_8a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8a"
+      ]
+    },
+    {
+      "id": "req_8a_geography",
+      "participant": {
+        "type": "class",
+        "id": "class_8a"
+      },
+      "subject_id": "geography",
+      "eligible_teacher_ids": [
+        "t_8a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8a"
+      ]
+    },
+    {
+      "id": "req_8a_history_belarus",
+      "participant": {
+        "type": "class",
+        "id": "class_8a"
+      },
+      "subject_id": "history_belarus",
+      "eligible_teacher_ids": [
+        "t_8a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8a"
+      ]
+    },
+    {
+      "id": "req_8a_world_history",
+      "participant": {
+        "type": "class",
+        "id": "class_8a"
+      },
+      "subject_id": "world_history",
+      "eligible_teacher_ids": [
+        "t_8a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8a"
+      ]
+    },
+    {
+      "id": "req_8a_physics",
+      "participant": {
+        "type": "class",
+        "id": "class_8a"
+      },
+      "subject_id": "physics",
+      "eligible_teacher_ids": [
+        "t_8a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8a"
+      ]
+    },
+    {
+      "id": "req_8a_chemistry",
+      "participant": {
+        "type": "class",
+        "id": "class_8a"
+      },
+      "subject_id": "chemistry",
+      "eligible_teacher_ids": [
+        "t_8a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 2,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8a"
+      ]
+    },
+    {
+      "id": "req_8b_mathematics",
+      "participant": {
+        "type": "class",
+        "id": "class_8b"
+      },
+      "subject_id": "mathematics",
+      "eligible_teacher_ids": [
+        "t_8b"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8b"
+      ]
+    },
+    {
+      "id": "req_8b_russian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_8b"
+      },
+      "subject_id": "russian_language",
+      "eligible_teacher_ids": [
+        "t_8b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8b"
+      ]
+    },
+    {
+      "id": "req_8b_russian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_8b"
+      },
+      "subject_id": "russian_literature",
+      "eligible_teacher_ids": [
+        "t_8b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8b"
+      ]
+    },
+    {
+      "id": "req_8b_belarusian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_8b"
+      },
+      "subject_id": "belarusian_language",
+      "eligible_teacher_ids": [
+        "t_8b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8b"
+      ]
+    },
+    {
+      "id": "req_8b_belarusian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_8b"
+      },
+      "subject_id": "belarusian_literature",
+      "eligible_teacher_ids": [
+        "t_8b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8b"
+      ]
+    },
+    {
+      "id": "req_8b_english",
+      "participant": {
+        "type": "class",
+        "id": "class_8b"
+      },
+      "subject_id": "english",
+      "eligible_teacher_ids": [
+        "t_8b"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8b"
+      ]
+    },
+    {
+      "id": "req_8b_physical_education",
+      "participant": {
+        "type": "class",
+        "id": "class_8b"
+      },
+      "subject_id": "physical_education",
+      "eligible_teacher_ids": [
+        "t_8b"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8b"
+      ]
+    },
+    {
+      "id": "req_8b_technology",
+      "participant": {
+        "type": "class",
+        "id": "class_8b"
+      },
+      "subject_id": "technology",
+      "eligible_teacher_ids": [
+        "t_8b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8b"
+      ]
+    },
+    {
+      "id": "req_8b_informatics",
+      "participant": {
+        "type": "class",
+        "id": "class_8b"
+      },
+      "subject_id": "informatics",
+      "eligible_teacher_ids": [
+        "t_8b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8b"
+      ]
+    },
+    {
+      "id": "req_8b_art",
+      "participant": {
+        "type": "class",
+        "id": "class_8b"
+      },
+      "subject_id": "art",
+      "eligible_teacher_ids": [
+        "t_8b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8b"
+      ]
+    },
+    {
+      "id": "req_8b_biology",
+      "participant": {
+        "type": "class",
+        "id": "class_8b"
+      },
+      "subject_id": "biology",
+      "eligible_teacher_ids": [
+        "t_8b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8b"
+      ]
+    },
+    {
+      "id": "req_8b_geography",
+      "participant": {
+        "type": "class",
+        "id": "class_8b"
+      },
+      "subject_id": "geography",
+      "eligible_teacher_ids": [
+        "t_8b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8b"
+      ]
+    },
+    {
+      "id": "req_8b_history_belarus",
+      "participant": {
+        "type": "class",
+        "id": "class_8b"
+      },
+      "subject_id": "history_belarus",
+      "eligible_teacher_ids": [
+        "t_8b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8b"
+      ]
+    },
+    {
+      "id": "req_8b_world_history",
+      "participant": {
+        "type": "class",
+        "id": "class_8b"
+      },
+      "subject_id": "world_history",
+      "eligible_teacher_ids": [
+        "t_8b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8b"
+      ]
+    },
+    {
+      "id": "req_8b_physics",
+      "participant": {
+        "type": "class",
+        "id": "class_8b"
+      },
+      "subject_id": "physics",
+      "eligible_teacher_ids": [
+        "t_8b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8b"
+      ]
+    },
+    {
+      "id": "req_8b_chemistry",
+      "participant": {
+        "type": "class",
+        "id": "class_8b"
+      },
+      "subject_id": "chemistry",
+      "eligible_teacher_ids": [
+        "t_8b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_8b"
+      ]
+    },
+    {
+      "id": "req_9a_mathematics",
+      "participant": {
+        "type": "class",
+        "id": "class_9a"
+      },
+      "subject_id": "mathematics",
+      "eligible_teacher_ids": [
+        "t_9a"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9a"
+      ]
+    },
+    {
+      "id": "req_9a_russian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_9a"
+      },
+      "subject_id": "russian_language",
+      "eligible_teacher_ids": [
+        "t_9a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9a"
+      ]
+    },
+    {
+      "id": "req_9a_russian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_9a"
+      },
+      "subject_id": "russian_literature",
+      "eligible_teacher_ids": [
+        "t_9a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9a"
+      ]
+    },
+    {
+      "id": "req_9a_belarusian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_9a"
+      },
+      "subject_id": "belarusian_language",
+      "eligible_teacher_ids": [
+        "t_9a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9a"
+      ]
+    },
+    {
+      "id": "req_9a_belarusian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_9a"
+      },
+      "subject_id": "belarusian_literature",
+      "eligible_teacher_ids": [
+        "t_9a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9a"
+      ]
+    },
+    {
+      "id": "req_9a_english",
+      "participant": {
+        "type": "class",
+        "id": "class_9a"
+      },
+      "subject_id": "english",
+      "eligible_teacher_ids": [
+        "t_9a"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9a"
+      ]
+    },
+    {
+      "id": "req_9a_physical_education",
+      "participant": {
+        "type": "class",
+        "id": "class_9a"
+      },
+      "subject_id": "physical_education",
+      "eligible_teacher_ids": [
+        "t_9a"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9a"
+      ]
+    },
+    {
+      "id": "req_9a_technology",
+      "participant": {
+        "type": "class",
+        "id": "class_9a"
+      },
+      "subject_id": "technology",
+      "eligible_teacher_ids": [
+        "t_9a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9a"
+      ]
+    },
+    {
+      "id": "req_9a_informatics",
+      "participant": {
+        "type": "class",
+        "id": "class_9a"
+      },
+      "subject_id": "informatics",
+      "eligible_teacher_ids": [
+        "t_9a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9a"
+      ]
+    },
+    {
+      "id": "req_9a_biology",
+      "participant": {
+        "type": "class",
+        "id": "class_9a"
+      },
+      "subject_id": "biology",
+      "eligible_teacher_ids": [
+        "t_9a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9a"
+      ]
+    },
+    {
+      "id": "req_9a_geography",
+      "participant": {
+        "type": "class",
+        "id": "class_9a"
+      },
+      "subject_id": "geography",
+      "eligible_teacher_ids": [
+        "t_9a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9a"
+      ]
+    },
+    {
+      "id": "req_9a_history_belarus",
+      "participant": {
+        "type": "class",
+        "id": "class_9a"
+      },
+      "subject_id": "history_belarus",
+      "eligible_teacher_ids": [
+        "t_9a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9a"
+      ]
+    },
+    {
+      "id": "req_9a_world_history",
+      "participant": {
+        "type": "class",
+        "id": "class_9a"
+      },
+      "subject_id": "world_history",
+      "eligible_teacher_ids": [
+        "t_9a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9a"
+      ]
+    },
+    {
+      "id": "req_9a_physics",
+      "participant": {
+        "type": "class",
+        "id": "class_9a"
+      },
+      "subject_id": "physics",
+      "eligible_teacher_ids": [
+        "t_9a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9a"
+      ]
+    },
+    {
+      "id": "req_9a_chemistry",
+      "participant": {
+        "type": "class",
+        "id": "class_9a"
+      },
+      "subject_id": "chemistry",
+      "eligible_teacher_ids": [
+        "t_9a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9a"
+      ]
+    },
+    {
+      "id": "req_9a_social_studies",
+      "participant": {
+        "type": "class",
+        "id": "class_9a"
+      },
+      "subject_id": "social_studies",
+      "eligible_teacher_ids": [
+        "t_9a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9a"
+      ]
+    },
+    {
+      "id": "req_9b_mathematics",
+      "participant": {
+        "type": "class",
+        "id": "class_9b"
+      },
+      "subject_id": "mathematics",
+      "eligible_teacher_ids": [
+        "t_9b"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9b"
+      ]
+    },
+    {
+      "id": "req_9b_russian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_9b"
+      },
+      "subject_id": "russian_language",
+      "eligible_teacher_ids": [
+        "t_9b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9b"
+      ]
+    },
+    {
+      "id": "req_9b_russian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_9b"
+      },
+      "subject_id": "russian_literature",
+      "eligible_teacher_ids": [
+        "t_9b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9b"
+      ]
+    },
+    {
+      "id": "req_9b_belarusian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_9b"
+      },
+      "subject_id": "belarusian_language",
+      "eligible_teacher_ids": [
+        "t_9b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9b"
+      ]
+    },
+    {
+      "id": "req_9b_belarusian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_9b"
+      },
+      "subject_id": "belarusian_literature",
+      "eligible_teacher_ids": [
+        "t_9b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9b"
+      ]
+    },
+    {
+      "id": "req_9b_english",
+      "participant": {
+        "type": "class",
+        "id": "class_9b"
+      },
+      "subject_id": "english",
+      "eligible_teacher_ids": [
+        "t_9b"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9b"
+      ]
+    },
+    {
+      "id": "req_9b_physical_education",
+      "participant": {
+        "type": "class",
+        "id": "class_9b"
+      },
+      "subject_id": "physical_education",
+      "eligible_teacher_ids": [
+        "t_9b"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9b"
+      ]
+    },
+    {
+      "id": "req_9b_technology",
+      "participant": {
+        "type": "class",
+        "id": "class_9b"
+      },
+      "subject_id": "technology",
+      "eligible_teacher_ids": [
+        "t_9b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9b"
+      ]
+    },
+    {
+      "id": "req_9b_informatics",
+      "participant": {
+        "type": "class",
+        "id": "class_9b"
+      },
+      "subject_id": "informatics",
+      "eligible_teacher_ids": [
+        "t_9b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9b"
+      ]
+    },
+    {
+      "id": "req_9b_biology",
+      "participant": {
+        "type": "class",
+        "id": "class_9b"
+      },
+      "subject_id": "biology",
+      "eligible_teacher_ids": [
+        "t_9b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9b"
+      ]
+    },
+    {
+      "id": "req_9b_geography",
+      "participant": {
+        "type": "class",
+        "id": "class_9b"
+      },
+      "subject_id": "geography",
+      "eligible_teacher_ids": [
+        "t_9b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9b"
+      ]
+    },
+    {
+      "id": "req_9b_history_belarus",
+      "participant": {
+        "type": "class",
+        "id": "class_9b"
+      },
+      "subject_id": "history_belarus",
+      "eligible_teacher_ids": [
+        "t_9b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9b"
+      ]
+    },
+    {
+      "id": "req_9b_world_history",
+      "participant": {
+        "type": "class",
+        "id": "class_9b"
+      },
+      "subject_id": "world_history",
+      "eligible_teacher_ids": [
+        "t_9b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9b"
+      ]
+    },
+    {
+      "id": "req_9b_physics",
+      "participant": {
+        "type": "class",
+        "id": "class_9b"
+      },
+      "subject_id": "physics",
+      "eligible_teacher_ids": [
+        "t_9b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9b"
+      ]
+    },
+    {
+      "id": "req_9b_chemistry",
+      "participant": {
+        "type": "class",
+        "id": "class_9b"
+      },
+      "subject_id": "chemistry",
+      "eligible_teacher_ids": [
+        "t_9b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9b"
+      ]
+    },
+    {
+      "id": "req_9b_social_studies",
+      "participant": {
+        "type": "class",
+        "id": "class_9b"
+      },
+      "subject_id": "social_studies",
+      "eligible_teacher_ids": [
+        "t_9b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9b"
+      ]
+    },
+    {
+      "id": "req_9v_mathematics",
+      "participant": {
+        "type": "class",
+        "id": "class_9v"
+      },
+      "subject_id": "mathematics",
+      "eligible_teacher_ids": [
+        "t_9v"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9v"
+      ]
+    },
+    {
+      "id": "req_9v_russian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_9v"
+      },
+      "subject_id": "russian_language",
+      "eligible_teacher_ids": [
+        "t_9v"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9v"
+      ]
+    },
+    {
+      "id": "req_9v_russian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_9v"
+      },
+      "subject_id": "russian_literature",
+      "eligible_teacher_ids": [
+        "t_9v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9v"
+      ]
+    },
+    {
+      "id": "req_9v_belarusian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_9v"
+      },
+      "subject_id": "belarusian_language",
+      "eligible_teacher_ids": [
+        "t_9v"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9v"
+      ]
+    },
+    {
+      "id": "req_9v_belarusian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_9v"
+      },
+      "subject_id": "belarusian_literature",
+      "eligible_teacher_ids": [
+        "t_9v"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9v"
+      ]
+    },
+    {
+      "id": "req_9v_english",
+      "participant": {
+        "type": "class",
+        "id": "class_9v"
+      },
+      "subject_id": "english",
+      "eligible_teacher_ids": [
+        "t_9v"
+      ],
+      "weekly_lessons": 5,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9v"
+      ]
+    },
+    {
+      "id": "req_9v_physical_education",
+      "participant": {
+        "type": "class",
+        "id": "class_9v"
+      },
+      "subject_id": "physical_education",
+      "eligible_teacher_ids": [
+        "t_9v"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9v"
+      ]
+    },
+    {
+      "id": "req_9v_technology",
+      "participant": {
+        "type": "class",
+        "id": "class_9v"
+      },
+      "subject_id": "technology",
+      "eligible_teacher_ids": [
+        "t_9v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9v"
+      ]
+    },
+    {
+      "id": "req_9v_informatics",
+      "participant": {
+        "type": "class",
+        "id": "class_9v"
+      },
+      "subject_id": "informatics",
+      "eligible_teacher_ids": [
+        "t_9v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9v"
+      ]
+    },
+    {
+      "id": "req_9v_biology",
+      "participant": {
+        "type": "class",
+        "id": "class_9v"
+      },
+      "subject_id": "biology",
+      "eligible_teacher_ids": [
+        "t_9v"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9v"
+      ]
+    },
+    {
+      "id": "req_9v_geography",
+      "participant": {
+        "type": "class",
+        "id": "class_9v"
+      },
+      "subject_id": "geography",
+      "eligible_teacher_ids": [
+        "t_9v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9v"
+      ]
+    },
+    {
+      "id": "req_9v_history_belarus",
+      "participant": {
+        "type": "class",
+        "id": "class_9v"
+      },
+      "subject_id": "history_belarus",
+      "eligible_teacher_ids": [
+        "t_9v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9v"
+      ]
+    },
+    {
+      "id": "req_9v_world_history",
+      "participant": {
+        "type": "class",
+        "id": "class_9v"
+      },
+      "subject_id": "world_history",
+      "eligible_teacher_ids": [
+        "t_9v"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9v"
+      ]
+    },
+    {
+      "id": "req_9v_physics",
+      "participant": {
+        "type": "class",
+        "id": "class_9v"
+      },
+      "subject_id": "physics",
+      "eligible_teacher_ids": [
+        "t_9v"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9v"
+      ]
+    },
+    {
+      "id": "req_9v_chemistry",
+      "participant": {
+        "type": "class",
+        "id": "class_9v"
+      },
+      "subject_id": "chemistry",
+      "eligible_teacher_ids": [
+        "t_9v"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9v"
+      ]
+    },
+    {
+      "id": "req_9v_social_studies",
+      "participant": {
+        "type": "class",
+        "id": "class_9v"
+      },
+      "subject_id": "social_studies",
+      "eligible_teacher_ids": [
+        "t_9v"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_9v"
+      ]
+    },
+    {
+      "id": "req_10a_mathematics",
+      "participant": {
+        "type": "class",
+        "id": "class_10a"
+      },
+      "subject_id": "mathematics",
+      "eligible_teacher_ids": [
+        "t_10a"
+      ],
+      "weekly_lessons": 6,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10a"
+      ]
+    },
+    {
+      "id": "req_10a_physics",
+      "participant": {
+        "type": "class",
+        "id": "class_10a"
+      },
+      "subject_id": "physics",
+      "eligible_teacher_ids": [
+        "t_10a"
+      ],
+      "weekly_lessons": 4,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10a"
+      ]
+    },
+    {
+      "id": "req_10a_chemistry",
+      "participant": {
+        "type": "class",
+        "id": "class_10a"
+      },
+      "subject_id": "chemistry",
+      "eligible_teacher_ids": [
+        "t_10a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10a"
+      ]
+    },
+    {
+      "id": "req_10a_biology",
+      "participant": {
+        "type": "class",
+        "id": "class_10a"
+      },
+      "subject_id": "biology",
+      "eligible_teacher_ids": [
+        "t_10a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10a"
+      ]
+    },
+    {
+      "id": "req_10a_russian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_10a"
+      },
+      "subject_id": "russian_language",
+      "eligible_teacher_ids": [
+        "t_10a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10a"
+      ]
+    },
+    {
+      "id": "req_10a_russian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_10a"
+      },
+      "subject_id": "russian_literature",
+      "eligible_teacher_ids": [
+        "t_10a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10a"
+      ]
+    },
+    {
+      "id": "req_10a_belarusian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_10a"
+      },
+      "subject_id": "belarusian_language",
+      "eligible_teacher_ids": [
+        "t_10a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10a"
+      ]
+    },
+    {
+      "id": "req_10a_belarusian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_10a"
+      },
+      "subject_id": "belarusian_literature",
+      "eligible_teacher_ids": [
+        "t_10a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10a"
+      ]
+    },
+    {
+      "id": "req_10a_english",
+      "participant": {
+        "type": "class",
+        "id": "class_10a"
+      },
+      "subject_id": "english",
+      "eligible_teacher_ids": [
+        "t_10a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10a"
+      ]
+    },
+    {
+      "id": "req_10a_physical_education",
+      "participant": {
+        "type": "class",
+        "id": "class_10a"
+      },
+      "subject_id": "physical_education",
+      "eligible_teacher_ids": [
+        "t_10a"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10a"
+      ]
+    },
+    {
+      "id": "req_10a_informatics",
+      "participant": {
+        "type": "class",
+        "id": "class_10a"
+      },
+      "subject_id": "informatics",
+      "eligible_teacher_ids": [
+        "t_10a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10a"
+      ]
+    },
+    {
+      "id": "req_10a_geography",
+      "participant": {
+        "type": "class",
+        "id": "class_10a"
+      },
+      "subject_id": "geography",
+      "eligible_teacher_ids": [
+        "t_10a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10a"
+      ]
+    },
+    {
+      "id": "req_10a_history_belarus",
+      "participant": {
+        "type": "class",
+        "id": "class_10a"
+      },
+      "subject_id": "history_belarus",
+      "eligible_teacher_ids": [
+        "t_10a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10a"
+      ]
+    },
+    {
+      "id": "req_10a_social_studies",
+      "participant": {
+        "type": "class",
+        "id": "class_10a"
+      },
+      "subject_id": "social_studies",
+      "eligible_teacher_ids": [
+        "t_10a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10a"
+      ]
+    },
+    {
+      "id": "req_10a_technical_drawing",
+      "participant": {
+        "type": "class",
+        "id": "class_10a"
+      },
+      "subject_id": "technical_drawing",
+      "eligible_teacher_ids": [
+        "t_10a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10a"
+      ]
+    },
+    {
+      "id": "req_10a_defense_medical",
+      "participant": {
+        "type": "class",
+        "id": "class_10a"
+      },
+      "subject_id": "defense_medical",
+      "eligible_teacher_ids": [
+        "t_10a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10a"
+      ]
+    },
+    {
+      "id": "req_10b_mathematics",
+      "participant": {
+        "type": "class",
+        "id": "class_10b"
+      },
+      "subject_id": "mathematics",
+      "eligible_teacher_ids": [
+        "t_10b"
+      ],
+      "weekly_lessons": 6,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10b"
+      ]
+    },
+    {
+      "id": "req_10b_physics",
+      "participant": {
+        "type": "class",
+        "id": "class_10b"
+      },
+      "subject_id": "physics",
+      "eligible_teacher_ids": [
+        "t_10b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10b"
+      ]
+    },
+    {
+      "id": "req_10b_chemistry",
+      "participant": {
+        "type": "class",
+        "id": "class_10b"
+      },
+      "subject_id": "chemistry",
+      "eligible_teacher_ids": [
+        "t_10b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10b"
+      ]
+    },
+    {
+      "id": "req_10b_biology",
+      "participant": {
+        "type": "class",
+        "id": "class_10b"
+      },
+      "subject_id": "biology",
+      "eligible_teacher_ids": [
+        "t_10b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10b"
+      ]
+    },
+    {
+      "id": "req_10b_russian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_10b"
+      },
+      "subject_id": "russian_language",
+      "eligible_teacher_ids": [
+        "t_10b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10b"
+      ]
+    },
+    {
+      "id": "req_10b_russian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_10b"
+      },
+      "subject_id": "russian_literature",
+      "eligible_teacher_ids": [
+        "t_10b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10b"
+      ]
+    },
+    {
+      "id": "req_10b_belarusian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_10b"
+      },
+      "subject_id": "belarusian_language",
+      "eligible_teacher_ids": [
+        "t_10b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10b"
+      ]
+    },
+    {
+      "id": "req_10b_belarusian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_10b"
+      },
+      "subject_id": "belarusian_literature",
+      "eligible_teacher_ids": [
+        "t_10b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10b"
+      ]
+    },
+    {
+      "id": "req_10b_english",
+      "participant": {
+        "type": "class",
+        "id": "class_10b"
+      },
+      "subject_id": "english",
+      "eligible_teacher_ids": [
+        "t_10b"
+      ],
+      "weekly_lessons": 4,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10b"
+      ]
+    },
+    {
+      "id": "req_10b_physical_education",
+      "participant": {
+        "type": "class",
+        "id": "class_10b"
+      },
+      "subject_id": "physical_education",
+      "eligible_teacher_ids": [
+        "t_10b"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10b"
+      ]
+    },
+    {
+      "id": "req_10b_informatics",
+      "participant": {
+        "type": "class",
+        "id": "class_10b"
+      },
+      "subject_id": "informatics",
+      "eligible_teacher_ids": [
+        "t_10b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10b"
+      ]
+    },
+    {
+      "id": "req_10b_geography",
+      "participant": {
+        "type": "class",
+        "id": "class_10b"
+      },
+      "subject_id": "geography",
+      "eligible_teacher_ids": [
+        "t_10b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10b"
+      ]
+    },
+    {
+      "id": "req_10b_history_belarus",
+      "participant": {
+        "type": "class",
+        "id": "class_10b"
+      },
+      "subject_id": "history_belarus",
+      "eligible_teacher_ids": [
+        "t_10b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10b"
+      ]
+    },
+    {
+      "id": "req_10b_social_studies",
+      "participant": {
+        "type": "class",
+        "id": "class_10b"
+      },
+      "subject_id": "social_studies",
+      "eligible_teacher_ids": [
+        "t_10b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10b"
+      ]
+    },
+    {
+      "id": "req_10b_technical_drawing",
+      "participant": {
+        "type": "class",
+        "id": "class_10b"
+      },
+      "subject_id": "technical_drawing",
+      "eligible_teacher_ids": [
+        "t_10b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10b"
+      ]
+    },
+    {
+      "id": "req_10b_defense_medical",
+      "participant": {
+        "type": "class",
+        "id": "class_10b"
+      },
+      "subject_id": "defense_medical",
+      "eligible_teacher_ids": [
+        "t_10b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_10b"
+      ]
+    },
+    {
+      "id": "req_11a_mathematics",
+      "participant": {
+        "type": "class",
+        "id": "class_11a"
+      },
+      "subject_id": "mathematics",
+      "eligible_teacher_ids": [
+        "t_11a"
+      ],
+      "weekly_lessons": 4,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11a"
+      ]
+    },
+    {
+      "id": "req_11a_physics",
+      "participant": {
+        "type": "class",
+        "id": "class_11a"
+      },
+      "subject_id": "physics",
+      "eligible_teacher_ids": [
+        "t_11a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11a"
+      ]
+    },
+    {
+      "id": "req_11a_chemistry",
+      "participant": {
+        "type": "class",
+        "id": "class_11a"
+      },
+      "subject_id": "chemistry",
+      "eligible_teacher_ids": [
+        "t_11a"
+      ],
+      "weekly_lessons": 4,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11a"
+      ]
+    },
+    {
+      "id": "req_11a_biology",
+      "participant": {
+        "type": "class",
+        "id": "class_11a"
+      },
+      "subject_id": "biology",
+      "eligible_teacher_ids": [
+        "t_11a"
+      ],
+      "weekly_lessons": 4,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11a"
+      ]
+    },
+    {
+      "id": "req_11a_russian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_11a"
+      },
+      "subject_id": "russian_language",
+      "eligible_teacher_ids": [
+        "t_11a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11a"
+      ]
+    },
+    {
+      "id": "req_11a_russian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_11a"
+      },
+      "subject_id": "russian_literature",
+      "eligible_teacher_ids": [
+        "t_11a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11a"
+      ]
+    },
+    {
+      "id": "req_11a_belarusian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_11a"
+      },
+      "subject_id": "belarusian_language",
+      "eligible_teacher_ids": [
+        "t_11a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11a"
+      ]
+    },
+    {
+      "id": "req_11a_belarusian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_11a"
+      },
+      "subject_id": "belarusian_literature",
+      "eligible_teacher_ids": [
+        "t_11a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11a"
+      ]
+    },
+    {
+      "id": "req_11a_english",
+      "participant": {
+        "type": "class",
+        "id": "class_11a"
+      },
+      "subject_id": "english",
+      "eligible_teacher_ids": [
+        "t_11a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11a"
+      ]
+    },
+    {
+      "id": "req_11a_physical_education",
+      "participant": {
+        "type": "class",
+        "id": "class_11a"
+      },
+      "subject_id": "physical_education",
+      "eligible_teacher_ids": [
+        "t_11a"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11a"
+      ]
+    },
+    {
+      "id": "req_11a_informatics",
+      "participant": {
+        "type": "class",
+        "id": "class_11a"
+      },
+      "subject_id": "informatics",
+      "eligible_teacher_ids": [
+        "t_11a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11a"
+      ]
+    },
+    {
+      "id": "req_11a_geography",
+      "participant": {
+        "type": "class",
+        "id": "class_11a"
+      },
+      "subject_id": "geography",
+      "eligible_teacher_ids": [
+        "t_11a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11a"
+      ]
+    },
+    {
+      "id": "req_11a_history_belarus",
+      "participant": {
+        "type": "class",
+        "id": "class_11a"
+      },
+      "subject_id": "history_belarus",
+      "eligible_teacher_ids": [
+        "t_11a"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11a"
+      ]
+    },
+    {
+      "id": "req_11a_social_studies",
+      "participant": {
+        "type": "class",
+        "id": "class_11a"
+      },
+      "subject_id": "social_studies",
+      "eligible_teacher_ids": [
+        "t_11a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11a"
+      ]
+    },
+    {
+      "id": "req_11a_astronomy",
+      "participant": {
+        "type": "class",
+        "id": "class_11a"
+      },
+      "subject_id": "astronomy",
+      "eligible_teacher_ids": [
+        "t_11a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11a"
+      ]
+    },
+    {
+      "id": "req_11a_defense_medical",
+      "participant": {
+        "type": "class",
+        "id": "class_11a"
+      },
+      "subject_id": "defense_medical",
+      "eligible_teacher_ids": [
+        "t_11a"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11a"
+      ]
+    },
+    {
+      "id": "req_11b_mathematics",
+      "participant": {
+        "type": "class",
+        "id": "class_11b"
+      },
+      "subject_id": "mathematics",
+      "eligible_teacher_ids": [
+        "t_11b"
+      ],
+      "weekly_lessons": 6,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11b"
+      ]
+    },
+    {
+      "id": "req_11b_physics",
+      "participant": {
+        "type": "class",
+        "id": "class_11b"
+      },
+      "subject_id": "physics",
+      "eligible_teacher_ids": [
+        "t_11b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11b"
+      ]
+    },
+    {
+      "id": "req_11b_chemistry",
+      "participant": {
+        "type": "class",
+        "id": "class_11b"
+      },
+      "subject_id": "chemistry",
+      "eligible_teacher_ids": [
+        "t_11b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11b"
+      ]
+    },
+    {
+      "id": "req_11b_biology",
+      "participant": {
+        "type": "class",
+        "id": "class_11b"
+      },
+      "subject_id": "biology",
+      "eligible_teacher_ids": [
+        "t_11b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11b"
+      ]
+    },
+    {
+      "id": "req_11b_russian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_11b"
+      },
+      "subject_id": "russian_language",
+      "eligible_teacher_ids": [
+        "t_11b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11b"
+      ]
+    },
+    {
+      "id": "req_11b_russian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_11b"
+      },
+      "subject_id": "russian_literature",
+      "eligible_teacher_ids": [
+        "t_11b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11b"
+      ]
+    },
+    {
+      "id": "req_11b_belarusian_language",
+      "participant": {
+        "type": "class",
+        "id": "class_11b"
+      },
+      "subject_id": "belarusian_language",
+      "eligible_teacher_ids": [
+        "t_11b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11b"
+      ]
+    },
+    {
+      "id": "req_11b_belarusian_literature",
+      "participant": {
+        "type": "class",
+        "id": "class_11b"
+      },
+      "subject_id": "belarusian_literature",
+      "eligible_teacher_ids": [
+        "t_11b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11b"
+      ]
+    },
+    {
+      "id": "req_11b_english",
+      "participant": {
+        "type": "class",
+        "id": "class_11b"
+      },
+      "subject_id": "english",
+      "eligible_teacher_ids": [
+        "t_11b"
+      ],
+      "weekly_lessons": 4,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11b"
+      ]
+    },
+    {
+      "id": "req_11b_physical_education",
+      "participant": {
+        "type": "class",
+        "id": "class_11b"
+      },
+      "subject_id": "physical_education",
+      "eligible_teacher_ids": [
+        "t_11b"
+      ],
+      "weekly_lessons": 3,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11b"
+      ]
+    },
+    {
+      "id": "req_11b_informatics",
+      "participant": {
+        "type": "class",
+        "id": "class_11b"
+      },
+      "subject_id": "informatics",
+      "eligible_teacher_ids": [
+        "t_11b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11b"
+      ]
+    },
+    {
+      "id": "req_11b_geography",
+      "participant": {
+        "type": "class",
+        "id": "class_11b"
+      },
+      "subject_id": "geography",
+      "eligible_teacher_ids": [
+        "t_11b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11b"
+      ]
+    },
+    {
+      "id": "req_11b_history_belarus",
+      "participant": {
+        "type": "class",
+        "id": "class_11b"
+      },
+      "subject_id": "history_belarus",
+      "eligible_teacher_ids": [
+        "t_11b"
+      ],
+      "weekly_lessons": 2,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11b"
+      ]
+    },
+    {
+      "id": "req_11b_social_studies",
+      "participant": {
+        "type": "class",
+        "id": "class_11b"
+      },
+      "subject_id": "social_studies",
+      "eligible_teacher_ids": [
+        "t_11b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11b"
+      ]
+    },
+    {
+      "id": "req_11b_astronomy",
+      "participant": {
+        "type": "class",
+        "id": "class_11b"
+      },
+      "subject_id": "astronomy",
+      "eligible_teacher_ids": [
+        "t_11b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11b"
+      ]
+    },
+    {
+      "id": "req_11b_defense_medical",
+      "participant": {
+        "type": "class",
+        "id": "class_11b"
+      },
+      "subject_id": "defense_medical",
+      "eligible_teacher_ids": [
+        "t_11b"
+      ],
+      "weekly_lessons": 1,
+      "block_length": 1,
+      "required_room_capabilities": [
+        "general"
+      ],
+      "allowed_classroom_ids": [
+        "room_11b"
+      ]
     }
   ],
   "resource_availability": [
     {
       "resource": {
-        "type": "teacher",
-        "id": "t_math"
+        "type": "class",
+        "id": "class_5a"
       },
       "unavailable_slots": [
         {
+          "day_id": "mon",
+          "period_id": "p7"
+        },
+        {
           "day_id": "tue",
-          "period_id": "p1"
+          "period_id": "p7"
+        },
+        {
+          "day_id": "wed",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "thu",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "fri",
+          "period_id": "p6"
+        },
+        {
+          "day_id": "fri",
+          "period_id": "p7"
         }
       ],
-      "preferred_slots": [
+      "preferred_slots": []
+    },
+    {
+      "resource": {
+        "type": "class",
+        "id": "class_5b"
+      },
+      "unavailable_slots": [
         {
           "day_id": "mon",
-          "period_id": "p2"
+          "period_id": "p7"
+        },
+        {
+          "day_id": "tue",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "wed",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "thu",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "fri",
+          "period_id": "p6"
+        },
+        {
+          "day_id": "fri",
+          "period_id": "p7"
         }
-      ]
+      ],
+      "preferred_slots": []
+    },
+    {
+      "resource": {
+        "type": "class",
+        "id": "class_5v"
+      },
+      "unavailable_slots": [
+        {
+          "day_id": "mon",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "tue",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "wed",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "thu",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "fri",
+          "period_id": "p6"
+        },
+        {
+          "day_id": "fri",
+          "period_id": "p7"
+        }
+      ],
+      "preferred_slots": []
+    },
+    {
+      "resource": {
+        "type": "class",
+        "id": "class_6a"
+      },
+      "unavailable_slots": [
+        {
+          "day_id": "mon",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "tue",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "wed",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "thu",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "fri",
+          "period_id": "p7"
+        }
+      ],
+      "preferred_slots": []
+    },
+    {
+      "resource": {
+        "type": "class",
+        "id": "class_6b"
+      },
+      "unavailable_slots": [
+        {
+          "day_id": "mon",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "tue",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "wed",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "thu",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "fri",
+          "period_id": "p7"
+        }
+      ],
+      "preferred_slots": []
+    },
+    {
+      "resource": {
+        "type": "class",
+        "id": "class_6v"
+      },
+      "unavailable_slots": [
+        {
+          "day_id": "mon",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "tue",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "wed",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "thu",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "fri",
+          "period_id": "p7"
+        }
+      ],
+      "preferred_slots": []
+    },
+    {
+      "resource": {
+        "type": "class",
+        "id": "class_7a"
+      },
+      "unavailable_slots": [
+        {
+          "day_id": "mon",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "tue",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "thu",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "fri",
+          "period_id": "p7"
+        }
+      ],
+      "preferred_slots": []
+    },
+    {
+      "resource": {
+        "type": "class",
+        "id": "class_7b"
+      },
+      "unavailable_slots": [
+        {
+          "day_id": "mon",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "tue",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "thu",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "fri",
+          "period_id": "p7"
+        }
+      ],
+      "preferred_slots": []
+    },
+    {
+      "resource": {
+        "type": "class",
+        "id": "class_7v"
+      },
+      "unavailable_slots": [
+        {
+          "day_id": "mon",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "tue",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "thu",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "fri",
+          "period_id": "p7"
+        }
+      ],
+      "preferred_slots": []
+    },
+    {
+      "resource": {
+        "type": "class",
+        "id": "class_8a"
+      },
+      "unavailable_slots": [
+        {
+          "day_id": "thu",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "fri",
+          "period_id": "p7"
+        }
+      ],
+      "preferred_slots": []
+    },
+    {
+      "resource": {
+        "type": "class",
+        "id": "class_8b"
+      },
+      "unavailable_slots": [
+        {
+          "day_id": "thu",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "fri",
+          "period_id": "p7"
+        }
+      ],
+      "preferred_slots": []
+    },
+    {
+      "resource": {
+        "type": "class",
+        "id": "class_9a"
+      },
+      "unavailable_slots": [
+        {
+          "day_id": "thu",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "fri",
+          "period_id": "p7"
+        }
+      ],
+      "preferred_slots": []
+    },
+    {
+      "resource": {
+        "type": "class",
+        "id": "class_9b"
+      },
+      "unavailable_slots": [
+        {
+          "day_id": "thu",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "fri",
+          "period_id": "p7"
+        }
+      ],
+      "preferred_slots": []
+    },
+    {
+      "resource": {
+        "type": "class",
+        "id": "class_9v"
+      },
+      "unavailable_slots": [
+        {
+          "day_id": "thu",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "fri",
+          "period_id": "p7"
+        }
+      ],
+      "preferred_slots": []
+    },
+    {
+      "resource": {
+        "type": "class",
+        "id": "class_10a"
+      },
+      "unavailable_slots": [
+        {
+          "day_id": "wed",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "thu",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "fri",
+          "period_id": "p7"
+        }
+      ],
+      "preferred_slots": []
+    },
+    {
+      "resource": {
+        "type": "class",
+        "id": "class_10b"
+      },
+      "unavailable_slots": [
+        {
+          "day_id": "wed",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "thu",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "fri",
+          "period_id": "p7"
+        }
+      ],
+      "preferred_slots": []
+    },
+    {
+      "resource": {
+        "type": "class",
+        "id": "class_11a"
+      },
+      "unavailable_slots": [
+        {
+          "day_id": "wed",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "thu",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "fri",
+          "period_id": "p7"
+        }
+      ],
+      "preferred_slots": []
+    },
+    {
+      "resource": {
+        "type": "class",
+        "id": "class_11b"
+      },
+      "unavailable_slots": [
+        {
+          "day_id": "wed",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "thu",
+          "period_id": "p7"
+        },
+        {
+          "day_id": "fri",
+          "period_id": "p7"
+        }
+      ],
+      "preferred_slots": []
+    },
+    {
+      "resource": {
+        "type": "teacher",
+        "id": "t_math"
+      },
+      "unavailable_slots": [],
+      "preferred_slots": []
+    },
+    {
+      "resource": {
+        "type": "teacher",
+        "id": "t_7a"
+      },
+      "unavailable_slots": [],
+      "preferred_slots": []
     },
     {
       "resource": {
@@ -454,8 +6810,8 @@
         "day_id": "mon",
         "period_id": "p1"
       },
-      "teacher_id": "t_history",
-      "classroom_id": "hall"
+      "teacher_id": "t_7a",
+      "classroom_id": "room_7a"
     }
   ],
   "policies": {
@@ -463,7 +6819,126 @@
       {
         "resource": {
           "type": "class",
+          "id": "class_5a"
+        },
+        "maximum": 6
+      },
+      {
+        "resource": {
+          "type": "teacher",
+          "id": "t_math"
+        },
+        "maximum": 6
+      },
+      {
+        "resource": {
+          "type": "class",
+          "id": "class_5b"
+        },
+        "maximum": 6
+      },
+      {
+        "resource": {
+          "type": "teacher",
+          "id": "t_5b"
+        },
+        "maximum": 6
+      },
+      {
+        "resource": {
+          "type": "class",
+          "id": "class_5v"
+        },
+        "maximum": 6
+      },
+      {
+        "resource": {
+          "type": "teacher",
+          "id": "t_5v"
+        },
+        "maximum": 6
+      },
+      {
+        "resource": {
+          "type": "class",
+          "id": "class_6a"
+        },
+        "maximum": 6
+      },
+      {
+        "resource": {
+          "type": "teacher",
+          "id": "t_6a"
+        },
+        "maximum": 6
+      },
+      {
+        "resource": {
+          "type": "class",
+          "id": "class_6b"
+        },
+        "maximum": 6
+      },
+      {
+        "resource": {
+          "type": "teacher",
+          "id": "t_6b"
+        },
+        "maximum": 6
+      },
+      {
+        "resource": {
+          "type": "class",
+          "id": "class_6v"
+        },
+        "maximum": 6
+      },
+      {
+        "resource": {
+          "type": "teacher",
+          "id": "t_6v"
+        },
+        "maximum": 6
+      },
+      {
+        "resource": {
+          "type": "class",
           "id": "class_7a"
+        },
+        "maximum": 7
+      },
+      {
+        "resource": {
+          "type": "teacher",
+          "id": "t_7a"
+        },
+        "maximum": 7
+      },
+      {
+        "resource": {
+          "type": "class",
+          "id": "class_7b"
+        },
+        "maximum": 7
+      },
+      {
+        "resource": {
+          "type": "teacher",
+          "id": "t_7b"
+        },
+        "maximum": 7
+      },
+      {
+        "resource": {
+          "type": "class",
+          "id": "class_7v"
+        },
+        "maximum": 7
+      },
+      {
+        "resource": {
+          "type": "teacher",
+          "id": "t_7v"
         },
         "maximum": 7
       },
@@ -477,25 +6952,249 @@
       {
         "resource": {
           "type": "teacher",
-          "id": "t_math"
+          "id": "t_8a"
         },
-        "maximum": 6
+        "maximum": 7
+      },
+      {
+        "resource": {
+          "type": "class",
+          "id": "class_8b"
+        },
+        "maximum": 7
+      },
+      {
+        "resource": {
+          "type": "teacher",
+          "id": "t_8b"
+        },
+        "maximum": 7
+      },
+      {
+        "resource": {
+          "type": "class",
+          "id": "class_9a"
+        },
+        "maximum": 7
+      },
+      {
+        "resource": {
+          "type": "teacher",
+          "id": "t_9a"
+        },
+        "maximum": 7
+      },
+      {
+        "resource": {
+          "type": "class",
+          "id": "class_9b"
+        },
+        "maximum": 7
+      },
+      {
+        "resource": {
+          "type": "teacher",
+          "id": "t_9b"
+        },
+        "maximum": 7
+      },
+      {
+        "resource": {
+          "type": "class",
+          "id": "class_9v"
+        },
+        "maximum": 7
+      },
+      {
+        "resource": {
+          "type": "teacher",
+          "id": "t_9v"
+        },
+        "maximum": 7
+      },
+      {
+        "resource": {
+          "type": "class",
+          "id": "class_10a"
+        },
+        "maximum": 7
+      },
+      {
+        "resource": {
+          "type": "teacher",
+          "id": "t_10a"
+        },
+        "maximum": 7
+      },
+      {
+        "resource": {
+          "type": "class",
+          "id": "class_10b"
+        },
+        "maximum": 7
+      },
+      {
+        "resource": {
+          "type": "teacher",
+          "id": "t_10b"
+        },
+        "maximum": 7
+      },
+      {
+        "resource": {
+          "type": "class",
+          "id": "class_11a"
+        },
+        "maximum": 7
+      },
+      {
+        "resource": {
+          "type": "teacher",
+          "id": "t_11a"
+        },
+        "maximum": 7
+      },
+      {
+        "resource": {
+          "type": "class",
+          "id": "class_11b"
+        },
+        "maximum": 7
+      },
+      {
+        "resource": {
+          "type": "teacher",
+          "id": "t_11b"
+        },
+        "maximum": 7
       }
     ],
     "difficult_load_targets": [
       {
         "participant": {
           "type": "class",
+          "id": "class_5a"
+        },
+        "target": 11
+      },
+      {
+        "participant": {
+          "type": "class",
+          "id": "class_5b"
+        },
+        "target": 11
+      },
+      {
+        "participant": {
+          "type": "class",
+          "id": "class_5v"
+        },
+        "target": 11
+      },
+      {
+        "participant": {
+          "type": "class",
+          "id": "class_6a"
+        },
+        "target": 11
+      },
+      {
+        "participant": {
+          "type": "class",
+          "id": "class_6b"
+        },
+        "target": 11
+      },
+      {
+        "participant": {
+          "type": "class",
+          "id": "class_6v"
+        },
+        "target": 11
+      },
+      {
+        "participant": {
+          "type": "class",
           "id": "class_7a"
         },
-        "target": 6
+        "target": 13
+      },
+      {
+        "participant": {
+          "type": "class",
+          "id": "class_7b"
+        },
+        "target": 13
+      },
+      {
+        "participant": {
+          "type": "class",
+          "id": "class_7v"
+        },
+        "target": 13
       },
       {
         "participant": {
           "type": "class",
           "id": "class_8a"
         },
-        "target": 6
+        "target": 13
+      },
+      {
+        "participant": {
+          "type": "class",
+          "id": "class_8b"
+        },
+        "target": 13
+      },
+      {
+        "participant": {
+          "type": "class",
+          "id": "class_9a"
+        },
+        "target": 13
+      },
+      {
+        "participant": {
+          "type": "class",
+          "id": "class_9b"
+        },
+        "target": 13
+      },
+      {
+        "participant": {
+          "type": "class",
+          "id": "class_9v"
+        },
+        "target": 13
+      },
+      {
+        "participant": {
+          "type": "class",
+          "id": "class_10a"
+        },
+        "target": 13
+      },
+      {
+        "participant": {
+          "type": "class",
+          "id": "class_10b"
+        },
+        "target": 13
+      },
+      {
+        "participant": {
+          "type": "class",
+          "id": "class_11a"
+        },
+        "target": 13
+      },
+      {
+        "participant": {
+          "type": "class",
+          "id": "class_11b"
+        },
+        "target": 13
       }
     ],
     "soft_constraint_weights": [
@@ -506,13 +7205,13 @@
       },
       {
         "constraint_id": "SC-002",
-        "priority": "P2",
-        "weight": 4
+        "priority": "P1",
+        "weight": 40
       },
       {
         "constraint_id": "SC-003",
         "priority": "P1",
-        "weight": 8
+        "weight": 200
       },
       {
         "constraint_id": "SC-004",

@@ -26,6 +26,28 @@ class SemanticValidatorTests(unittest.TestCase):
     def test_synthetic_example_is_semantically_valid(self) -> None:
         self.assertEqual(SemanticValidator(load_example()).validate(), [])
 
+    def test_representative_demo_has_every_class_and_full_weekly_load(self) -> None:
+        dataset = load_example()
+        expected = {
+            **{f"class_5{section}": 29 for section in "abv"},
+            **{f"class_6{section}": 30 for section in "abv"},
+            **{f"class_7{section}": 31 for section in "abv"},
+            **{f"class_8{section}": 33 for section in "ab"},
+            **{f"class_9{section}": 33 for section in "abv"},
+            **{f"class_10{section}": 32 for section in "ab"},
+            **{f"class_11{section}": 32 for section in "ab"},
+        }
+        actual = {
+            class_id: sum(
+                requirement["weekly_lessons"]
+                for requirement in dataset["curriculum_requirements"]
+                if requirement["participant"] == {"type": "class", "id": class_id}
+            )
+            for class_id in expected
+        }
+        self.assertEqual(len(dataset["classes"]), 18)
+        self.assertEqual(actual, expected)
+
     def test_duplicate_identifier_is_rejected(self) -> None:
         dataset = load_example()
         duplicate = copy.deepcopy(dataset["teachers"][0])
@@ -43,9 +65,9 @@ class SemanticValidatorTests(unittest.TestCase):
 
     def test_incomplete_complete_partition_is_rejected(self) -> None:
         dataset = load_example()
-        dataset["groups"][0]["student_count"] = 11
+        dataset["groups"][0]["student_count"] -= 1
 
-        self.assert_has_error(dataset, "complete partition totals 23, expected 24")
+        self.assert_has_error(dataset, "complete partition totals 27, expected 28")
 
     def test_unsuitable_allowed_classroom_is_rejected(self) -> None:
         dataset = load_example()

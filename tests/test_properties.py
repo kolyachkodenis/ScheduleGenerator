@@ -44,7 +44,9 @@ class PropertyTests(unittest.TestCase):
         self, class_size: int, first_group: int, second_group: int
     ) -> None:
         dataset = load_example()
-        dataset["classes"][0]["student_count"] = class_size
+        next(item for item in dataset["classes"] if item["id"] == "class_7a")[
+            "student_count"
+        ] = class_size
         dataset["groups"][0]["student_count"] = first_group
         dataset["groups"][1]["student_count"] = second_group
 
