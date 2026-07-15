@@ -24,7 +24,7 @@ python scripts/import_school_data.py outputs/stage-7/school-data-import-template
 After correcting every error, apply the same source atomically:
 
 ```powershell
-python scripts/import_school_data.py outputs/stage-7/school-data-import-template.xlsx --database school.db --apply
+python scripts/import_school_data.py outputs/stage-7/school-data-import-template.xlsx --database schedule-generator.db --apply
 ```
 
 Invalid input exits with status 1 and cannot be applied. JSON export and consistent SQLite backup are available through `DatasetStore.export_json` and `DatasetStore.backup`.
