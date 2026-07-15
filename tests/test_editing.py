@@ -24,7 +24,7 @@ def assignments() -> list[dict]:
             "occurrence_index": 0,
             "slot": {"day_id": "mon", "period_id": "p1"},
             "occupied_period_ids": ["p1"],
-            "teacher_id": "t_history",
+            "teacher_id": "t_art",
             "classroom_id": "hall",
         },
         {

@@ -31,8 +31,8 @@ def result_for(problem: SchedulingProblem, _options: GenerationOptions) -> Gener
                     "occurrence_index": 0,
                     "slot": {"day_id": "mon", "period_id": "p1"},
                     "occupied_period_ids": ["p1"],
-                    "teacher_id": "t_history",
-                    "classroom_id": "hall",
+                    "teacher_id": "t_art",
+                    "classroom_id": "room_7a",
                 }
             ],
             "quality_report": {"total_penalty": 0, "by_constraint": {}, "violations": []},

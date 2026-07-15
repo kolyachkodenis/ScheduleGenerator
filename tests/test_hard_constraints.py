@@ -110,7 +110,12 @@ class HardConstraintTests(unittest.TestCase):
         )
 
     def test_hc007_teacher_unavailability_removes_candidates(self) -> None:
-        self.builder.availability[("teacher", "t_7a")]["unavailable"].add(("tue", "p1"))
+        requirement = self.builder.requirements["req_7a_math"]
+        for teacher_id in requirement["eligible_teacher_ids"]:
+            self.builder.availability[("teacher", teacher_id)] = {
+                "unavailable": {("tue", "p1")},
+                "preferred": set(),
+            }
         item = occurrence(self.builder, "req_7a_math")
         candidates = self.builder.enumerate_candidates(item)
         self.assertNotIn(
@@ -142,7 +147,7 @@ class HardConstraintTests(unittest.TestCase):
                 candidate.teacher_id,
                 candidate.classroom_id,
             ),
-            ("mon", "p1", "t_7a", "room_7a"),
+            ("mon", "p1", "t_art", "room_7a"),
         )
 
     def test_hc010_only_eligible_teachers_receive_candidates(self) -> None:
@@ -150,7 +155,14 @@ class HardConstraintTests(unittest.TestCase):
         candidates = self.builder.enumerate_candidates(item)
         self.assertEqual(
             {candidate.teacher_id for candidate in candidates},
-            {"t_8a"},
+            {
+                "t_english_1",
+                "t_english_2",
+                "t_english_3",
+                "t_english_4",
+                "t_english_5",
+                "t_english_6",
+            },
         )
 
     def test_hc011_room_capability_filters_candidates(self) -> None:

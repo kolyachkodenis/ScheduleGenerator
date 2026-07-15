@@ -404,7 +404,8 @@ function translateError(message) {
     [/^Daily load spread for (.+)$/, "Неравномерная дневная нагрузка для $1"],
     [/^Internal class gap for (.+) on (.+) period (\d+)$/, "Окно у класса $1 в день $2, урок $3"],
     [/^Internal teacher gap for (.+) on (.+) period (\d+)$/, "Окно у учителя $1 в день $2, урок $3"],
-    [/^Repeated (.+) starts for (.+) on (.+)$/, "Повтор предмета $1 у $2 в день $3"]
+    [/^Repeated (.+) starts for (.+) on (.+)$/, "Повтор предмета $1 у $2 в день $3"],
+    [/^Unpaired (.+) and (.+) for (.+) on (.+)$/, "Предметы $1 и $2 не совмещены у $3 в день $4"]
   ];
   const pattern = patterns.find(([expression]) => expression.test(message));
   return language === "ru" && pattern ? message.replace(pattern[0], pattern[1]) : message;

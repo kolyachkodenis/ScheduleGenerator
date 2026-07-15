@@ -6,6 +6,21 @@ const collections = [
   ["curriculum_requirements", "Curriculum"], ["resource_availability", "Availability"]
 ];
 const titles = { overview: "Overview", data: "School data", rules: "Rules", generate: "Generate", results: "Results", admin: "Security" };
+const teacherNamesRu = {
+  Smirnov: "Смирнов", Kuznetsova: "Кузнецова", Sokolov: "Соколов", Volkova: "Волкова",
+  Popov: "Попов", Medvedeva: "Медведева", Ivanov: "Иванов", Morozova: "Морозова",
+  Lebedev: "Лебедев", Kovalenko: "Коваленко", Shevchenko: "Шевченко", Bondarenko: "Бондаренко",
+  Taylor: "Тейлор", Brown: "Браун", Wilson: "Уилсон", Cooper: "Купер", Harris: "Харрис",
+  Orlov: "Орлов", Pavlova: "Павлова", Zaitsev: "Зайцев", Karpov: "Карпов",
+  Fedorov: "Фёдоров", Vinogradov: "Виноградов", Mikhailova: "Михайлова", Belyaeva: "Беляева",
+  Egorova: "Егорова", Nikolaeva: "Николаева", Alexeev: "Алексеев", Novik: "Новик",
+  Kravchenko: "Кравченко", Savchenko: "Савченко", Romanov: "Романов", Semenov: "Семёнов",
+  Gromov: "Громов", Kozlova: "Козлова", Sorokina: "Сорокина", Vasiliev: "Васильев",
+  Andreev: "Андреев", Tarasov: "Тарасов", Bogdanov: "Богданов", Petrov: "Петров",
+  Golubeva: "Голубева", Komarov: "Комаров", Markov: "Марков", Zhukov: "Жуков",
+  Kiselev: "Киселёв", Belov: "Белов", Denisov: "Денисов", Martin: "Мартин",
+  Kulikov: "Куликов", Fomina: "Фомина"
+};
 
 function collectionLabel(key) { return t(collections.find(([item]) => item === key)?.[1] || key); }
 function roleLabel(role) { return t(role); }
@@ -13,6 +28,7 @@ function statusLabel(status) { return t(status); }
 function dataLabel(label) {
   const translated = t(label);
   if (translated !== label || window.ScheduleI18n.language !== "ru") return translated;
+  if (teacherNamesRu[label]) return teacherNamesRu[label];
   const section = (value) => ({ A: "А", B: "Б", V: "В" }[value] || value);
   let match = label.match(/^Class (\d+)([ABV])$/);
   if (match) return `${match[1]} «${section(match[2])}» класс`;

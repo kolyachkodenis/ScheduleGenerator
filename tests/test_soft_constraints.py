@@ -75,6 +75,26 @@ class SoftConstraintTests(unittest.TestCase):
         )
         self.assertEqual(solve_penalty(dataset, "SC-007"), (1, 5, 5))
 
+    def test_sc019_related_language_subjects_prefer_the_same_day(self) -> None:
+        dataset = fixed_lesson_dataset(
+            [("mon", "p1"), ("tue", "p1")],
+            constraint_id="SC-019",
+            weight=3,
+            same_subject=False,
+        )
+        replacements = {
+            "subject_0": "russian_language",
+            "subject_1": "russian_literature",
+        }
+        for subject in dataset["subjects"]:
+            subject["id"] = replacements[subject["id"]]
+        for requirement in dataset["curriculum_requirements"]:
+            requirement["subject_id"] = replacements[requirement["subject_id"]]
+        dataset["teachers"][0]["qualified_subject_ids"] = list(
+            replacements.values()
+        )
+        self.assertEqual(solve_penalty(dataset, "SC-019"), (2, 6, 6))
+
 
 if __name__ == "__main__":
     unittest.main()

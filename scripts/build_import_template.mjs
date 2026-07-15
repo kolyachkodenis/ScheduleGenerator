@@ -8,6 +8,7 @@ const workbook = Workbook.create();
 
 const guide = workbook.worksheets.add("Guide");
 guide.showGridLines = false;
+guide.getRange("A1:F14").format.fill = "#FFFFFF";
 guide.getRange("A1:F1").merge();
 guide.getRange("A1").values = [["ScheduleGenerator school data import"]];
 guide.getRange("A1:F1").format = { fill: "#17365D", font: { bold: true, color: "#FFFFFF", size: 18 }, rowHeight: 32, verticalAlignment: "center" };

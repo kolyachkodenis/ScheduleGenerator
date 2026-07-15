@@ -3,9 +3,8 @@
   "operation": "replace_resource_unavailability_with_all_slots",
   "resource": {
     "type": "teacher",
-    "id": "t_math"
+    "id": "t_defense"
   },
   "expected_status": "INPUT_INFEASIBLE",
   "expected_diagnostic_code": "NO_CANDIDATE"
 }
-

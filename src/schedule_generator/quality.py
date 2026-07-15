@@ -5,6 +5,8 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import Any
 
+from schedule_generator.related_subjects import RELATED_SUBJECT_PAIRS
+
 
 def evaluate_quality(
     dataset: dict[str, Any], assignments: list[dict[str, Any]]
@@ -130,6 +132,29 @@ def evaluate_quality(
             f"Repeated {subject_id} starts for {class_id} on {day_id}",
             max(0, starts - 1),
         )
+    for class_item in dataset["classes"]:
+        class_id = class_item["id"]
+        for first_subject, second_subject in RELATED_SUBJECT_PAIRS:
+            if not any(
+                requirement["participant"] == {"type": "class", "id": class_id}
+                and requirement["subject_id"] == first_subject
+                for requirement in dataset["curriculum_requirements"]
+            ) or not any(
+                requirement["participant"] == {"type": "class", "id": class_id}
+                and requirement["subject_id"] == second_subject
+                for requirement in dataset["curriculum_requirements"]
+            ):
+                continue
+            for day_id in days:
+                mismatch = int(
+                    bool(subject_starts[(class_id, first_subject, day_id)])
+                    != bool(subject_starts[(class_id, second_subject, day_id)])
+                )
+                add(
+                    "SC-019",
+                    f"Unpaired {first_subject} and {second_subject} for {class_id} on {day_id}",
+                    mismatch,
+                )
 
     violations.sort(
         key=lambda item: (

@@ -49,6 +49,7 @@ All entries are currently `Draft`. Cardinalities, thresholds, applicability, and
 | SC-016 | Prefer compact teacher day | Avoid isolated first or last lessons and unnecessarily long on-site spans. | Teacher, day | Excess span or isolated lesson | Draft |
 | SC-017 | Prefer parallel group alignment | Schedule compatible split groups concurrently when operationally preferred. | Class partition, time slot | Non-aligned group occurrence | Draft |
 | SC-018 | Prefer classroom suitability | Among valid rooms, choose the room with the best matching optional capabilities or home-room preference. | Lesson, classroom | Suitability shortfall | Draft |
+| SC-019 | Align related language subjects | Prefer scheduling a language and its corresponding literature subject on the same teaching day. | Class, related subject pair, day | Days containing only one subject from the pair | Draft |
 
 ## Rules requiring early validation
 
@@ -63,4 +64,3 @@ The following rules are structurally important and can substantially change the 
 - SC-017: whether split groups must always be simultaneous.
 
 Their unresolved discovery questions are tracked in [the discovery log](../discovery/OPEN_QUESTIONS.md).
-

@@ -61,8 +61,28 @@ class SolverPrototypeTests(unittest.TestCase):
             if item["requirement_id"] == "req_joint_advisory"
         )
         self.assertEqual(assignment["slot"], {"day_id": "mon", "period_id": "p1"})
-        self.assertEqual(assignment["teacher_id"], "t_7a")
+        self.assertEqual(assignment["teacher_id"], "t_art")
         self.assertEqual(assignment["classroom_id"], "room_7a")
+
+    def test_each_class_subject_keeps_one_teacher_for_the_week(self) -> None:
+        teachers_by_requirement = {}
+        for assignment in self.result["assignments"]:
+            teachers_by_requirement.setdefault(
+                assignment["requirement_id"], set()
+            ).add(assignment["teacher_id"])
+        self.assertTrue(
+            all(len(teacher_ids) == 1 for teacher_ids in teachers_by_requirement.values())
+        )
+
+    def test_related_language_subjects_are_aligned_as_far_as_possible(self) -> None:
+        penalties = {
+            constraint_id: item["raw"]
+            for constraint_id, item in self.result["quality_report"][
+                "by_constraint"
+            ].items()
+        }
+        self.assertEqual(penalties["SC-019"], 28)
+        self.assertEqual(penalties["SC-005"], 3)
 
     def test_class_timetables_have_expected_daily_loads_without_gaps(self) -> None:
         dataset = load_example()
