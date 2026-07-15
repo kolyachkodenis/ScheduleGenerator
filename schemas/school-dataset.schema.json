@@ -284,6 +284,12 @@
           "items": {
             "$ref": "#/$defs/id"
           }
+        },
+        "classroom_id": {
+          "anyOf": [
+            {"$ref": "#/$defs/id"},
+            {"type": "null"}
+          ]
         }
       }
     },

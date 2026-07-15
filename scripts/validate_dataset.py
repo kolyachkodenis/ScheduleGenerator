@@ -271,6 +271,13 @@ class SemanticValidator:
                         f"$.teachers[{teacher_id}].qualified_subject_ids",
                         f"unknown subject ID {subject_id!r}",
                     )
+            classroom_id = teacher.get("classroom_id")
+            if classroom_id is not None:
+                self.ref(
+                    "classrooms",
+                    classroom_id,
+                    f"$.teachers[{teacher_id}].classroom_id",
+                )
 
     def validate_requirements(self) -> None:
         for requirement_id, requirement in self.by_collection[
@@ -306,7 +313,15 @@ class SemanticValidator:
                         f"teacher {teacher_id!r} is not qualified for subject {requirement.get('subject_id')!r}",
                     )
 
-            allowed_rooms = requirement.get("allowed_classroom_ids", [])
+            restricted_rooms = list(requirement.get("allowed_classroom_ids", []))
+            allowed_rooms = list(restricted_rooms)
+            if restricted_rooms:
+                for teacher_id in requirement.get("eligible_teacher_ids", []):
+                    classroom_id = self.by_collection["teachers"].get(
+                        teacher_id, {}
+                    ).get("classroom_id")
+                    if classroom_id and classroom_id not in allowed_rooms:
+                        allowed_rooms.append(classroom_id)
             candidate_rooms: list[dict[str, Any]] = []
             if allowed_rooms:
                 for room_id in allowed_rooms:
@@ -331,6 +346,21 @@ class SemanticValidator:
                     location,
                     "no candidate classroom satisfies required capabilities and capacity",
                 )
+            for teacher_id in requirement.get("eligible_teacher_ids", []):
+                classroom_id = self.by_collection["teachers"].get(
+                    teacher_id, {}
+                ).get("classroom_id")
+                if not classroom_id:
+                    continue
+                room = self.by_collection["classrooms"].get(classroom_id)
+                if room and (
+                    not required_caps.issubset(set(room.get("capabilities", [])))
+                    or room.get("capacity", 0) < participant_size
+                ):
+                    self.error(
+                        f"{location}.eligible_teacher_ids",
+                        f"assigned classroom {classroom_id!r} is unsuitable for teacher {teacher_id!r}",
+                    )
 
     def validate_availability(self) -> None:
         for position, availability in enumerate(
@@ -392,7 +422,12 @@ class SemanticValidator:
             )
         if room:
             allowed_rooms = requirement.get("allowed_classroom_ids", [])
-            if allowed_rooms and record.get("classroom_id") not in allowed_rooms:
+            teacher_room = teacher.get("classroom_id") if teacher else None
+            if (
+                allowed_rooms
+                and record.get("classroom_id") not in allowed_rooms
+                and record.get("classroom_id") != teacher_room
+            ):
                 self.error(
                     f"{location}.classroom_id",
                     "classroom is not in the requirement's allowed list",

@@ -1,11 +1,18 @@
 const { t, translateStatic, translateError } = window.ScheduleI18n;
-const state = { datasets: [], jobs: [], drafts: [], publications: [], permissions: [], currentUser: null, dataset: null, collection: "classes", poller: null, initialized: false };
+const state = { datasets: [], jobs: [], drafts: [], publications: [], permissions: [], currentUser: null, dataset: null, collection: "teachers", selectedTeacherId: null, selectedClassId: null, selectedRoomId: null, poller: null, initialized: false };
 const collections = [
-  ["classes", "Classes"], ["teachers", "Teachers"], ["subjects", "Subjects"],
-  ["classrooms", "Classrooms"], ["groups", "Groups"], ["cohorts", "Cohorts"],
-  ["curriculum_requirements", "Curriculum"], ["resource_availability", "Availability"]
+  ["teachers", "Teachers"], ["curriculum", "Curriculum"], ["classrooms", "Classrooms"]
 ];
 const titles = { overview: "Overview", data: "School data", rules: "Rules", generate: "Generate", results: "Results", admin: "Security" };
+const qualityRules = {
+  "SC-001": ["Difficult lessons are concentrated", "The class received more difficulty points in one day than its configured target."],
+  "SC-002": ["Uneven daily lesson load", "The number of lessons varies too much between the lightest and busiest day."],
+  "SC-003": ["Gaps in a class timetable", "A class has an empty period between its first and last lesson."],
+  "SC-004": ["Gaps in a teacher timetable", "A teacher has an empty period between their first and last lesson."],
+  "SC-005": ["The same subject repeats in one day", "Several lessons of the same subject were placed on one day instead of being spread across the week."],
+  "SC-007": ["Teacher preference was missed", "A lesson starts outside a time marked as preferred by its teacher."],
+  "SC-019": ["Related language lessons are on different days", "Language and literature could not be placed on the same day for this class."]
+};
 const teacherNamesRu = {
   Smirnov: "Смирнов", Kuznetsova: "Кузнецова", Sokolov: "Соколов", Volkova: "Волкова",
   Popov: "Попов", Medvedeva: "Медведева", Ivanov: "Иванов", Morozova: "Морозова",
@@ -137,9 +144,9 @@ function render() {
   const data = state.dataset?.data;
   document.querySelector("#user-badge").textContent = state.currentUser ? `${state.currentUser.username} · ${roleLabel(state.currentUser.role)}` : "";
   document.querySelector("#admin-nav").hidden = !can("security:admin");
-  document.querySelector("#save-collection").hidden = !can("data:write");
-  document.querySelector("#collection-json").readOnly = !can("data:write");
   document.querySelector("#load-demo").hidden = !can("data:write");
+  document.querySelector("#import-configuration").disabled = !data || !can("data:write");
+  document.querySelector("#export-configuration").disabled = !data;
   document.querySelectorAll("#generation-form input, #generation-form button").forEach((element) => { element.disabled = !can("generation:write"); });
   document.querySelector("#empty-state").hidden = Boolean(data);
   document.querySelector("#dashboard").hidden = !data;
@@ -186,14 +193,317 @@ function renderEditor() {
   tabs.innerHTML = collections.map(([key]) => `<button class="collection-tab ${key === state.collection ? "active" : ""}" data-collection="${key}">${collectionLabel(key)}</button>`).join("");
   tabs.querySelectorAll("button").forEach((button) => button.addEventListener("click", () => { state.collection = button.dataset.collection; renderEditor(); }));
   const label = collectionLabel(state.collection);
-  const records = state.dataset.data[state.collection] || [];
   document.querySelector("#editor-title").textContent = label;
-  document.querySelector("#record-count").textContent = t("{{count}} records", {count: records.length});
-  document.querySelector("#collection-json").value = JSON.stringify(records, null, 2);
+  if (state.collection === "teachers") renderTeachersEditor();
+  if (state.collection === "curriculum") renderCurriculumEditor();
+  if (state.collection === "classrooms") renderClassroomsEditor();
+}
+
+function copyData(value) { return JSON.parse(JSON.stringify(value)); }
+function nextId(prefix, records) {
+  const used = new Set(records.map((item) => item.id));
+  let number = records.length + 1;
+  while (used.has(`${prefix}_${number}`)) number += 1;
+  return `${prefix}_${number}`;
+}
+function uniqueId(base, records) {
+  const used = new Set(records.map((item) => item.id));
+  if (!used.has(base)) return base;
+  let number = 2;
+  while (used.has(`${base}_${number}`)) number += 1;
+  return `${base}_${number}`;
+}
+function checkedValues(selector) {
+  return [...document.querySelectorAll(`${selector}:checked`)].map((item) => item.value);
+}
+async function saveConfiguration(updates, successMessage) {
+  await api(`/api/datasets/${encodeURIComponent(state.dataset.dataset_id)}/configuration`, {
+    method: "PUT", body: JSON.stringify({updates})
+  });
+  await loadState(true);
+  notice(t(successMessage));
+}
+
+async function exportConfiguration() {
+  try {
+    const response = await fetch(`/api/datasets/${encodeURIComponent(state.dataset.dataset_id)}/configuration-workbook`);
+    if (!response.ok) {
+      const payload = await response.json();
+      throw new Error(translateError(payload.detail || payload.error || t("Request failed")));
+    }
+    const disposition = response.headers.get("Content-Disposition") || "";
+    const filename = disposition.match(/filename="([^"]+)"/)?.[1] || "school-configuration.xlsx";
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(await response.blob());
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(link.href);
+    notice(t("Configuration exported"));
+  } catch (error) { notice(error.message, true); }
+}
+
+async function importConfiguration(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  try {
+    const content = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.addEventListener("load", () => resolve(String(reader.result).split(",", 2)[1]));
+      reader.addEventListener("error", () => reject(reader.error));
+      reader.readAsDataURL(file);
+    });
+    await api(`/api/datasets/${encodeURIComponent(state.dataset.dataset_id)}/configuration-workbook`, {
+      method: "POST", body: JSON.stringify({content_base64: content})
+    });
+    await loadState(true);
+    notice(t("Configuration imported"));
+  } catch (error) { notice(error.message, true); }
+  finally { event.target.value = ""; }
+}
+
+function participantLabel(requirement, data) {
+  if (requirement.participant.type === "class") {
+    return dataLabel(data.classes.find((item) => item.id === requirement.participant.id)?.label || requirement.participant.id);
+  }
+  if (requirement.participant.type === "group") {
+    return dataLabel(data.groups.find((item) => item.id === requirement.participant.id)?.label || requirement.participant.id);
+  }
+  return dataLabel(data.cohorts.find((item) => item.id === requirement.participant.id)?.label || requirement.participant.id);
+}
+
+function renderTeachersEditor() {
+  const data = state.dataset.data;
+  const teachers = data.teachers;
+  if (!state.selectedTeacherId || (!teachers.some((item) => item.id === state.selectedTeacherId) && state.selectedTeacherId !== "__new__")) {
+    state.selectedTeacherId = teachers[0]?.id || "__new__";
+  }
+  const isNew = state.selectedTeacherId === "__new__";
+  const teacher = isNew ? {id: "", label: "", qualified_subject_ids: [], classroom_id: null} : teachers.find((item) => item.id === state.selectedTeacherId);
+  const editable = can("data:write");
+  const options = teachers.map((item) => `<option value="${html(item.id)}" ${item.id === state.selectedTeacherId ? "selected" : ""}>${html(dataLabel(item.label))}</option>`).join("");
+  const subjectChecks = data.subjects.map((subject) => `<label class="choice"><input type="checkbox" data-teacher-subject value="${html(subject.id)}" ${teacher.qualified_subject_ids.includes(subject.id) ? "checked" : ""} ${editable ? "" : "disabled"}><span>${html(dataLabel(subject.label))}</span></label>`).join("");
+  const assignmentEntries = data.curriculum_requirements.filter((item) => ["class", "group"].includes(item.participant.type));
+  const foreignSubjectIds = new Set(data.subjects.filter((item) => item.id === "english" || item.id.includes("foreign")).map((item) => item.id));
+  for (const group of data.groups) {
+    for (const subjectId of foreignSubjectIds) {
+      const groupRequirement = assignmentEntries.find((item) => item.participant.type === "group" && item.participant.id === group.id && item.subject_id === subjectId);
+      const classRequirement = assignmentEntries.find((item) => item.participant.type === "class" && item.participant.id === group.class_id && item.subject_id === subjectId);
+      if (!groupRequirement && classRequirement) assignmentEntries.push({...classRequirement, id: `virtual|${group.id}|${subjectId}`, participant: {type: "group", id: group.id}, eligible_teacher_ids: []});
+    }
+  }
+  const assignments = assignmentEntries.map((requirement) => {
+    const subject = data.subjects.find((item) => item.id === requirement.subject_id);
+    const visible = teacher.qualified_subject_ids.includes(requirement.subject_id);
+    const groupClass = requirement.participant.type === "group" ? " subgroup" : "";
+    return `<label class="choice assignment-choice${groupClass}" data-assignment-subject="${html(requirement.subject_id)}" ${visible ? "" : "hidden"}><input type="checkbox" data-teacher-requirement value="${html(requirement.id)}" ${requirement.eligible_teacher_ids.includes(teacher.id) ? "checked" : ""} ${editable ? "" : "disabled"}><span>${html(participantLabel(requirement, data))}<small>${html(dataLabel(subject?.label || requirement.subject_id))}${requirement.participant.type === "group" ? ` · ${t("Language subgroup")}` : ""}</small></span></label>`;
+  }).join("");
+  document.querySelector("#record-count").textContent = t("{{count}} records", {count: teachers.length});
+  document.querySelector("#visual-editor").innerHTML = `<div class="editor-selector"><select id="teacher-select" aria-label="${t("Select teacher")}">${options}<option value="__new__" ${isNew ? "selected" : ""}>${t("Add teacher")}</option></select><button id="add-teacher" class="primary-button" ${editable ? "" : "disabled"}>${t("Add teacher")}</button></div><form id="teacher-editor" class="visual-form"><div class="form-grid"><div class="field"><label for="teacher-name">${t("Teacher name")}</label><input id="teacher-name" value="${html(teacher.label)}" required ${editable ? "" : "disabled"}></div><div class="field"><label for="teacher-room">${t("Assigned classroom")}</label><select id="teacher-room" ${editable ? "" : "disabled"}><option value="">${t("No assigned classroom")}</option>${data.classrooms.map((room) => `<option value="${html(room.id)}" ${room.id === teacher.classroom_id ? "selected" : ""}>${html(dataLabel(room.label))}</option>`).join("")}</select></div></div><fieldset><legend>${t("Subjects")}</legend><div class="choice-grid">${subjectChecks}</div></fieldset><fieldset><legend>${t("Classes and language subgroups")}</legend><div class="assignment-list">${assignments || `<p>${t("Create curriculum requirements first.")}</p>`}</div></fieldset><div class="editor-actions"><button id="delete-teacher" type="button" class="danger-button" ${isNew || !editable ? "disabled" : ""}>${t("Delete teacher")}</button><button class="primary-button" type="submit" ${editable ? "" : "disabled"}>${t("Save teacher")}</button></div></form>`;
+  document.querySelector("#teacher-select").addEventListener("change", (event) => { state.selectedTeacherId = event.target.value; renderTeachersEditor(); });
+  document.querySelector("#add-teacher").addEventListener("click", () => { state.selectedTeacherId = "__new__"; renderTeachersEditor(); });
+  document.querySelectorAll("[data-teacher-subject]").forEach((input) => input.addEventListener("change", () => {
+    const active = new Set(checkedValues("[data-teacher-subject]"));
+    document.querySelectorAll("[data-assignment-subject]").forEach((row) => { row.hidden = !active.has(row.dataset.assignmentSubject); });
+  }));
+  document.querySelector("#teacher-editor").addEventListener("submit", saveTeacher);
+  document.querySelector("#delete-teacher").addEventListener("click", deleteTeacher);
+}
+
+async function saveTeacher(event) {
+  event.preventDefault();
+  try {
+    const data = state.dataset.data;
+    const teachers = copyData(data.teachers);
+    const requirements = copyData(data.curriculum_requirements);
+    const isNew = state.selectedTeacherId === "__new__";
+    const teacherId = isNew ? nextId("teacher", teachers) : state.selectedTeacherId;
+    const qualified = checkedValues("[data-teacher-subject]");
+    if (!qualified.length) throw new Error(t("Select at least one subject"));
+    const assigned = new Set(checkedValues("[data-teacher-requirement]"));
+    const virtualAssignments = [...assigned].filter((id) => id.startsWith("virtual|"));
+    for (const virtualId of virtualAssignments) {
+      const [, selectedGroupId, subjectId] = virtualId.split("|");
+      const selectedGroup = data.groups.find((item) => item.id === selectedGroupId);
+      const baseIndex = requirements.findIndex((item) => item.participant.type === "class" && item.participant.id === selectedGroup?.class_id && item.subject_id === subjectId);
+      if (!selectedGroup || baseIndex < 0) continue;
+      const base = requirements[baseIndex];
+      const partitionGroups = data.groups.filter((item) => item.partition_id === selectedGroup.partition_id);
+      const created = [];
+      for (const group of partitionGroups) {
+        let requirement = requirements.find((item) => item.participant.type === "group" && item.participant.id === group.id && item.subject_id === subjectId);
+        if (!requirement) {
+          requirement = {...copyData(base), id: uniqueId(`req_${group.id}_${subjectId}`, requirements), participant: {type: "group", id: group.id}, allowed_classroom_ids: []};
+          requirements.push(requirement);
+        }
+        created.push(requirement);
+      }
+      requirements.splice(baseIndex, 1);
+      for (const selectedVirtual of virtualAssignments) {
+        const [, groupId, selectedSubjectId] = selectedVirtual.split("|");
+        if (selectedSubjectId !== subjectId || !partitionGroups.some((item) => item.id === groupId)) continue;
+        assigned.delete(selectedVirtual);
+        const selectedRequirement = created.find((item) => item.participant.id === groupId);
+        if (selectedRequirement) assigned.add(selectedRequirement.id);
+      }
+    }
+    const record = {id: teacherId, label: document.querySelector("#teacher-name").value.trim(), qualified_subject_ids: qualified};
+    if (!record.label) throw new Error(t("Teacher name is required"));
+    const room = document.querySelector("#teacher-room").value;
+    if (room) record.classroom_id = room;
+    const index = teachers.findIndex((item) => item.id === teacherId);
+    if (index >= 0) teachers[index] = record; else teachers.push(record);
+    for (const requirement of requirements) {
+      if (!["class", "group"].includes(requirement.participant.type)) {
+        if (!qualified.includes(requirement.subject_id)) requirement.eligible_teacher_ids = requirement.eligible_teacher_ids.filter((id) => id !== teacherId);
+        continue;
+      }
+      const eligible = new Set(requirement.eligible_teacher_ids.filter((id) => id !== teacherId));
+      if (assigned.has(requirement.id) && qualified.includes(requirement.subject_id)) eligible.add(teacherId);
+      requirement.eligible_teacher_ids = [...eligible];
+    }
+    await saveConfiguration({teachers, curriculum_requirements: requirements}, "Teacher saved");
+    state.selectedTeacherId = teacherId;
+    renderEditor();
+  } catch (error) { notice(error.message, true); }
+}
+
+async function deleteTeacher() {
+  try {
+    const id = state.selectedTeacherId;
+    const data = state.dataset.data;
+    if (data.fixed_lessons.some((item) => item.teacher_id === id)) throw new Error(t("Move fixed lessons to another teacher before deleting this teacher."));
+    const requirements = copyData(data.curriculum_requirements);
+    for (const requirement of requirements) requirement.eligible_teacher_ids = requirement.eligible_teacher_ids.filter((item) => item !== id);
+    if (requirements.some((item) => !item.eligible_teacher_ids.length)) throw new Error(t("Assign another teacher to every affected lesson before deleting this teacher."));
+    const availability = data.resource_availability.filter((item) => !(item.resource.type === "teacher" && item.resource.id === id));
+    const policies = copyData(data.policies);
+    policies.daily_limits = policies.daily_limits.filter((item) => !(item.resource.type === "teacher" && item.resource.id === id));
+    await saveConfiguration({teachers: data.teachers.filter((item) => item.id !== id), curriculum_requirements: requirements, resource_availability: availability, policies}, "Teacher deleted");
+    state.selectedTeacherId = null;
+    renderEditor();
+  } catch (error) { notice(error.message, true); }
+}
+
+function renderCurriculumEditor() {
+  const data = state.dataset.data;
+  if (!state.selectedClassId || !data.classes.some((item) => item.id === state.selectedClassId)) state.selectedClassId = data.classes[0]?.id || null;
+  const classItem = data.classes.find((item) => item.id === state.selectedClassId);
+  const classGroupIds = new Set(data.groups.filter((item) => item.class_id === state.selectedClassId).map((item) => item.id));
+  const requirements = new Map();
+  for (const requirement of data.curriculum_requirements) {
+    const belongsToClass = requirement.participant.type === "class" && requirement.participant.id === state.selectedClassId;
+    const belongsToGroup = requirement.participant.type === "group" && classGroupIds.has(requirement.participant.id);
+    if ((belongsToClass || belongsToGroup) && !requirements.has(requirement.subject_id)) requirements.set(requirement.subject_id, requirement);
+  }
+  const rows = data.subjects.map((subject) => {
+    const requirement = requirements.get(subject.id);
+    const teacherCount = data.teachers.filter((teacher) => teacher.qualified_subject_ids.includes(subject.id)).length;
+    return `<div class="curriculum-row"><div><strong>${html(dataLabel(subject.label))}</strong><small>${t("{{count}} eligible teacher(s)", {count: teacherCount})}</small></div><label><span>${t("Lessons per week")}</span><input type="number" min="0" max="40" value="${requirement?.weekly_lessons || 0}" data-curriculum-subject="${html(subject.id)}" ${can("data:write") ? "" : "disabled"}></label></div>`;
+  }).join("");
+  document.querySelector("#record-count").textContent = t("{{count}} records", {count: data.classes.length});
+  document.querySelector("#visual-editor").innerHTML = `<div class="editor-selector"><label for="curriculum-class">${t("Class")}</label><select id="curriculum-class">${data.classes.map((item) => `<option value="${html(item.id)}" ${item.id === state.selectedClassId ? "selected" : ""}>${html(dataLabel(item.label))}</option>`).join("")}</select></div><form id="curriculum-editor" class="visual-form"><div class="curriculum-list">${rows}</div><div class="editor-actions"><small>${t("Set zero to remove a subject from this class.")}</small><button class="primary-button" type="submit" ${can("data:write") ? "" : "disabled"}>${t("Save curriculum")}</button></div></form>`;
+  document.querySelector("#curriculum-class").addEventListener("change", (event) => { state.selectedClassId = event.target.value; renderCurriculumEditor(); });
+  document.querySelector("#curriculum-editor").addEventListener("submit", saveCurriculum);
+  if (classItem) document.querySelector("#editor-kind").textContent = dataLabel(classItem.label);
+}
+
+async function saveCurriculum(event) {
+  event.preventDefault();
+  try {
+    const data = state.dataset.data;
+    const requirements = copyData(data.curriculum_requirements);
+    const classGroupIds = new Set(data.groups.filter((item) => item.class_id === state.selectedClassId).map((item) => item.id));
+    for (const input of document.querySelectorAll("[data-curriculum-subject]")) {
+      const subjectId = input.dataset.curriculumSubject;
+      const weekly = Number(input.value);
+      const index = requirements.findIndex((item) => item.participant.type === "class" && item.participant.id === state.selectedClassId && item.subject_id === subjectId);
+      const groupRequirements = requirements.filter((item) => item.participant.type === "group" && classGroupIds.has(item.participant.id) && item.subject_id === subjectId);
+      if (weekly === 0) {
+        for (let itemIndex = requirements.length - 1; itemIndex >= 0; itemIndex -= 1) {
+          const item = requirements[itemIndex];
+          const matchesClass = item.participant.type === "class" && item.participant.id === state.selectedClassId;
+          const matchesGroup = item.participant.type === "group" && classGroupIds.has(item.participant.id);
+          if ((matchesClass || matchesGroup) && item.subject_id === subjectId) requirements.splice(itemIndex, 1);
+        }
+        continue;
+      }
+      if (!Number.isInteger(weekly) || weekly < 0 || weekly > 40) throw new Error(t("Weekly lessons must be between 0 and 40."));
+      if (index >= 0) { requirements[index].weekly_lessons = weekly; requirements[index].block_length = 1; continue; }
+      if (groupRequirements.length) {
+        for (const requirement of groupRequirements) { requirement.weekly_lessons = weekly; requirement.block_length = 1; }
+        continue;
+      }
+      const eligible = data.teachers.filter((teacher) => teacher.qualified_subject_ids.includes(subjectId)).map((teacher) => teacher.id);
+      if (!eligible.length) {
+        const subject = data.subjects.find((item) => item.id === subjectId);
+        throw new Error(t("Add a qualified teacher before adding {{subject}}.", {subject: dataLabel(subject?.label || subjectId)}));
+      }
+      requirements.push({id: uniqueId(`req_${state.selectedClassId.replace(/^class_/, "")}_${subjectId}`, requirements), participant: {type: "class", id: state.selectedClassId}, subject_id: subjectId, eligible_teacher_ids: eligible, weekly_lessons: weekly, block_length: 1, required_room_capabilities: ["general"], allowed_classroom_ids: []});
+    }
+    await saveConfiguration({curriculum_requirements: requirements}, "Curriculum saved");
+    renderEditor();
+  } catch (error) { notice(error.message, true); }
+}
+
+function renderClassroomsEditor() {
+  const data = state.dataset.data;
+  if (!state.selectedRoomId || (!data.classrooms.some((item) => item.id === state.selectedRoomId) && state.selectedRoomId !== "__new__")) state.selectedRoomId = data.classrooms[0]?.id || "__new__";
+  const isNew = state.selectedRoomId === "__new__";
+  const room = isNew ? {id: "", label: "", capacity: 30, capabilities: ["general"]} : data.classrooms.find((item) => item.id === state.selectedRoomId);
+  const assignedTeacher = data.teachers.find((item) => item.classroom_id === room.id)?.id || "";
+  const capabilities = [...new Set(["general", "sports", "physics_lab", "chemistry_lab", "computer_lab", "workshop", "art", "assembly", ...data.classrooms.flatMap((item) => item.capabilities)])].sort();
+  document.querySelector("#record-count").textContent = t("{{count}} records", {count: data.classrooms.length});
+  document.querySelector("#visual-editor").innerHTML = `<div class="editor-selector"><select id="room-select" aria-label="${t("Select classroom")}">${data.classrooms.map((item) => `<option value="${html(item.id)}" ${item.id === state.selectedRoomId ? "selected" : ""}>${html(dataLabel(item.label))}</option>`).join("")}<option value="__new__" ${isNew ? "selected" : ""}>${t("Add classroom")}</option></select><button id="add-room" class="primary-button" ${can("data:write") ? "" : "disabled"}>${t("Add classroom")}</button></div><form id="room-editor" class="visual-form"><div class="form-grid"><div class="field"><label for="room-name">${t("Classroom name")}</label><input id="room-name" value="${html(room.label)}" required ${can("data:write") ? "" : "disabled"}></div><div class="field"><label for="room-capacity">${t("Capacity")}</label><input id="room-capacity" type="number" min="1" value="${room.capacity}" required ${can("data:write") ? "" : "disabled"}></div><div class="field"><label for="room-teacher">${t("Assigned teacher")}</label><select id="room-teacher" ${can("data:write") ? "" : "disabled"}><option value="">${t("No assigned teacher")}</option>${data.teachers.map((teacher) => `<option value="${html(teacher.id)}" ${teacher.id === assignedTeacher ? "selected" : ""}>${html(dataLabel(teacher.label))}</option>`).join("")}</select></div></div><fieldset><legend>${t("Room capabilities")}</legend><div class="choice-grid">${capabilities.map((capability) => `<label class="choice"><input type="checkbox" data-room-capability value="${html(capability)}" ${room.capabilities.includes(capability) ? "checked" : ""} ${can("data:write") ? "" : "disabled"}><span>${html(t(capability))}</span></label>`).join("")}</div></fieldset><div class="editor-actions"><button id="delete-room" type="button" class="danger-button" ${isNew || !can("data:write") ? "disabled" : ""}>${t("Delete classroom")}</button><button class="primary-button" type="submit" ${can("data:write") ? "" : "disabled"}>${t("Save classroom")}</button></div></form>`;
+  document.querySelector("#room-select").addEventListener("change", (event) => { state.selectedRoomId = event.target.value; renderClassroomsEditor(); });
+  document.querySelector("#add-room").addEventListener("click", () => { state.selectedRoomId = "__new__"; renderClassroomsEditor(); });
+  document.querySelector("#room-editor").addEventListener("submit", saveClassroom);
+  document.querySelector("#delete-room").addEventListener("click", deleteClassroom);
+}
+
+async function saveClassroom(event) {
+  event.preventDefault();
+  try {
+    const data = state.dataset.data;
+    const rooms = copyData(data.classrooms);
+    const teachers = copyData(data.teachers);
+    const isNew = state.selectedRoomId === "__new__";
+    const roomId = isNew ? nextId("classroom", rooms) : state.selectedRoomId;
+    const record = {id: roomId, label: document.querySelector("#room-name").value.trim(), capacity: Number(document.querySelector("#room-capacity").value), capabilities: checkedValues("[data-room-capability]")};
+    if (!record.label) throw new Error(t("Classroom name is required"));
+    if (!record.capabilities.length) throw new Error(t("Select at least one room capability"));
+    const index = rooms.findIndex((item) => item.id === roomId);
+    if (index >= 0) rooms[index] = record; else rooms.push(record);
+    const teacherId = document.querySelector("#room-teacher").value;
+    for (const teacher of teachers) {
+      if (teacher.classroom_id === roomId) delete teacher.classroom_id;
+      if (teacher.id === teacherId) teacher.classroom_id = roomId;
+    }
+    await saveConfiguration({classrooms: rooms, teachers}, "Classroom saved");
+    state.selectedRoomId = roomId;
+    renderEditor();
+  } catch (error) { notice(error.message, true); }
+}
+
+async function deleteClassroom() {
+  try {
+    const id = state.selectedRoomId;
+    const data = state.dataset.data;
+    if (data.classrooms.length <= 1) throw new Error(t("At least one classroom is required."));
+    if (data.fixed_lessons.some((item) => item.classroom_id === id)) throw new Error(t("Move fixed lessons out of this classroom before deleting it."));
+    const teachers = copyData(data.teachers);
+    for (const teacher of teachers) if (teacher.classroom_id === id) delete teacher.classroom_id;
+    const requirements = copyData(data.curriculum_requirements);
+    for (const requirement of requirements) requirement.allowed_classroom_ids = requirement.allowed_classroom_ids.filter((item) => item !== id);
+    const availability = data.resource_availability.filter((item) => !(item.resource.type === "classroom" && item.resource.id === id));
+    await saveConfiguration({classrooms: data.classrooms.filter((item) => item.id !== id), teachers, curriculum_requirements: requirements, resource_availability: availability}, "Classroom deleted");
+    state.selectedRoomId = null;
+    renderEditor();
+  } catch (error) { notice(error.message, true); }
 }
 
 function renderRules(data) {
-  document.querySelector("#difficulty-list").innerHTML = data.subjects.map((subject) => `<div class="form-row"><div><strong>${html(dataLabel(subject.label))}</strong><small>${html(subject.id)}</small></div><span class="level">${t("Level {{level}}", {level: subject.default_workload})}</span></div>`).join("");
+  document.querySelector("#difficulty-list").innerHTML = data.subjects.map((subject) => `<label class="form-row difficulty-row"><span><strong>${html(dataLabel(subject.label))}</strong><small>${t("Difficulty affects the daily workload balance")}</small></span><input type="number" min="1" max="5" step="1" value="${subject.default_workload}" data-subject-difficulty="${html(subject.id)}" ${can("data:write") ? "" : "disabled"}></label>`).join("");
+  document.querySelector("#difficulty-form button").disabled = !can("data:write");
   document.querySelector("#priority-list").innerHTML = data.policies.soft_constraint_weights.map((rule) => `<div class="form-row"><div><strong>${html(rule.constraint_id)}</strong><small>${html(t(rule.priority))}</small></div><span class="level">${t("Weight {{weight}}", {weight: rule.weight})}</span></div>`).join("");
   const summary = [
     [data.curriculum_requirements.length, "Curriculum rules"],
@@ -202,6 +512,19 @@ function renderRules(data) {
     [data.fixed_lessons.length, "Fixed lessons"]
   ];
   document.querySelector("#rules-summary").innerHTML = summary.map(([value, label]) => `<div><strong>${value}</strong><small>${t(label)}</small></div>`).join("");
+}
+
+async function saveDifficulty(event) {
+  event.preventDefault();
+  try {
+    const subjects = copyData(state.dataset.data.subjects);
+    for (const input of document.querySelectorAll("[data-subject-difficulty]")) {
+      const value = Number(input.value);
+      if (!Number.isInteger(value) || value < 1 || value > 5) throw new Error(t("Difficulty must be between 1 and 5."));
+      subjects.find((item) => item.id === input.dataset.subjectDifficulty).default_workload = value;
+    }
+    await saveConfiguration({subjects}, "Difficulty saved");
+  } catch (error) { notice(error.message, true); }
 }
 
 function renderCurrentRun() {
@@ -217,7 +540,9 @@ function renderCurrentRun() {
 
 function renderJobSelect() {
   const select = document.querySelector("#job-select");
-  const successful = state.jobs.filter((job) => job.status === "SUCCEEDED");
+  const successful = [...state.jobs].reverse().filter((job) =>
+    job.status === "SUCCEEDED" && job.dataset_revision === state.dataset?.revision
+  );
   const previous = select.value;
   select.innerHTML = successful.length ? successful.map((job) => `<option value="${job.job_id}">${job.job_id.slice(0, 8)} · ${t("{{count}} alternative(s)", {count: job.parameters.alternatives})}</option>`).join("") : `<option value="">${t("No successful jobs")}</option>`;
   if (successful.some((job) => job.job_id === previous)) select.value = previous;
@@ -225,7 +550,8 @@ function renderJobSelect() {
 
 function selectedJob() {
   const id = document.querySelector("#job-select").value;
-  return state.jobs.find((job) => job.job_id === id) || [...state.jobs].reverse().find((job) => job.status === "SUCCEEDED");
+  return state.jobs.find((job) => job.job_id === id && job.dataset_revision === state.dataset?.revision)
+    || [...state.jobs].reverse().find((job) => job.status === "SUCCEEDED" && job.dataset_revision === state.dataset?.revision);
 }
 
 function selectedDraft() {
@@ -247,7 +573,12 @@ function renderResults() {
   const report = result.quality_report;
   document.querySelector("#quality-chip").textContent = report ? t("Quality penalty {{penalty}}", {penalty: report.total_penalty}) : t("Feasible timetable");
   const violations = report?.violations || [];
-  document.querySelector("#quality-report").innerHTML = violations.length ? violations.map((item) => `<div class="quality-item"><strong>${html(item.constraint_id)} · +${item.weighted_penalty}</strong><small>${html(translateError(item.description))}</small></div>`).join("") : `<div class="check-item"><span>${t("No preference violations")}</span><b>${t("Excellent")}</b></div>`;
+  const grouped = Object.entries(report?.by_constraint || {}).sort((left, right) => right[1].weighted - left[1].weighted);
+  document.querySelector("#quality-report").innerHTML = grouped.length ? grouped.map(([constraintId, values]) => {
+    const [title, explanation] = qualityRules[constraintId] || [constraintId, "This configured preference could not be fully met."];
+    const count = violations.filter((item) => item.constraint_id === constraintId).length;
+    return `<div class="quality-item"><strong>${html(t(title))}</strong><small>${t("{{count}} case(s) · {{points}} penalty point(s)", {count, points: values.weighted})}</small><p>${html(t(explanation))}</p></div>`;
+  }).join("") : `<div class="check-item"><span>${t("No preference violations")}</span><b>${t("Excellent")}</b></div>`;
   renderEditing(draft);
   renderPublication(draft);
   renderResourceOptions();
@@ -368,17 +699,18 @@ function renderTimetable(assignments, draft = null) {
   const periods = [...data.academic_period.periods].sort((a, b) => a.ordinal - b.ordinal);
   const days = [...data.academic_period.days].sort((a, b) => a.ordinal - b.ordinal);
   const locked = new Set(draft?.locked_assignment_ids || []);
-  const cells = (day, period) => {
-    const lesson = filtered.find((item) => item.slot.day_id === day.id && item.occupied_period_ids.includes(period.id));
-    if (!lesson) return "";
-    const requirement = data.curriculum_requirements.find((item) => item.id === lesson.requirement_id);
-    const subject = dataLabel(data.subjects.find((item) => item.id === requirement?.subject_id)?.label || lesson.requirement_id);
-    const teacher = dataLabel(data.teachers.find((item) => item.id === lesson.teacher_id)?.label || lesson.teacher_id);
-    const room = dataLabel(data.classrooms.find((item) => item.id === lesson.classroom_id)?.label || lesson.classroom_id);
-    const startsHere = lesson.slot.period_id === period.id;
-    const classes = `lesson ${draft && startsHere ? "editable" : ""} ${locked.has(lesson.id) ? "locked" : ""}`;
-    return `<span class="${classes}" ${draft && startsHere && !locked.has(lesson.id) ? `draggable="true" data-assignment-id="${html(lesson.id)}"` : ""}>${html(subject)}<small>${html(teacher)} · ${html(room)}</small>${draft && startsHere ? `<button type="button" data-edit-assignment="${html(lesson.id)}" aria-label="${t("Edit {{subject}}", {subject: html(subject)})}">${locked.has(lesson.id) ? "◆" : "✎"}</button>` : ""}</span>`;
-  };
+  const cells = (day, period) => filtered
+    .filter((item) => item.slot.day_id === day.id && item.occupied_period_ids.includes(period.id))
+    .map((lesson) => {
+      const requirement = data.curriculum_requirements.find((item) => item.id === lesson.requirement_id);
+      const subject = dataLabel(data.subjects.find((item) => item.id === requirement?.subject_id)?.label || lesson.requirement_id);
+      const teacher = dataLabel(data.teachers.find((item) => item.id === lesson.teacher_id)?.label || lesson.teacher_id);
+      const room = dataLabel(data.classrooms.find((item) => item.id === lesson.classroom_id)?.label || lesson.classroom_id);
+      const group = requirement?.participant.type === "group" ? dataLabel(data.groups.find((item) => item.id === requirement.participant.id)?.label || requirement.participant.id) : "";
+      const startsHere = lesson.slot.period_id === period.id;
+      const classes = `lesson ${draft && startsHere ? "editable" : ""} ${locked.has(lesson.id) ? "locked" : ""}`;
+      return `<span class="${classes}" ${draft && startsHere && !locked.has(lesson.id) ? `draggable="true" data-assignment-id="${html(lesson.id)}"` : ""}>${html(subject)}${group ? `<em>${html(group)}</em>` : ""}<small>${html(teacher)} · ${html(room)}</small>${draft && startsHere ? `<button type="button" data-edit-assignment="${html(lesson.id)}" aria-label="${t("Edit {{subject}}", {subject: html(subject)})}">${locked.has(lesson.id) ? "◆" : "✎"}</button>` : ""}</span>`;
+    }).join("");
   const timetable = document.querySelector("#timetable");
   timetable.innerHTML = `<table><thead><tr><th>${t("Period")}</th>${days.map((day) => `<th>${html(dataLabel(day.label))}</th>`).join("")}</tr></thead><tbody>${periods.map((period) => `<tr><th>${html(dataLabel(period.label))}<br><small>${html(period.start_time)}</small></th>${days.map((day) => `<td class="${draft ? "drop-target" : ""}" data-day-id="${html(day.id)}" data-period-id="${html(period.id)}">${cells(day, period)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
   timetable.querySelectorAll("[data-edit-assignment]").forEach((button) => button.addEventListener("click", () => openMoveDialog(button.dataset.editAssignment)));
@@ -486,16 +818,6 @@ function bindDragAndDrop(timetable) {
   });
 }
 
-async function saveCollection() {
-  try {
-    const records = JSON.parse(document.querySelector("#collection-json").value);
-    if (!Array.isArray(records)) throw new Error(t("The editor must contain a JSON array"));
-    await api(`/api/datasets/${encodeURIComponent(state.dataset.dataset_id)}/collections/${state.collection}`, { method: "PUT", body: JSON.stringify({ records }) });
-    await loadState(true);
-    notice(t("{{collection}} saved as a new revision", {collection: collectionLabel(state.collection)}));
-  } catch (error) { notice(error.message, true); }
-}
-
 async function startGeneration(event) {
   event.preventDefault();
   if (!state.dataset) return notice(t("Load school data first"), true);
@@ -573,8 +895,11 @@ document.querySelector("#refresh").addEventListener("click", () => loadState());
 document.querySelector("#auth-form").addEventListener("submit", authenticate);
 document.querySelector("#logout").addEventListener("click", logout);
 document.querySelector("#load-demo").addEventListener("click", async () => { try { await api("/api/demo", { method: "POST" }); await loadState(true); notice(t("Demonstration school loaded")); } catch (error) { notice(error.message, true); } });
-document.querySelector("#save-collection").addEventListener("click", saveCollection);
+document.querySelector("#export-configuration").addEventListener("click", exportConfiguration);
+document.querySelector("#import-configuration").addEventListener("click", () => document.querySelector("#configuration-file").click());
+document.querySelector("#configuration-file").addEventListener("change", importConfiguration);
 document.querySelector("#generation-form").addEventListener("submit", startGeneration);
+document.querySelector("#difficulty-form").addEventListener("submit", saveDifficulty);
 document.querySelector("#job-select").addEventListener("change", renderResults);
 document.querySelector("#view-mode").addEventListener("change", () => { renderResourceOptions(); renderResults(); });
 document.querySelector("#resource-select").addEventListener("change", renderResults);

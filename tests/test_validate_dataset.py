@@ -63,6 +63,15 @@ class SemanticValidatorTests(unittest.TestCase):
 
         self.assert_has_error(dataset, "unknown teachers ID 't_missing'")
 
+    def test_unsuitable_assigned_teacher_classroom_is_rejected(self) -> None:
+        dataset = load_example()
+        teacher = next(item for item in dataset["teachers"] if item["id"] == "t_math")
+        teacher["classroom_id"] = "room_5a"
+        room = next(item for item in dataset["classrooms"] if item["id"] == "room_5a")
+        room["capacity"] = 1
+
+        self.assert_has_error(dataset, "assigned classroom 'room_5a' is unsuitable")
+
     def test_incomplete_complete_partition_is_rejected(self) -> None:
         dataset = load_example()
         dataset["groups"][0]["student_count"] -= 1

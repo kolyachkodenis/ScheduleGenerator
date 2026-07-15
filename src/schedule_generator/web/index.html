@@ -96,14 +96,12 @@
       </section>
 
       <section id="view-data" class="view">
-        <div class="section-intro"><div><p class="eyebrow">Reference data</p><h2>School configuration</h2><p>Edit a collection as structured JSON. Changes are validated atomically before a new revision is saved.</p></div></div>
+        <div class="section-intro"><div><p class="eyebrow">Reference data</p><h2>School configuration</h2><p>Manage teachers, weekly curriculum, language groups, and classrooms with validated forms.</p></div><div class="configuration-actions"><button id="import-configuration" class="text-button">Import Excel</button><button id="export-configuration" class="primary-button">Export Excel</button><input id="configuration-file" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden></div></div>
         <div class="editor-layout">
           <div id="collection-tabs" class="collection-tabs" role="tablist"></div>
           <article class="panel editor-panel">
             <div class="panel-heading"><div><p class="eyebrow" id="editor-kind">Collection</p><h3 id="editor-title">Classes</h3></div><span id="record-count" class="pill">0 records</span></div>
-            <label for="collection-json">Collection records</label>
-            <textarea id="collection-json" spellcheck="false"></textarea>
-            <div class="editor-actions"><small>IDs and references must remain unique and valid.</small><button id="save-collection" class="primary-button">Validate and save</button></div>
+            <div id="visual-editor" class="visual-editor"></div>
           </article>
         </div>
       </section>
@@ -111,7 +109,7 @@
       <section id="view-rules" class="view">
         <div class="section-intro"><div><p class="eyebrow">Scheduling policy</p><h2>Workload and constraints</h2><p>Review difficulty levels, daily limits, availability, and curriculum requirements.</p></div></div>
         <div class="two-column rules-grid">
-          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">Subject workload</p><h3>Difficulty levels</h3></div></div><div id="difficulty-list" class="form-list"></div></article>
+          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">Subject workload</p><h3>Difficulty levels</h3></div></div><form id="difficulty-form"><div id="difficulty-list" class="form-list"></div><div class="editor-actions"><small>1 is easiest, 5 is most difficult.</small><button class="primary-button" type="submit">Save difficulty</button></div></form></article>
           <article class="panel"><div class="panel-heading"><div><p class="eyebrow">Preference weights</p><h3>Quality priorities</h3></div></div><div id="priority-list" class="form-list"></div></article>
           <article class="panel span-two"><div class="panel-heading"><div><p class="eyebrow">Coverage</p><h3>Rules inventory</h3></div></div><div id="rules-summary" class="summary-row"></div></article>
         </div>
@@ -151,7 +149,7 @@
           <div class="two-column result-grid">
             <article class="panel timetable-panel"><div id="timetable" class="timetable"></div></article>
             <div class="result-side">
-              <article class="panel"><div class="panel-heading"><div><p class="eyebrow">Quality report</p><h3>Detected preferences</h3></div></div><div id="quality-report" class="quality-report"></div></article>
+              <details id="quality-panel" class="panel quality-panel"><summary><span><span class="eyebrow">Quality report</span><strong>Why this score?</strong></span><span class="details-action"><span class="when-closed">Show details</span><span class="when-open">Hide details</span></span></summary><p class="quality-help">A lower penalty is better. Zero means that all configured preferences were met. Penalty points only help compare alternatives; they are not timetable errors.</p><div id="quality-report" class="quality-report"></div></details>
               <article id="history-panel" class="panel" hidden><div class="panel-heading"><div><p class="eyebrow">Change history</p><h3>Versions</h3></div></div><div id="version-history" class="version-history"></div><div class="compare-controls"><select id="compare-left" aria-label="Compare from version"></select><select id="compare-right" aria-label="Compare to version"></select><button id="compare-versions" class="text-button">Compare</button></div><div id="comparison-result" class="comparison-result"></div></article>
               <article id="publication-panel" class="panel"><div class="panel-heading"><div><p class="eyebrow">Distribution</p><h3>Publish timetable</h3></div></div><div id="publication-status" class="publication-status"></div></article>
             </div>

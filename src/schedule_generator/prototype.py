@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 import json
 import platform
-import random
 import sys
 from collections import defaultdict
 from dataclasses import dataclass
@@ -259,7 +258,7 @@ class PrototypeBuilder:
         blocks = self._period_blocks(
             occurrence.block_length, self._allowed_periods(occurrence.participant)
         )
-        rooms = self._room_candidates(requirement)
+        default_rooms = self._room_candidates(requirement)
         result: list[Candidate] = []
         for day_id in self.day_ids:
             for block in blocks:
@@ -269,7 +268,25 @@ class PrototypeBuilder:
                 for teacher_id in requirement["eligible_teacher_ids"]:
                     if self._is_unavailable(("teacher", teacher_id), occupied):
                         continue
+                    fixed = self.fixed.get((occurrence.requirement_id, occurrence.index))
+                    assigned_room = self.teachers[teacher_id].get("classroom_id")
+                    rooms = (
+                        [fixed["classroom_id"]]
+                        if fixed and fixed["teacher_id"] == teacher_id
+                        else [assigned_room]
+                        if assigned_room
+                        else default_rooms
+                    )
                     for room_id in rooms:
+                        if room_id not in self.rooms:
+                            continue
+                        required = set(requirement["required_room_capabilities"])
+                        if not required.issubset(set(self.rooms[room_id]["capabilities"])):
+                            continue
+                        if self.rooms[room_id]["capacity"] < self.participant_size(
+                            requirement["participant"]
+                        ):
+                            continue
                         if self._is_unavailable(("classroom", room_id), occupied):
                             continue
                         candidate = Candidate(
@@ -679,7 +696,12 @@ class PrototypeBuilder:
                 )
             variables = []
             class_id = next(iter(self.participant_classes(first.participant)))
-            pool = tuple(requirement["eligible_teacher_ids"])
+            student_atoms = self.student_atoms(first.participant)
+            pool = tuple(
+                teacher_id
+                for teacher_id, teacher in self.teachers.items()
+                if requirement["subject_id"] in teacher["qualified_subject_ids"]
+            )
             for slot, candidate in unique.items():
                 variable = reduced.new_bool_var(
                     f"construct__{requirement_id}__{slot[0]}__{slot[1]}"
@@ -691,7 +713,8 @@ class PrototypeBuilder:
                     (class_id, requirement["subject_id"], slot[0])
                 ].append(variable)
                 for occupied_slot in candidate.occupied_slots:
-                    class_terms[(class_id, occupied_slot)].append(variable)
+                    for atom in student_atoms:
+                        class_terms[(atom, occupied_slot)].append(variable)
                     teacher_pool_terms[(pool, occupied_slot)].append(variable)
             reduced.add(sum(variables) == len(occurrences))
 
@@ -788,7 +811,12 @@ class PrototypeBuilder:
                     representatives[(requirement_id, slot)].occupied_slots
                 )
             requirement_slots[requirement_id] = occupied
-            pool = tuple(self.requirements[requirement_id]["eligible_teacher_ids"])
+            subject_id = self.requirements[requirement_id]["subject_id"]
+            pool = tuple(
+                teacher_id
+                for teacher_id, teacher in self.teachers.items()
+                if subject_id in teacher["qualified_subject_ids"]
+            )
             requirements_by_pool[pool].append(requirement_id)
 
         selected_teachers: dict[str, str] = {}
@@ -799,17 +827,25 @@ class PrototypeBuilder:
                     f"teacher__{requirement_id}__{teacher_id}"
                 )
                 for requirement_id in requirement_ids
-                for teacher_id in pool
+                for teacher_id in self.requirements[requirement_id][
+                    "eligible_teacher_ids"
+                ]
             }
             for requirement_id in requirement_ids:
                 coloring.add_exactly_one(
-                    choices[(requirement_id, teacher_id)] for teacher_id in pool
+                    choices[(requirement_id, teacher_id)]
+                    for teacher_id in self.requirements[requirement_id][
+                        "eligible_teacher_ids"
+                    ]
                 )
             for left_index, left in enumerate(requirement_ids):
                 for right in requirement_ids[left_index + 1 :]:
                     if requirement_slots[left].isdisjoint(requirement_slots[right]):
                         continue
-                    for teacher_id in pool:
+                    common_teachers = set(
+                        self.requirements[left]["eligible_teacher_ids"]
+                    ) & set(self.requirements[right]["eligible_teacher_ids"])
+                    for teacher_id in common_teachers:
                         coloring.add_at_most_one(
                             choices[(left, teacher_id)],
                             choices[(right, teacher_id)],
@@ -833,7 +869,9 @@ class PrototypeBuilder:
             for requirement_id in requirement_ids:
                 selected_teachers[requirement_id] = next(
                     teacher_id
-                    for teacher_id in pool
+                    for teacher_id in self.requirements[requirement_id][
+                        "eligible_teacher_ids"
+                    ]
                     if color_solver.value(choices[(requirement_id, teacher_id)])
                 )
 
@@ -855,59 +893,54 @@ class PrototypeBuilder:
                 remaining_slots.remove(slot)
             planned.extend(zip(remaining_occurrences, remaining_slots))
 
-        rng = random.Random(seed)
-        used_teachers: defaultdict[SlotKey, set[str]] = defaultdict(set)
-        used_rooms: defaultdict[SlotKey, set[str]] = defaultdict(set)
-        teacher_loads: defaultdict[str, int] = defaultdict(int)
-        teacher_last_period: dict[tuple[str, str], int] = {}
-        chosen: list[tuple[Occurrence, int]] = []
-        for occurrence, slot in sorted(
-            planned,
-            key=lambda item: (
-                -item[0].block_length,
-                self.day_ids.index(item[1][0]),
-                self.period_index[item[1][1]],
-            ),
-        ):
+        resource_model = cp_model.CpModel()
+        resource_choices: dict[tuple[str, int], Any] = {}
+        resource_terms: defaultdict[tuple[str, str, SlotKey], list[Any]] = (
+            defaultdict(list)
+        )
+        for occurrence, slot in planned:
             options = [
                 (index, candidate)
                 for index, candidate in enumerate(self.candidates[occurrence.id])
                 if (candidate.day_id, candidate.start_period_id) == slot
                 and candidate.teacher_id
                 == selected_teachers[occurrence.requirement_id]
-                and all(
-                    candidate.teacher_id not in used_teachers[occupied]
-                    and candidate.classroom_id not in used_rooms[occupied]
-                    for occupied in candidate.occupied_slots
-                )
             ]
             if not options:
                 return 0
-            rng.shuffle(options)
-            options.sort(
-                key=lambda item: (
-                    0
-                    if teacher_last_period.get(
-                        (item[1].teacher_id, item[1].day_id)
-                    )
-                    == self.period_index[item[1].start_period_id] - 1
-                    else 1
-                    if (item[1].teacher_id, item[1].day_id)
-                    not in teacher_last_period
-                    else 2,
-                    teacher_loads[item[1].teacher_id],
+            occurrence_terms = []
+            for index, candidate in options:
+                variable = resource_model.new_bool_var(
+                    f"resource__{occurrence.id}__{index}"
                 )
-            )
-            index, candidate = options[0]
-            chosen.append((occurrence, index))
-            teacher_loads[candidate.teacher_id] += occurrence.block_length
-            teacher_last_period[(candidate.teacher_id, candidate.day_id)] = max(
-                self.period_index[period_id]
-                for _day_id, period_id in candidate.occupied_slots
-            )
-            for occupied in candidate.occupied_slots:
-                used_teachers[occupied].add(candidate.teacher_id)
-                used_rooms[occupied].add(candidate.classroom_id)
+                resource_choices[(occurrence.id, index)] = variable
+                occurrence_terms.append(variable)
+                for occupied in candidate.occupied_slots:
+                    resource_terms[
+                        ("teacher", candidate.teacher_id, occupied)
+                    ].append(variable)
+                    resource_terms[
+                        ("classroom", candidate.classroom_id, occupied)
+                    ].append(variable)
+            resource_model.add_exactly_one(occurrence_terms)
+        for terms in resource_terms.values():
+            if len(terms) > 1:
+                resource_model.add_at_most_one(terms)
+
+        resource_solver = cp_model.CpSolver()
+        resource_solver.parameters.max_time_in_seconds = 8.0
+        resource_solver.parameters.random_seed = seed
+        resource_solver.parameters.num_search_workers = 1
+        resource_status = resource_solver.solve(resource_model)
+        if resource_solver.status_name(resource_status) not in {"OPTIMAL", "FEASIBLE"}:
+            return 0
+        chosen = [
+            (occurrence, index)
+            for occurrence, _slot in planned
+            for index, _candidate in enumerate(self.candidates[occurrence.id])
+            if (variable := resource_choices.get((occurrence.id, index))) is not None
+            and resource_solver.value(variable)
+        ]
 
         for occurrence, index in chosen:
             self.model.add_hint(self.variables[(occurrence.id, index)], 1)

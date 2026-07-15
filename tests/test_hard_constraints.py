@@ -165,6 +165,20 @@ class HardConstraintTests(unittest.TestCase):
             },
         )
 
+    def test_assigned_classroom_is_used_for_its_teacher(self) -> None:
+        teacher = next(item for item in self.dataset["teachers"] if item["id"] == "t_english_1")
+        teacher["classroom_id"] = "room_5a"
+        builder = PrototypeBuilder(self.dataset)
+        candidates = builder.enumerate_candidates(occurrence(builder, "req_8a_english"))
+        self.assertEqual(
+            {item.classroom_id for item in candidates if item.teacher_id == "t_english_1"},
+            {"room_5a"},
+        )
+        self.assertEqual(
+            {item.classroom_id for item in candidates if item.teacher_id == "t_english_2"},
+            {"room_8a"},
+        )
+
     def test_hc011_room_capability_filters_candidates(self) -> None:
         item = occurrence(self.builder, "req_7a_physics")
         candidates = self.builder.enumerate_candidates(item)

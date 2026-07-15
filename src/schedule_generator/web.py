@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import argparse
+import base64
+import binascii
 import hmac
 import json
 import logging
@@ -21,6 +23,10 @@ from typing import Any, Callable, Mapping
 from urllib.parse import unquote, urlparse
 
 from schedule_generator.api import GenerationOptions
+from schedule_generator.configuration_workbook import (
+    export_configuration_xlsx,
+    import_configuration_xlsx,
+)
 from schedule_generator.editing import TimetableDraft, TimetableEditingService
 from schedule_generator.jobs import GenerationJob, GenerationRequest, SchedulingService
 from schedule_generator.operations import (
@@ -176,6 +182,9 @@ class WebApplication:
             if method == "GET" and path == "/api/state":
                 user, _token = self._authorize(request_headers, "workspace:read")
                 return self._state(user)
+            if method == "GET" and path.endswith("/configuration-workbook"):
+                user, _token = self._authorize(request_headers, "workspace:read")
+                return self._export_configuration_workbook(path, user)
             if method == "GET" and path == "/api/users":
                 user, _token = self._authorize(request_headers, "security:admin")
                 return self._list_users(user)
@@ -194,6 +203,9 @@ class WebApplication:
             if method == "POST" and path == "/api/demo":
                 user, _token = self._authorize(request_headers, "data:write")
                 return self._load_demo(user)
+            if method == "POST" and path.endswith("/configuration-workbook"):
+                user, _token = self._authorize(request_headers, "data:write")
+                return self._import_configuration_workbook(path, payload, user)
             if method == "POST" and path == "/api/jobs":
                 user, _token = self._authorize(request_headers, "generation:write")
                 return self._create_job(payload, user)
@@ -223,6 +235,8 @@ class WebApplication:
                 return self._change_publication(publication_id, action, user)
             if method == "PUT" and path.startswith("/api/datasets/"):
                 user, _token = self._authorize(request_headers, "data:write")
+                if path.endswith("/configuration"):
+                    return self._replace_configuration(path, payload, user)
                 return self._replace_collection(path, payload, user)
             if method == "POST" and path == "/api/validate":
                 self._authorize(request_headers, "draft:write")
@@ -232,7 +246,13 @@ class WebApplication:
             return WebResponse.json(HTTPStatus.UNAUTHORIZED, {"error": str(error)})
         except AuthorizationError as error:
             return WebResponse.json(HTTPStatus.FORBIDDEN, {"error": str(error)})
-        except (KeyError, ValueError, json.JSONDecodeError, UnicodeError) as error:
+        except (
+            KeyError,
+            ValueError,
+            json.JSONDecodeError,
+            UnicodeError,
+            binascii.Error,
+        ) as error:
             return WebResponse.json(HTTPStatus.BAD_REQUEST, {"error": str(error)})
         except Exception as error:
             LOGGER.exception(
@@ -480,6 +500,107 @@ class WebApplication:
                 {"collection": collection, "revision": saved.revision},
             )
             return response
+        finally:
+            store.close()
+
+    def _replace_configuration(
+        self, path: str, payload: dict[str, Any], user: User
+    ) -> WebResponse:
+        parts = path.strip("/").split("/")
+        if len(parts) != 4 or parts[3] != "configuration":
+            raise ValueError("invalid configuration route")
+        updates = payload.get("updates")
+        if not isinstance(updates, dict) or not updates:
+            raise ValueError("updates must be a non-empty object")
+        dataset_id = parts[2]
+        store, _service = self._service()
+        try:
+            stored = store.get(dataset_id)
+            unknown = sorted(set(updates) - set(stored.data))
+            if unknown:
+                raise ValueError(f"unknown configuration fields: {', '.join(unknown)}")
+            for field, value in updates.items():
+                expected = stored.data[field]
+                if isinstance(expected, list) != isinstance(value, list):
+                    raise ValueError(f"{field} has an invalid value type")
+                if isinstance(expected, dict) != isinstance(value, dict):
+                    raise ValueError(f"{field} has an invalid value type")
+                stored.data[field] = value
+            saved = store.save(stored.data)
+            response = WebResponse.json(
+                HTTPStatus.OK,
+                {"dataset_id": saved.dataset_id, "revision": saved.revision},
+            )
+            self._audit(
+                user,
+                "dataset.configuration_updated",
+                "dataset",
+                saved.dataset_id,
+                {"fields": sorted(updates), "revision": saved.revision},
+            )
+            return response
+        finally:
+            store.close()
+
+    @staticmethod
+    def _configuration_dataset_id(path: str) -> str:
+        parts = path.strip("/").split("/")
+        if len(parts) != 4 or parts[0] != "api" or parts[1] != "datasets":
+            raise ValueError("invalid configuration workbook route")
+        return parts[2]
+
+    def _export_configuration_workbook(
+        self, path: str, user: User
+    ) -> WebResponse:
+        dataset_id = self._configuration_dataset_id(path)
+        store, _service = self._service()
+        try:
+            stored = store.get(dataset_id)
+            content = export_configuration_xlsx(stored.data)
+            self._audit(
+                user,
+                "dataset.configuration_exported",
+                "dataset",
+                dataset_id,
+                {"revision": stored.revision},
+            )
+            return WebResponse(
+                HTTPStatus.OK,
+                content,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                (("Content-Disposition", f'attachment; filename="{dataset_id}-configuration.xlsx"'),),
+            )
+        finally:
+            store.close()
+
+    def _import_configuration_workbook(
+        self, path: str, payload: dict[str, Any], user: User
+    ) -> WebResponse:
+        dataset_id = self._configuration_dataset_id(path)
+        encoded = payload.get("content_base64")
+        if not isinstance(encoded, str) or not encoded:
+            raise ValueError("content_base64 is required")
+        if len(encoded) > 14_000_000:
+            raise ValueError("configuration workbook is too large")
+        content = base64.b64decode(encoded, validate=True)
+        store, _service = self._service()
+        try:
+            stored = store.get(dataset_id)
+            updates = import_configuration_xlsx(stored.data, content)
+            updated = dict(stored.data)
+            updated.update(updates)
+            saved = store.save(updated)
+            self._audit(
+                user,
+                "dataset.configuration_imported",
+                "dataset",
+                dataset_id,
+                {"revision": saved.revision},
+            )
+            return WebResponse.json(
+                HTTPStatus.OK,
+                {"dataset_id": saved.dataset_id, "revision": saved.revision},
+            )
         finally:
             store.close()
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import json
 import tempfile
 import unittest
@@ -110,7 +111,19 @@ class WebApplicationTests(unittest.TestCase):
         self.assertIn(b"schedule-generator-language", translations.body)
         self.assertIn(b"dataLabel(day.label)", script.body)
         self.assertIn(b"dataLabel(subject.label)", script.body)
+        self.assertIn(b"job.dataset_revision === state.dataset?.revision", script.body)
         self.assertIn(b'data-language="ru"', page.body)
+        self.assertNotIn(b"collection-json", page.body)
+        self.assertNotIn(b"collection-json", script.body)
+        self.assertIn(b"visual-editor", page.body)
+        self.assertIn(b"saveConfiguration", script.body)
+        self.assertIn(b"configuration-file", page.body)
+        self.assertIn(b"quality-panel", page.body)
+        self.assertIn(b"data-subject-difficulty", script.body)
+        self.assertIn(b".assignment-choice[hidden]", style.body)
+        self.assertIn(b"top: 72px", style.body)
+        self.assertIn(b"z-index: 120", style.body)
+        self.assertIn(b"route not found", translations.body)
         self.assertIn(b".timetable", style.body)
 
     def test_authentication_and_role_authorization(self) -> None:
@@ -190,6 +203,60 @@ class WebApplicationTests(unittest.TestCase):
         )
         self.assertEqual(response.status, HTTPStatus.OK)
         self.assertEqual(self.payload(response)["revision"], 2)
+
+    def test_related_configuration_is_saved_atomically(self) -> None:
+        self.application.dispatch("POST", "/api/demo")
+        state = self.payload(self.application.dispatch("GET", "/api/state"))
+        data = state["datasets"][0]["data"]
+        teachers = data["teachers"]
+        teachers[0]["classroom_id"] = "room_5a"
+        first_requirement = data["curriculum_requirements"][0]
+        removed_teacher_id = first_requirement["eligible_teacher_ids"][0]
+        first_requirement["eligible_teacher_ids"] = first_requirement[
+            "eligible_teacher_ids"
+        ][1:]
+        response = self.application.dispatch(
+            "PUT",
+            "/api/datasets/small_school_demo/configuration",
+            json.dumps(
+                {
+                    "updates": {
+                        "teachers": teachers,
+                        "curriculum_requirements": data["curriculum_requirements"],
+                    }
+                }
+            ).encode(),
+        )
+        self.assertEqual(response.status, HTTPStatus.OK)
+        self.assertEqual(self.payload(response)["revision"], 2)
+        updated = self.payload(self.application.dispatch("GET", "/api/state"))
+        self.assertEqual(
+            updated["datasets"][0]["data"]["teachers"][0]["classroom_id"],
+            "room_5a",
+        )
+        self.assertNotIn(
+            removed_teacher_id,
+            updated["datasets"][0]["data"]["curriculum_requirements"][0][
+                "eligible_teacher_ids"
+            ],
+        )
+
+    def test_configuration_workbook_can_be_exported_and_imported(self) -> None:
+        self.application.dispatch("POST", "/api/demo")
+        exported = self.application.dispatch(
+            "GET", "/api/datasets/small_school_demo/configuration-workbook"
+        )
+        self.assertEqual(exported.status, HTTPStatus.OK)
+        self.assertEqual(exported.body[:2], b"PK")
+        imported = self.application.dispatch(
+            "POST",
+            "/api/datasets/small_school_demo/configuration-workbook",
+            json.dumps(
+                {"content_base64": base64.b64encode(exported.body).decode("ascii")}
+            ).encode(),
+        )
+        self.assertEqual(imported.status, HTTPStatus.OK)
+        self.assertEqual(self.payload(imported)["revision"], 2)
 
     def test_generation_route_returns_completed_job_and_result(self) -> None:
         self.application.dispatch("POST", "/api/demo")
