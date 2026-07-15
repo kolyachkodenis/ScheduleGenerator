@@ -8,6 +8,7 @@ This directory is the working package for Roadmap Stage 1. It separates confirme
 - [Use cases](USE_CASES.md): user goals and acceptance outcomes independent of implementation.
 - [Interview guide](INTERVIEW_GUIDE.md): questions for the scheduler and school representatives.
 - [Data request](DATA_REQUEST.md): sanitized examples needed to validate requirements.
+- [Timetable sample analysis](TIMETABLE_SAMPLE_ANALYSIS.md): observations and limitations from the first supplied weekly timetable.
 - [Quality criteria](QUALITY_CRITERIA.md): candidate metrics and the process for approving targets.
 - [Open questions](OPEN_QUESTIONS.md): unresolved decisions that can change product behavior.
 
@@ -23,7 +24,7 @@ Every material discovery statement should use one of these evidence levels:
 | Hypothesis | A plausible starting point that still requires validation. |
 | Rejected | Considered and explicitly determined not to apply. |
 
-At present, all workflow details in this package are hypotheses. The high-level need to account for classes, teachers, and excessive difficult-subject load comes from the repository owner, but still requires school-side clarification.
+Most workflow details in this package remain hypotheses. The first completed timetable is recorded as observed evidence in the [sample analysis](TIMETABLE_SAMPLE_ANALYSIS.md), but its group semantics, scheduling rules, and quality targets still require school-side clarification. The high-level need to account for classes, teachers, and excessive difficult-subject load comes from the repository owner.
 
 ## Stage 1 completion gate
 
@@ -51,4 +52,3 @@ Stage 1 may move to `Complete` only when all of the following are true:
 7. Record approval and update the roadmap status.
 
 Do not commit real names, contact details, student data, credentials, or unrestricted school documents to the repository.
-

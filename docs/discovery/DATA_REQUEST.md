@@ -61,3 +61,10 @@ The first representative package should include at least:
 
 This is a coverage target, not a claim about the final data model.
 
+## Current evidence
+
+`SRC-001`, the first supplied completed timetable, is documented in the
+[representative timetable sample analysis](TIMETABLE_SAMPLE_ANALYSIS.md). It confirms
+class-level weekly layouts and split-group notation, but it does not satisfy the requested
+completed-timetable artifact because teacher, room, period-time, and explicit group
+relationships are missing.
