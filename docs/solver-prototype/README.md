@@ -46,7 +46,8 @@ HC-018 is deferred because schema version 0.1.0 contains no prior assignment inp
 - SC-003: internal class gap periods;
 - SC-004: internal teacher gap periods;
 - SC-005: repeated same-subject starts on one day as a spread penalty;
-- SC-007: assignments outside a teacher's explicitly preferred slots.
+- SC-007: assignments outside a teacher's explicitly preferred slots;
+- SC-019: related language and literature lessons placed on different days.
 
 Only configured rules contribute to the objective. Other catalog rules remain future work. Split-group workload is excluded from SC-001 and SC-005 until discovery defines whether parallel group lessons count once or separately for the parent class.
 

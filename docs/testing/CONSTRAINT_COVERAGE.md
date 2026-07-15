@@ -50,6 +50,6 @@
 | SC-016 | Deferred | Compact teacher-day policy is not represented. |
 | SC-017 | Deferred | Parallel-group preference semantics await discovery. |
 | SC-018 | Deferred | Optional room-suitability ranking is not represented. |
+| SC-019 | Automated | Exact related language-and-literature same-day alignment penalty test. |
 
 The repository check compares this matrix with the catalog so every catalog ID has exactly one declared coverage state.
-
