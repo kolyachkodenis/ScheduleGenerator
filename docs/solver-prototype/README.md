@@ -74,6 +74,8 @@ Hard unavailability, fixed placements, and shift boundaries are applied before B
 
 The command accepts an integer seed and uses one search worker by default. The result records solver version, seed, time limit, status, objective, wall time, search statistics, assignments, penalties, diagnostics, and independent validation errors.
 
+For large models under short interactive limits, constructive scheduling first finds feasibility without an objective and then uses that solution as a warm start for a bounded quality pass. A complete independently validated constructive schedule is returned directly instead of spending the remaining limit in a full model that has not completed presolve. Candidate templates and participant-derived values are reused across repeated weekly occurrences. Large interactive models use at least four workers during constructive preprocessing; exact one-worker reproducibility remains available for smaller models and longer full-model runs.
+
 ## Known limitations
 
 - All classes currently need at most one complete group partition for correct atomic overlap behavior.

@@ -826,7 +826,8 @@ async function startGeneration(event) {
       dataset_id: state.dataset.dataset_id,
       alternatives: Number(document.querySelector("#alternatives").value),
       time_limit_seconds: Number(document.querySelector("#time-limit").value),
-      seed: Number(document.querySelector("#seed").value), workers: 1
+      seed: Number(document.querySelector("#seed").value),
+      workers: Number(document.querySelector("#workers").value)
     }) });
     notice(t("Generation job {{job}} started", {job: job.job_id.slice(0, 8)}));
     await loadState(true);

@@ -68,6 +68,15 @@ class HardConstraintTests(unittest.TestCase):
                 requirement["weekly_lessons"] // requirement["block_length"],
             )
 
+    def test_repeated_occurrences_reuse_candidate_templates(self) -> None:
+        first = occurrence(self.builder, "req_7a_math", 0)
+        second = occurrence(self.builder, "req_7a_math", 1)
+
+        self.assertIs(
+            self.builder.enumerate_candidates(first),
+            self.builder.enumerate_candidates(second),
+        )
+
     def test_hc002_class_non_overlap_is_detected(self) -> None:
         self.assertTrue(
             any("Resource collision ('student'" in error for error in self.same_candidate_math_conflict())

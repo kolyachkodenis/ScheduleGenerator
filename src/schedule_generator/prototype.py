@@ -9,6 +9,7 @@ import sys
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
+from time import perf_counter
 from typing import Any, Iterable
 
 from ortools import __version__ as ortools_version
@@ -25,6 +26,8 @@ from scripts.validate_dataset import SCHEMA_PATH, SemanticValidator, load_json, 
 
 SlotKey = tuple[str, str]
 ResourceKey = tuple[str, str]
+CONSTRUCTIVE_ONLY_VARIABLE_THRESHOLD = 50_000
+CONSTRUCTIVE_ONLY_TIME_LIMIT = 15.0
 
 
 @dataclass(frozen=True)
@@ -93,6 +96,15 @@ class PrototypeBuilder:
             (item["requirement_id"], item["occurrence_index"]): item
             for item in dataset["fixed_lessons"]
         }
+        self._participant_classes_cache: dict[ResourceKey, set[str]] = {}
+        self._participant_size_cache: dict[ResourceKey, int] = {}
+        self._participant_resources_cache: dict[ResourceKey, set[ResourceKey]] = {}
+        self._student_atoms_cache: dict[ResourceKey, set[str]] = {}
+        self._allowed_periods_cache: dict[ResourceKey, set[str]] = {}
+        self._period_blocks_cache: dict[
+            tuple[int, frozenset[str]], list[tuple[str, ...]]
+        ] = {}
+        self._room_candidates_cache: dict[str, list[str]] = {}
         self.availability = self._availability_index()
         self.soft_weights = {
             item["constraint_id"]: item["weight"]
@@ -101,6 +113,7 @@ class PrototypeBuilder:
         self.diagnostics: list[dict[str, Any]] = []
         self.occurrences = self._make_occurrences()
         self.candidates: dict[str, list[Candidate]] = {}
+        self._candidate_cache: dict[str, list[Candidate]] = {}
         self.variables: dict[tuple[str, int], Any] = {}
         self.penalty_terms: list[PenaltyTerm] = []
         self.class_occupancy: dict[tuple[str, SlotKey], Any] = {}
@@ -143,69 +156,95 @@ class PrototypeBuilder:
     def participant_classes(self, participant: dict[str, str]) -> set[str]:
         resource_type = participant["type"]
         record_id = participant["id"]
+        key = (resource_type, record_id)
+        if key in self._participant_classes_cache:
+            return self._participant_classes_cache[key]
         if resource_type == "class":
-            return {record_id}
-        if resource_type == "group":
-            return {self.groups[record_id]["class_id"]}
-        result: set[str] = set()
-        for member in self.cohorts[record_id]["members"]:
-            result.update(self.participant_classes(member))
+            result = {record_id}
+        elif resource_type == "group":
+            result = {self.groups[record_id]["class_id"]}
+        else:
+            result = set()
+            for member in self.cohorts[record_id]["members"]:
+                result.update(self.participant_classes(member))
+        self._participant_classes_cache[key] = result
         return result
 
     def participant_size(self, participant: dict[str, str]) -> int:
         resource_type = participant["type"]
         record_id = participant["id"]
+        key = (resource_type, record_id)
+        if key in self._participant_size_cache:
+            return self._participant_size_cache[key]
         if resource_type == "class":
-            return self.classes[record_id]["student_count"]
-        if resource_type == "group":
-            return self.groups[record_id]["student_count"]
-        return sum(
-            self.participant_size(member)
-            for member in self.cohorts[record_id]["members"]
-        )
+            result = self.classes[record_id]["student_count"]
+        elif resource_type == "group":
+            result = self.groups[record_id]["student_count"]
+        else:
+            result = sum(
+                self.participant_size(member)
+                for member in self.cohorts[record_id]["members"]
+            )
+        self._participant_size_cache[key] = result
+        return result
 
     def participant_resources(self, participant: dict[str, str]) -> set[ResourceKey]:
         resource_type = participant["type"]
         record_id = participant["id"]
+        key = (resource_type, record_id)
+        if key in self._participant_resources_cache:
+            return self._participant_resources_cache[key]
         if resource_type in {"class", "group"}:
-            return {(resource_type, record_id)}
-        result: set[ResourceKey] = set()
-        for member in self.cohorts[record_id]["members"]:
-            result.update(self.participant_resources(member))
+            result = {(resource_type, record_id)}
+        else:
+            result = set()
+            for member in self.cohorts[record_id]["members"]:
+                result.update(self.participant_resources(member))
+        self._participant_resources_cache[key] = result
         return result
 
     def student_atoms(self, participant: dict[str, str]) -> set[str]:
         resource_type = participant["type"]
         record_id = participant["id"]
+        key = (resource_type, record_id)
+        if key in self._student_atoms_cache:
+            return self._student_atoms_cache[key]
         if resource_type == "group":
-            return {f"group:{record_id}"}
-        if resource_type == "cohort":
+            result = {f"group:{record_id}"}
+        elif resource_type == "cohort":
             result: set[str] = set()
             for member in self.cohorts[record_id]["members"]:
                 result.update(self.student_atoms(member))
-            return result
-
-        partitions = [
-            partition
-            for partition in self.partitions.values()
-            if partition["class_id"] == record_id and partition["complete"]
-        ]
-        if not partitions:
-            return {f"class:{record_id}"}
-        partition = partitions[0]
-        return {
-            f"group:{group['id']}"
-            for group in self.groups.values()
-            if group["partition_id"] == partition["id"]
-        }
+        else:
+            partitions = [
+                partition
+                for partition in self.partitions.values()
+                if partition["class_id"] == record_id and partition["complete"]
+            ]
+            if not partitions:
+                result = {f"class:{record_id}"}
+            else:
+                partition = partitions[0]
+                result = {
+                    f"group:{group['id']}"
+                    for group in self.groups.values()
+                    if group["partition_id"] == partition["id"]
+                }
+        self._student_atoms_cache[key] = result
+        return result
 
     def _allowed_periods(self, participant: dict[str, str]) -> set[str]:
+        key = (participant["type"], participant["id"])
+        if key in self._allowed_periods_cache:
+            return self._allowed_periods_cache[key]
         class_ids = self.participant_classes(participant)
         allowed_sets = [
             set(self.shifts[self.classes[class_id]["shift_id"]]["period_ids"])
             for class_id in class_ids
         ]
-        return set.intersection(*allowed_sets) if allowed_sets else set(self.period_ids)
+        result = set.intersection(*allowed_sets) if allowed_sets else set(self.period_ids)
+        self._allowed_periods_cache[key] = result
+        return result
 
     def _is_unavailable(self, key: ResourceKey, slots: Iterable[SlotKey]) -> bool:
         blocked = self.availability.get(key, {}).get("unavailable", set())
@@ -214,22 +253,31 @@ class PrototypeBuilder:
     def _participant_unavailable(
         self, participant: dict[str, str], slots: tuple[SlotKey, ...]
     ) -> bool:
-        resources = self.participant_resources(participant)
-        resources.update(("class", class_id) for class_id in self.participant_classes(participant))
+        resources = self.participant_resources(participant) | {
+            ("class", class_id)
+            for class_id in self.participant_classes(participant)
+        }
         return any(self._is_unavailable(resource, slots) for resource in resources)
 
     def _room_candidates(self, requirement: dict[str, Any]) -> list[str]:
+        if requirement["id"] in self._room_candidates_cache:
+            return self._room_candidates_cache[requirement["id"]]
         room_ids = requirement["allowed_classroom_ids"] or list(self.rooms)
         required = set(requirement["required_room_capabilities"])
         size = self.participant_size(requirement["participant"])
-        return [
+        result = [
             room_id
             for room_id in room_ids
             if required.issubset(set(self.rooms[room_id]["capabilities"]))
             and self.rooms[room_id]["capacity"] >= size
         ]
+        self._room_candidates_cache[requirement["id"]] = result
+        return result
 
     def _period_blocks(self, block_length: int, allowed: set[str]) -> list[tuple[str, ...]]:
+        key = (block_length, frozenset(allowed))
+        if key in self._period_blocks_cache:
+            return self._period_blocks_cache[key]
         result: list[tuple[str, ...]] = []
         for start in range(0, len(self.period_ids) - block_length + 1):
             block = tuple(self.period_ids[start : start + block_length])
@@ -238,6 +286,7 @@ class PrototypeBuilder:
                 range(ordinals[0], ordinals[0] + block_length)
             ):
                 result.append(block)
+        self._period_blocks_cache[key] = result
         return result
 
     def _candidate_matches_fixed(
@@ -255,6 +304,9 @@ class PrototypeBuilder:
 
     def enumerate_candidates(self, occurrence: Occurrence) -> list[Candidate]:
         requirement = self.requirements[occurrence.requirement_id]
+        fixed = self.fixed.get((occurrence.requirement_id, occurrence.index))
+        if not fixed and occurrence.requirement_id in self._candidate_cache:
+            return self._candidate_cache[occurrence.requirement_id]
         blocks = self._period_blocks(
             occurrence.block_length, self._allowed_periods(occurrence.participant)
         )
@@ -268,7 +320,6 @@ class PrototypeBuilder:
                 for teacher_id in requirement["eligible_teacher_ids"]:
                     if self._is_unavailable(("teacher", teacher_id), occupied):
                         continue
-                    fixed = self.fixed.get((occurrence.requirement_id, occurrence.index))
                     assigned_room = self.teachers[teacher_id].get("classroom_id")
                     rooms = (
                         [fixed["classroom_id"]]
@@ -298,6 +349,8 @@ class PrototypeBuilder:
                         )
                         if self._candidate_matches_fixed(occurrence, candidate):
                             result.append(candidate)
+        if not fixed:
+            self._candidate_cache[occurrence.requirement_id] = result
         return result
 
     def _add_decisions(self) -> None:
@@ -672,7 +725,15 @@ class PrototypeBuilder:
         )
         return self._artifacts()
 
-    def add_constructive_hints(self, seed: int, time_limit: float = 8.0) -> int:
+    def add_constructive_hints(
+        self,
+        seed: int,
+        time_limit: float = 8.0,
+        workers: int = 1,
+        *,
+        optimize_quality: bool = True,
+        warm_start_quality: bool = False,
+    ) -> int:
         """Build a compact subject-slot solution and use it to seed the full model."""
         if len(self.occurrences) < 100:
             return 0
@@ -683,8 +744,11 @@ class PrototypeBuilder:
         teacher_pool_terms: defaultdict[tuple[tuple[str, ...], SlotKey], list[Any]] = defaultdict(list)
         subject_day_terms: defaultdict[tuple[str, str, str], list[Any]] = defaultdict(list)
         by_requirement: defaultdict[str, list[Occurrence]] = defaultdict(list)
+        occurrence_counts: defaultdict[tuple[str, str], int] = defaultdict(int)
         for occurrence in self.occurrences:
             by_requirement[occurrence.requirement_id].append(occurrence)
+            for class_id in self.participant_classes(occurrence.participant):
+                occurrence_counts[(class_id, occurrence.subject_id)] += 1
 
         for requirement_id, occurrences in by_requirement.items():
             requirement = self.requirements[requirement_id]
@@ -733,12 +797,7 @@ class PrototypeBuilder:
             for (class_id, subject_id, day_id), terms in subject_day_terms.items():
                 if len(terms) < 2:
                     continue
-                occurrence_count = sum(
-                    1
-                    for occurrence in self.occurrences
-                    if occurrence.subject_id == subject_id
-                    and class_id in self.participant_classes(occurrence.participant)
-                )
+                occurrence_count = occurrence_counts[(class_id, subject_id)]
                 reduced.add(
                     sum(terms)
                     <= (occurrence_count + len(self.day_ids) - 1)
@@ -781,7 +840,8 @@ class PrototypeBuilder:
                             mismatch, first_present - second_present
                         )
                         reduced_penalties.append(pair_weight * mismatch)
-        if reduced_penalties:
+        refine_quality = reduced_penalties and optimize_quality and warm_start_quality
+        if reduced_penalties and optimize_quality and not warm_start_quality:
             reduced.minimize(sum(reduced_penalties))
         for fixed in self.data["fixed_lessons"]:
             slot = (fixed["slot"]["day_id"], fixed["slot"]["period_id"])
@@ -790,12 +850,48 @@ class PrototypeBuilder:
                 reduced.add(variable == 1)
 
         hint_solver = cp_model.CpSolver()
-        hint_solver.parameters.max_time_in_seconds = time_limit
+        hint_solver.parameters.max_time_in_seconds = (
+            min(5.0, max(2.0, time_limit * 0.4))
+            if refine_quality
+            else time_limit
+        )
         hint_solver.parameters.random_seed = 11
-        hint_solver.parameters.num_search_workers = 1
+        hint_solver.parameters.num_search_workers = workers
         status = hint_solver.solve(reduced)
+        if (
+            refine_quality
+            and hint_solver.status_name(status) not in {"OPTIMAL", "FEASIBLE"}
+            and hint_solver.wall_time < time_limit
+        ):
+            retry_solver = cp_model.CpSolver()
+            retry_solver.parameters.max_time_in_seconds = max(
+                1.0, time_limit - hint_solver.wall_time
+            )
+            retry_solver.parameters.random_seed = seed
+            retry_solver.parameters.num_search_workers = workers
+            retry_status = retry_solver.solve(reduced)
+            if retry_solver.status_name(retry_status) in {"OPTIMAL", "FEASIBLE"}:
+                hint_solver = retry_solver
+                status = retry_status
+                refine_quality = False
         if hint_solver.status_name(status) not in {"OPTIMAL", "FEASIBLE"}:
             return 0
+        if refine_quality:
+            for variable in starts.values():
+                reduced.add_hint(variable, hint_solver.value(variable))
+            reduced.minimize(sum(reduced_penalties))
+            refinement_solver = cp_model.CpSolver()
+            refinement_solver.parameters.max_time_in_seconds = max(
+                1.0, time_limit - hint_solver.wall_time
+            )
+            refinement_solver.parameters.random_seed = seed
+            refinement_solver.parameters.num_search_workers = workers
+            refinement_status = refinement_solver.solve(reduced)
+            if refinement_solver.status_name(refinement_status) in {
+                "OPTIMAL",
+                "FEASIBLE",
+            }:
+                hint_solver = refinement_solver
 
         selected: defaultdict[str, list[SlotKey]] = defaultdict(list)
         for (requirement_id, slot), variable in starts.items():
@@ -859,7 +955,7 @@ class PrototypeBuilder:
             color_solver = cp_model.CpSolver()
             color_solver.parameters.max_time_in_seconds = 5.0
             color_solver.parameters.random_seed = 11
-            color_solver.parameters.num_search_workers = 1
+            color_solver.parameters.num_search_workers = workers
             color_status = color_solver.solve(coloring)
             if color_solver.status_name(color_status) not in {
                 "OPTIMAL",
@@ -930,7 +1026,7 @@ class PrototypeBuilder:
         resource_solver = cp_model.CpSolver()
         resource_solver.parameters.max_time_in_seconds = 8.0
         resource_solver.parameters.random_seed = seed
-        resource_solver.parameters.num_search_workers = 1
+        resource_solver.parameters.num_search_workers = workers
         resource_status = resource_solver.solve(resource_model)
         if resource_solver.status_name(resource_status) not in {"OPTIMAL", "FEASIBLE"}:
             return 0
@@ -1124,24 +1220,61 @@ def solve_dataset(
             "assignments": [],
             "validation_errors": [],
         }
-    builder.add_constructive_hints(seed, min(25.0, max(20.0, time_limit)))
+    fast_constructive = (
+        len(artifacts.variables) >= CONSTRUCTIVE_ONLY_VARIABLE_THRESHOLD
+        and time_limit <= CONSTRUCTIVE_ONLY_TIME_LIMIT
+    )
+    constructive_workers = max(4, workers) if fast_constructive else workers
+    constructive_time_limit = (
+        min(10.0, max(6.0, time_limit))
+        if fast_constructive
+        else min(25.0, max(20.0, time_limit))
+    )
+    constructive_started = perf_counter()
+    constructive_count = builder.add_constructive_hints(
+        seed,
+        constructive_time_limit,
+        constructive_workers,
+        warm_start_quality=fast_constructive,
+    )
+    constructive_wall_time = perf_counter() - constructive_started
 
     solver = cp_model.CpSolver()
-    solver.parameters.max_time_in_seconds = time_limit
-    solver.parameters.random_seed = seed
-    solver.parameters.num_search_workers = workers
-    status_code = solver.solve(artifacts.model)
-    status = solver.status_name(status_code)
     assignments: list[dict[str, Any]] = []
     penalties: dict[str, dict[str, int]] = {}
     quality_report: dict[str, Any] | None = None
     validation_errors: list[str] = []
-
-    if status == "UNKNOWN" and builder.constructive_assignments:
+    use_constructive_result = (
+        len(artifacts.variables) >= CONSTRUCTIVE_ONLY_VARIABLE_THRESHOLD
+        and time_limit <= CONSTRUCTIVE_ONLY_TIME_LIMIT
+        and constructive_count == len(artifacts.occurrences)
+    )
+    if use_constructive_result:
         status = "FEASIBLE"
         assignments = builder.constructive_assignments
-    elif status in {"OPTIMAL", "FEASIBLE"}:
-        assignments = selected_assignments(solver, artifacts)
+        solver_wall_time = constructive_wall_time
+        best_bound = None
+        branches = 0
+        conflicts = 0
+    else:
+        solver.parameters.max_time_in_seconds = time_limit
+        solver.parameters.random_seed = seed
+        solver.parameters.num_search_workers = workers
+        status_code = solver.solve(artifacts.model)
+        status = solver.status_name(status_code)
+        solver_wall_time = solver.wall_time
+        best_bound = (
+            solver.best_objective_bound
+            if status in {"OPTIMAL", "FEASIBLE", "UNKNOWN"}
+            else None
+        )
+        branches = solver.num_branches
+        conflicts = solver.num_conflicts
+        if status == "UNKNOWN" and builder.constructive_assignments:
+            status = "FEASIBLE"
+            assignments = builder.constructive_assignments
+        elif status in {"OPTIMAL", "FEASIBLE"}:
+            assignments = selected_assignments(solver, artifacts)
     if status in {"OPTIMAL", "FEASIBLE"}:
         validation_errors = verify_solution(dataset, assignments)
         if validation_errors:
@@ -1177,15 +1310,13 @@ def solve_dataset(
             "seed": seed,
             "workers": workers,
             "time_limit_seconds": time_limit,
-            "wall_time_seconds": solver.wall_time,
+            "wall_time_seconds": solver_wall_time,
             "objective": quality_report["total_penalty"]
             if status in {"OPTIMAL", "FEASIBLE"}
             else None,
-            "best_bound": solver.best_objective_bound
-            if status in {"OPTIMAL", "FEASIBLE", "UNKNOWN"}
-            else None,
-            "branches": solver.num_branches,
-            "conflicts": solver.num_conflicts,
+            "best_bound": best_bound,
+            "branches": branches,
+            "conflicts": conflicts,
             "variables": len(proto.variables),
             "constraints": len(proto.constraints),
         },

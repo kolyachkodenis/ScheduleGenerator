@@ -116,12 +116,13 @@
       </section>
 
       <section id="view-generate" class="view">
-        <div class="section-intro"><div><p class="eyebrow">Solver controls</p><h2>Generate alternatives</h2><p>Every run is pinned to the current dataset revision and remains reproducible.</p></div></div>
+        <div class="section-intro"><div><p class="eyebrow">Solver controls</p><h2>Generate alternatives</h2><p>Every run is pinned to the current dataset revision and records its solver settings.</p></div></div>
         <div class="two-column generate-grid">
           <form id="generation-form" class="panel generation-form">
-            <div class="field"><label for="alternatives">Alternatives</label><input id="alternatives" type="number" min="1" max="10" value="2"><small>Different deterministic seeds</small></div>
+            <div class="field"><label for="alternatives">Alternatives</label><input id="alternatives" type="number" min="1" max="10" value="1"><small>Different search seeds</small></div>
             <div class="field"><label for="time-limit">Time limit</label><div class="input-unit"><input id="time-limit" type="number" min="1" max="300" value="10"><span>seconds</span></div><small>Applied to each alternative</small></div>
             <div class="field"><label for="seed">Starting seed</label><input id="seed" type="number" min="0" value="1"><small>Saved with the job</small></div>
+            <div class="field"><label for="workers">Parallel workers</label><input id="workers" type="number" min="1" max="16" value="4"><small>More workers use more CPU and memory</small></div>
             <button class="primary-button large" type="submit">Start generation</button>
           </form>
           <article class="panel run-panel">
